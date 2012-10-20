@@ -8,7 +8,8 @@ module twodee.engine;
 
 import allegro5.allegro;
 import allegro5.allegro_image;
-
+import twodee.game_state;
+import twodee.state_manager;
 
 /**
  * The Game Engine.
@@ -28,6 +29,7 @@ class Engine
       if (display_ is null)
          throw new Exception("Error creating display.");
 
+      stateManager_ = new StateManager();
    }
 
    /// Destroys the Engine
@@ -41,6 +43,23 @@ class Engine
       al_uninstall_system();
    }
 
+
+   /// Runs the engine main loop, with a given starting state.
+   void run(GameState startingState)
+   {
+      stateManager_.pushState(startingState);
+      while (!stateManager_.empty)
+      {
+         // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+         stateManager_.onTick(0.1); // TODO: pass a real delta time!
+         stateManager_.onDraw();
+         al_flip_display();
+      }
+   }
+
    /// The one and only display (window) where we show things.
    private ALLEGRO_DISPLAY* display_;
+
+   /// The object managing the game states.
+   private StateManager stateManager_;
 }

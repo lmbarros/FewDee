@@ -28,7 +28,15 @@ import twodee.game_state;
 class StateManager
 {
    /// Returns the state at the top of the stack.
-   public @property GameState top() { return states_[$-1]; }
+   public @property GameState top()
+   in
+   {
+      assert(states_.length > 0);
+   }
+   body
+   {
+      return states_[$-1];
+   }
 
    /// Checks whether the stack of states is empty.
    public @property bool empty() const { return states_.length == 0; }
@@ -64,6 +72,42 @@ class StateManager
    {
       states_[$-1] = state;
       state.stateManager_ = this;
+   }
+
+   /**
+    * Called periodically. This is the place to update the world state.
+    *
+    * Parameters:
+    *   deltaTime = The time, in seconds, elapsed since the previous call to
+    *               onTick().
+    */
+   public void onTick(double deltaTime)
+   {
+      foreach(state; states_)
+      {
+         if (state.wantsTicks)
+            state.onTick(deltaTime);
+      }
+   }
+
+   /// Called periodically. This is the place to do all the drawing.
+   public void onDraw()
+   {
+      foreach(state; states_)
+      {
+         if (state.wantsToDraw)
+            state.onDraw();
+      }
+   }
+
+   /// Called when a mouse down event is received.
+   public void onMouseDown()
+   {
+      foreach(state; states_)
+      {
+         if (state.wantsTicks)
+            state.onMouseDown();
+      }
    }
 
    /// An array of Game States, used as a stack.

@@ -48,36 +48,71 @@ class GameState
       stateManager_.popState();
    }
 
-   // /// Sets the root node for this state. This is what will be drawn.
-   // public void setRootNode(Node node)
-   // {
-   //    rootNode_ = node;
-   // }
-
-   /// Called when a mouse down event is received.
-   public void onMouseDown() { };
-
    /**
     * Called when this state is buried under another one (that is, when a new
     * state is pushed into the stack, just on top of this one).
     */
-   public void onBury() { };
+   public void onBury()
+   {
+      wantsTicks = false;
+      wantsEvents = false;
+   };
 
    /**
     * Called when this state becomes the one on the top of stack again, after
     * the state previously on top was popped.
     */
-   public void onDigOut() { };
+   public void onDigOut()
+   {
+      wantsTicks = true;
+      wantsEvents = true;
+   };
 
-   // /**
-   //  * The root node. This is what will be drawn while this state is the current
-   //  * one.
-   //  */
-   // package Node rootNode_;
+   /**
+    * Called periodically. This is the place to update the world state.
+    *
+    * Parameters:
+    *   deltaTime = The time, in seconds, elapsed since the previous call to
+    *               onTick().
+    */
+   public void onTick(double deltaTime) { };
+
+   /// Called periodically. This is the place to do all the drawing.
+   public void onDraw() { };
+
+   /// Called when a mouse down event is received.
+   public void onMouseDown() { };
+
+   /// Does this GameState want to receive "tick" events?
+   public @property bool wantsTicks() const { return wantsTicks_; }
+
+   /// Does this GameState want to receive "tick" events?
+   public @property wantsTicks(bool wants) { wantsTicks_ = wants; }
+
+   /// Does this GameState want to receive events other than "tick"?
+   public @property bool wantsEvents() const { return wantsEvents_; }
+
+   /// Does this GameState want to receive events other than "tick"?
+   public @property wantsEvents(bool wants) { wantsEvents_ = wants; }
+
+   /// Does this GameState want to draw?
+   public @property bool wantsToDraw() const { return wantsToDraw_; }
+
+   /// Does this GameState want to draw?
+   public @property wantsToDraw(bool wants) { wantsToDraw_ = wants; }
 
    /**
     * The StateManager managing this state. This is set by the StateManager
     * itself, as soon as this is added to it.
     */
    package StateManager stateManager_;
+
+   /// Does this GameState want to receive "tick" events?
+   private bool wantsTicks_ = true;
+
+   /// Does this GameState want to receive events other than "tick"?
+   private bool wantsEvents_ = true;
+
+   /// Does this GameState want to draw?
+   private bool wantsToDraw_ = true;
 }
