@@ -44,7 +44,7 @@ class Engine
       al_register_event_source(eventQueue_, al_get_mouse_event_source());
       al_register_event_source(eventQueue_, al_get_keyboard_event_source());
 
-      stateManager_ = new StateManager();
+      stateManager_ = new StateManager(this);
    }
 
    /// Destroys the Engine
@@ -83,6 +83,7 @@ class Engine
             stateManager_.onEvent(event);
 
          stateManager_.onTick(deltaTime);
+         al_set_target_backbuffer(display_);
          stateManager_.onDraw();
          al_flip_display();
       }
