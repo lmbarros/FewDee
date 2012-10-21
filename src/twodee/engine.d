@@ -48,10 +48,16 @@ class Engine
    void run(GameState startingState)
    {
       stateManager_.pushState(startingState);
+
+      double prevTime = al_get_time();
+
       while (!stateManager_.empty)
       {
-         // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-         stateManager_.onTick(0.1); // TODO: pass a real delta time!
+         double now = al_get_time();
+         auto deltaTime = now - prevTime;
+         prevTime = now;
+
+         stateManager_.onTick(deltaTime);
          stateManager_.onDraw();
          al_flip_display();
       }
