@@ -56,6 +56,7 @@ class GameState
    {
       wantsTicks = false;
       wantsEvents = false;
+      wantsToDraw = false;
    };
 
    /**
@@ -66,6 +67,7 @@ class GameState
    {
       wantsTicks = true;
       wantsEvents = true;
+      wantsToDraw = true;
    };
 
    /**
