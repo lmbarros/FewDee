@@ -143,7 +143,7 @@ class GameState
    private bool wantsToDraw_ = true;
 
    /// A type for an event handling callback.
-   alias void delegate(in ref ALLEGRO_EVENT event) EventHandler_t;
+   protected alias void delegate(in ref ALLEGRO_EVENT event) EventHandler_t;
 
    /**
     * The registered event handling callbacks. This is an associative array
