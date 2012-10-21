@@ -6,6 +6,7 @@
 
 module twodee.state_manager;
 
+import allegro5.allegro;
 import twodee.game_state;
 
 
@@ -100,13 +101,19 @@ class StateManager
       }
    }
 
-   /// Called when a mouse down event is received.
-   public void onMouseDown()
+   /**
+    * Called when an event (any event) is received. This method just forwards
+    * the event to all states that want to receive it.
+    *
+    * Parameters:
+    *    event = The event received.
+    */
+   public void onEvent(in ref ALLEGRO_EVENT event)
    {
       foreach(state; states_)
       {
-         if (state.wantsTicks)
-            state.onMouseDown();
+         if (state.wantsEvents)
+            state.onEvent(event);
       }
    }
 

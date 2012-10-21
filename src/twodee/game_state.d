@@ -6,6 +6,7 @@
 
 module twodee.game_state;
 
+import allegro5.allegro;
 import twodee.state_manager;
 
 
@@ -82,8 +83,31 @@ class GameState
    /// Called periodically. This is the place to do all the drawing.
    public void onDraw() { };
 
-   /// Called when a mouse down event is received.
-   public void onMouseDown() { };
+   /**
+    * Called when an event is received. Calls all event handlers registered for
+    * event.type.
+    *
+    * Parameters:
+    *    event = The event received.
+    */
+   public void onEvent(in ref ALLEGRO_EVENT event)
+   {
+      auto pCallbacks = event.type in eventHandlers_;
+      if (pCallbacks !is null)
+      {
+         foreach(callback; *pCallbacks)
+            callback(event);
+      }
+   }
+
+   /**
+    * Adds an event handler for a given type. The event handler will be called
+    * whenever an event of the requested type arrives.
+    */
+   void addEventHandler(ALLEGRO_EVENT_TYPE type, EventHandler_t handler)
+   {
+      eventHandlers_[type] ~= handler;
+   }
 
    /// Does this GameState want to receive "tick" events?
    public @property bool wantsTicks() const { return wantsTicks_; }
@@ -117,4 +141,14 @@ class GameState
 
    /// Does this GameState want to draw?
    private bool wantsToDraw_ = true;
+
+   /// A type for an event handling callback.
+   alias void delegate(in ref ALLEGRO_EVENT event) EventHandler_t;
+
+   /**
+    * The registered event handling callbacks. This is an associative array
+    * whose index is the event type, and whose value is an array with the
+    * registered event handlers for that type.
+    */
+   EventHandler_t[][ALLEGRO_EVENT_TYPE] eventHandlers_;
 }
