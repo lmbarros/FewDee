@@ -8,10 +8,11 @@ module twodee.sprite;
 
 import allegro5.allegro;
 import std.conv;
+import twodee.guish;
 
 
 /// A collection of same-sized bitmaps and a few additional bits.
-class Sprite
+class Sprite: GUIshObject
 {
    /**
     * Constructs the Sprite, without adding any image to it.
@@ -22,7 +23,7 @@ class Sprite
     *    centerX = The Sprite center along the x axis.
     *    centerY = The Sprite center along the x axis.
     */
-   this(int width, int height, double centerX = 0.0, double centerY = 0.0)
+   this(int width, int height, float centerX = 0.0, float centerY = 0.0)
    {
       width_ = width;
       height_ = height;
@@ -72,27 +73,58 @@ class Sprite
       currentIndex_ = newIndex;
    }
 
+   /// The Sprite position, measured in pixels from the left of the screen.
+   public @property void left(float newLeft) { left_ = newLeft; }
+
+   /// The Sprite position, measured in pixels from the top of the screen.
+   public @property void top(float newTop) { top_ = newTop; }
+
+   /// The Sprite position, measured in pixels from the left of the screen.
+   public @property float left() const { return left_; }
+
+   /// The Sprite position, measured in pixels from the top of the screen.
+   public @property float top() const { return top_; }
+
+   /// The sprite width, in pixels.
+   public @property float width() const { return width_; }
+
+   /// The sprite height, in pixels.
+   public @property float height() const { return height_; }
+
+   /// Is the point (py, px) in screen coordinates inside this sprite?
+   public bool contains(float px, float py) const
+   {
+      return px >= left
+         && py >= top
+         && px <= left + width
+         && py <= top + height;
+   }
+
    /**
     * Draws current the Sprite bitmap to the current target.
     *
     * Parameters:
-    *    x = The x coordinate where the bitmap will be drawn.
-    *    y = The y coordinate where the bitmap will be drawn.
     *    flags = The flags. As of now, ALLEGRO_FLIP_HORIZONTAL and
     *       ALLEGRO_FLIP_VERTICAL are available.
     */
-   void draw(double x, double y, int flags = 0)
+   void draw(int flags = 0)
    in
    {
       assert(currentIndex_ < bitmaps_.length);
    }
    body
    {
-      al_draw_bitmap(bitmaps_[currentIndex_], x, y, flags);
+      al_draw_bitmap(bitmaps_[currentIndex_], left_, top_, flags);
    }
 
    /// The index (into bitmaps_) of current bitmap.
    size_t currentIndex_ = 0;
+
+   /// The Sprite position, in pixels from the top of the screen.
+   float top_;
+
+   /// The Sprite position, in pixels from the left of the screen.
+   float left_;
 
    /// Sprite width, in pixels.
    int width_;
@@ -101,10 +133,10 @@ class Sprite
    int height_;
 
    /// Sprite center along the x axis.
-   double centerX_;
+   float centerX_;
 
    /// Sprite center along the y axis.
-   double centerY_;
+   float centerY_;
 
    /// The bitmaps.
    ALLEGRO_BITMAP*[] bitmaps_;

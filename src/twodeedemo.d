@@ -4,6 +4,7 @@ import allegro5.allegro;
 
 import twodee.engine;
 import twodee.game_state;
+import twodee.guish;
 import twodee.state_manager;
 import twodee.sprite;
 import twodee.updater;
@@ -14,6 +15,7 @@ class MyState: GameState
    this()
    {
       updater_ = new Updater();
+      guish_ = new GUIshEventGenerator();
 
       sprite_ = new Sprite(64, 64);
       sprite_.addBitmap("data/flag_1.png");
@@ -21,20 +23,54 @@ class MyState: GameState
       sprite_.addBitmap("data/flag_1.png");
       sprite_.addBitmap("data/flag_3.png");
 
-      addEventHandler(ALLEGRO_EVENT_MOUSE_AXES, &sayWhereMouseIs);
+      sprite_.top = 200;
+      sprite_.left = 200;
+
+      //addEventHandler(ALLEGRO_EVENT_MOUSE_AXES, &sayWhereMouseIs);
       addEventHandler(ALLEGRO_EVENT_MOUSE_BUTTON_DOWN, &startAnimation);
+
+      import std.stdio;
+
+      guish_.addHandler(sprite_, EventType.MOUSE_ENTER,
+                        delegate() { writeln("Mouse enter!"); });
+
+      guish_.addHandler(sprite_, EventType.MOUSE_LEAVE,
+                        delegate() { writeln("Mouse leave!"); });
+
+      guish_.addHandler(sprite_, EventType.MOUSE_MOVE,
+                        delegate() { writeln("Mouse move!"); });
+
+      guish_.addHandler(sprite_, EventType.MOUSE_UP,
+                        delegate() { writeln("Mouse up!"); });
+
+      guish_.addHandler(sprite_, EventType.MOUSE_DOWN,
+                        delegate() { writeln("Mouse down!"); });
+
+      guish_.addHandler(sprite_, EventType.CLICK,
+                        delegate() { writeln("Click!"); });
+
+      guish_.addHandler(sprite_, EventType.DOUBLE_CLICK,
+                        delegate() { writeln("Double click!"); });
    }
 
    void onTick(double deltaTime)
    {
       updater_.tick(deltaTime);
+      guish_.tick(deltaTime);
    }
 
    void onDraw()
    {
       al_clear_to_color(al_map_rgb(200, 200, 0));
-      sprite_.draw(200, 200);
+      sprite_.draw();
    }
+
+   override public void onEvent(in ref ALLEGRO_EVENT event)
+   {
+      super.onEvent(event);
+      guish_.onEvent(event);
+   }
+
 
    void sayWhereMouseIs(in ref ALLEGRO_EVENT event)
    {
@@ -60,6 +96,8 @@ class MyState: GameState
    private Updater updater_;
 
    private Sprite sprite_;
+
+   private GUIshEventGenerator guish_;
 }
 
 
