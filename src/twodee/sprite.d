@@ -8,11 +8,12 @@ module twodee.sprite;
 
 import allegro5.allegro;
 import std.conv;
-import twodee.guish;
+import twodee.aabb;
+import twodee.node;
 
 
 /// A collection of same-sized bitmaps and a few additional bits.
-class Sprite: GUIshObject
+class Sprite: Node
 {
    /**
     * Constructs the Sprite, without adding any image to it.
@@ -29,6 +30,8 @@ class Sprite: GUIshObject
       height_ = height;
       centerX_ = centerX;
       centerY_ = centerY;
+
+      aabb_ = AABB(0, height, 0, width);
    }
 
    /// Destroys the Sprite. Destroys all bitmaps.
@@ -37,6 +40,9 @@ class Sprite: GUIshObject
       foreach(bitmap; bitmaps_)
          al_destroy_bitmap(bitmap);
    }
+
+   /// Returns the node's bounding rectangle.
+   public @property ref const(AABB) aabb() const { return aabb_; }
 
    /**
     * Adds a bitmap to the Sprite.
@@ -74,10 +80,18 @@ class Sprite: GUIshObject
    }
 
    /// The Sprite position, measured in pixels from the left of the screen.
-   public @property void left(float newLeft) { left_ = newLeft; }
+   public @property void left(float newLeft)
+   {
+      left_ = newLeft;
+      aabb_ = AABB(top, top + height, left, left + width);
+   }
 
    /// The Sprite position, measured in pixels from the top of the screen.
-   public @property void top(float newTop) { top_ = newTop; }
+   public @property void top(float newTop)
+   {
+      top_ = newTop;
+      aabb_ = AABB(top, top + height, left, left + width);
+   }
 
    /// The Sprite position, measured in pixels from the left of the screen.
    public @property float left() const { return left_; }
@@ -90,15 +104,6 @@ class Sprite: GUIshObject
 
    /// The sprite height, in pixels.
    public @property float height() const { return height_; }
-
-   /// Is the point (py, px) in screen coordinates inside this sprite?
-   public bool contains(float px, float py) const
-   {
-      return px >= left
-         && py >= top
-         && px <= left + width
-         && py <= top + height;
-   }
 
    /**
     * Draws current the Sprite bitmap to the current target.
@@ -137,6 +142,15 @@ class Sprite: GUIshObject
 
    /// Sprite center along the y axis.
    float centerY_;
+
+   /**
+    * The bounding box.
+    *
+    * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    * xxxxxxx top, left, width and height can be deduced from this! Get rid of
+    *         the redundancy (TODO).
+    */
+   AABB aabb_;
 
    /// The bitmaps.
    ALLEGRO_BITMAP*[] bitmaps_;

@@ -1,5 +1,5 @@
 /**
- * Objects supporting GUI-like events.
+ * GUI-like events for scene graph nodes.
  *
  * Authors: Leandro Motta Barros
  */
@@ -8,29 +8,7 @@ module twodee.guish;
 
 import allegro5.allegro;
 import std.conv;
-
-
-/**
- * An interface that must be implemented by objects that want to be able to
- * receive GUI-like events.
- */
-interface GUIshObject
-{
-   /// Object's position, in pixels, measured from the left of the screen.
-   public @property float left() const;
-
-   /// Object's position, in pixels, measured from the top of the screen.
-   public @property float top() const;
-
-   /// Object's width, in pixels.
-   public @property float width() const;
-
-   /// Object's height, in pixels.
-   public @property float height() const;
-
-   /// Is the point (px, py) inside the object?
-   public bool contains(float px, float py) const;
-}
+import twodee.node;
 
 
 /// The possible types of GUI-like events.
@@ -47,7 +25,7 @@ enum EventType
 
 
 /**
- * Generates GUI-like events for registered GUIshObjects.
+ * Generates GUI-like events for registered Nodes.
  */
 class GUIshEventGenerator
 {
@@ -84,7 +62,7 @@ class GUIshEventGenerator
     * One could think that handling most of these events in a "mouse axis" event
     * would work just as well and be more efficient. The truth is, it wouldn't
     * work just as well. Mouse enter, mouse leave and mouse move events in GUIsh
-    * are "relative": if a moving object crosses a static mouse pointer, the
+    * are "relative": if a moving node crosses a static mouse pointer, the
     * events shall be generated. This is by design.
     */
    public void tick(double deltaTime)
@@ -97,21 +75,21 @@ class GUIshEventGenerator
       updatePickingData(mouseState.x, mouseState.y);
 
       // Trigger the events
-      if (objectUnderMouse_ == prevObjectUnderMouse_)
+      if (nodeUnderMouse_ == prevNodeUnderMouse_)
       {
-         if (prevObjectUnderMouse_ !is null
+         if (prevNodeUnderMouse_ !is null
              && positionUnderMouse_ != prevPositionUnderMouse_)
          {
-            callHandlers(objectUnderMouse_, EventType.MOUSE_MOVE);
+            callHandlers(nodeUnderMouse_, EventType.MOUSE_MOVE);
          }
       }
-      else // objectUnderMouse != prevObjectUnderMouse_
+      else // nodeUnderMouse != prevNodeUnderMouse_
       {
-         if (prevObjectUnderMouse_ !is null)
-            callHandlers(prevObjectUnderMouse_, EventType.MOUSE_LEAVE);
+         if (prevNodeUnderMouse_ !is null)
+            callHandlers(prevNodeUnderMouse_, EventType.MOUSE_LEAVE);
 
-         if (objectUnderMouse_ !is null)
-            callHandlers(objectUnderMouse_, EventType.MOUSE_ENTER);
+         if (nodeUnderMouse_ !is null)
+            callHandlers(nodeUnderMouse_, EventType.MOUSE_ENTER);
       }
    }
 
@@ -120,11 +98,11 @@ class GUIshEventGenerator
     * Adds a handler for a GUI-like event.
     *
     * Parameters:
-    *   obj = The object receiving the event.
+    *   obj = The node receiving the event.
     *   event = The desired event type.
     *   handler = The handler to run.
     */
-   public void addHandler(GUIshObject obj, EventType event,
+   public void addHandler(Node obj, EventType event,
                           handler_t handler)
    {
       import std.stdio;
@@ -137,7 +115,7 @@ class GUIshEventGenerator
 
 
    /**
-    * Updates prevObjectUnderMouse_, prevPositionUnderMouse_, objectUnderMouse_
+    * Updates prevNodeUnderMouse_, prevPositionUnderMouse_, nodeUnderMouse_
     * and positionUnderMouse_.
     *
     * Parameters:
@@ -146,37 +124,37 @@ class GUIshEventGenerator
     */
    private void updatePickingData(float mouseX, float mouseY)
    {
-      GUIshObject currentObjectUnderMouse = null;
+      Node currentNodeUnderMouse = null;
       foreach(obj, dummy; handlers_)
       {
          if (obj.contains(mouseX, mouseY))
          {
-            currentObjectUnderMouse = obj;
+            currentNodeUnderMouse = obj;
             break;
          }
       }
 
       point currentPositionUnderMouse;
-      if (currentObjectUnderMouse !is null)
+      if (currentNodeUnderMouse !is null)
       {
          currentPositionUnderMouse = point(
-            mouseX - currentObjectUnderMouse.left,
-            mouseY - currentObjectUnderMouse.top);
+            mouseX - currentNodeUnderMouse.aabb.left,
+            mouseY - currentNodeUnderMouse.aabb.top);
       }
 
-      prevObjectUnderMouse_ = objectUnderMouse_;
+      prevNodeUnderMouse_ = nodeUnderMouse_;
       prevPositionUnderMouse_ = positionUnderMouse_;
 
-      objectUnderMouse_ = currentObjectUnderMouse;
+      nodeUnderMouse_ = currentNodeUnderMouse;
       positionUnderMouse_ = currentPositionUnderMouse;
    }
 
 
    /**
     * Calls all event handlers of a given event type registered for a given
-    * object.
+    * node.
     */
-   private void callHandlers(GUIshObject obj, EventType eventType)
+   private void callHandlers(Node obj, EventType eventType)
    {
       foreach(handler; handlers_[obj][eventType])
          handler();
@@ -192,11 +170,11 @@ class GUIshEventGenerator
    body
    {
       // Trigger a "MouseDown" signal.
-      if (objectUnderMouse_ !is null)
-         callHandlers(objectUnderMouse_, EventType.MOUSE_DOWN);
+      if (nodeUnderMouse_ !is null)
+         callHandlers(nodeUnderMouse_, EventType.MOUSE_DOWN);
 
       // Do the bookkeeping for "Click" and "DoubleClick"
-      objectThatGotMouseDown_[event.mouse.button] = objectUnderMouse_;
+      nodeThatGotMouseDown_[event.mouse.button] = nodeUnderMouse_;
    }
 
 
@@ -210,24 +188,24 @@ class GUIshEventGenerator
    {
       enum DOUBLE_CLICK_INTERVAL = 0.3;
 
-      if (objectUnderMouse_ !is null)
+      if (nodeUnderMouse_ !is null)
       {
          immutable button = event.mouse.button;
 
-         callHandlers(objectUnderMouse_, EventType.MOUSE_UP);
+         callHandlers(nodeUnderMouse_, EventType.MOUSE_UP);
 
          // Now, the trickier ones: "Click" and "DoubleClick"
-         if (objectUnderMouse_ == objectThatGotMouseDown_[button])
+         if (nodeUnderMouse_ == nodeThatGotMouseDown_[button])
          {
-            callHandlers(objectUnderMouse_, EventType.CLICK);
+            callHandlers(nodeUnderMouse_, EventType.CLICK);
 
             if (time_ - timeOfLastClick_[button] < DOUBLE_CLICK_INTERVAL
-                && objectUnderMouse_ == objectThatGotClick_[button])
+                && nodeUnderMouse_ == nodeThatGotClick_[button])
             {
-               callHandlers(objectUnderMouse_, EventType.DOUBLE_CLICK);
+               callHandlers(nodeUnderMouse_, EventType.DOUBLE_CLICK);
             }
 
-            objectThatGotClick_[button] = objectUnderMouse_;
+            nodeThatGotClick_[button] = nodeUnderMouse_;
             timeOfLastClick_[button] = time_;
          }
       }
@@ -238,26 +216,26 @@ class GUIshEventGenerator
    private double time_ = 0.0;
 
    /**
-    * All the event handlers. handlers_[MyObject][EventType.CLICK] gets an array
-    * with all handlers for the "click" event of MyObject.
+    * All the event handlers. handlers_[MyNode][EventType.CLICK] gets an array
+    * with all handlers for the "click" event of MyNode.
     */
-   private handler_t[][EventType][GUIshObject] handlers_;
+   private handler_t[][EventType][Node] handlers_;
 
-   /// The object currently under the mouse pointer.
-   private GUIshObject objectUnderMouse_;
+   /// The node currently under the mouse pointer.
+   private Node nodeUnderMouse_;
 
    /**
-    * The position (in the object coordinate system) of objectUnderMouse_ (the
-    * object currently under the mouse pointer).
+    * The position (in the node coordinate system) of nodeUnderMouse_ (the
+    * node currently under the mouse pointer).
     */
    private point positionUnderMouse_;
 
-   /// The object previously under the mouse pointer.
-   private GUIshObject prevObjectUnderMouse_;
+   /// The node previously under the mouse pointer.
+   private Node prevNodeUnderMouse_;
 
    /**
-    * The position (in the object coordinate system) of prevObjectUnderMouse_
-    * (the object previously under the mouse pointer).
+    * The position (in the node coordinate system) of prevNodeUnderMouse_
+    * (the node previously under the mouse pointer).
     */
    private point prevPositionUnderMouse_;
 
@@ -281,16 +259,16 @@ class GUIshEventGenerator
    private enum mouseButtonArraySize_ = 33;
 
    /**
-    * An array indicating (for every mouse button) which was the object that
+    * An array indicating (for every mouse button) which was the node that
     * received the last mouse down event. This is used to identify clicks.
     */
-   private GUIshObject objectThatGotMouseDown_[mouseButtonArraySize_];
+   private Node nodeThatGotMouseDown_[mouseButtonArraySize_];
 
    /**
-    * An array indicating (for every mouse button) which was the object that
+    * An array indicating (for every mouse button) which was the node that
     * received the last click event. This is used to identify double clicks.
     */
-   private GUIshObject objectThatGotClick_[mouseButtonArraySize_];
+   private Node nodeThatGotClick_[mouseButtonArraySize_];
 
    /**
     * An array indicating (for every mouse button) the time at which the last
