@@ -24,4 +24,7 @@ boxes because their own bounding box changed. This way, we'll always
 have updated bounding boxes.
 
 Unit tests: addChild(), removeChild(). Consider what happens when the
-same node as child twice.
+same node is added as child twice.
+
+Engine: constructor should have scope(failure) statements to properly
+destriy stuff if it throws.
