@@ -42,7 +42,7 @@ class Sprite: Node
    }
 
    /// Returns the node's bounding rectangle.
-   public @property ref const(AABB) aabb() const { return aabb_; }
+   public @property AABB aabb() const { return aabb_; }
 
    /**
     * Adds a bitmap to the Sprite.

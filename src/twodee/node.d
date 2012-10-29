@@ -20,7 +20,7 @@ class Node
    }
 
    /// Returns the node's bounding rectangle.
-   abstract public @property ref const(AABB) aabb() const;
+   abstract public @property AABB aabb() const;
 
    /**
     * Checks whether a given point is contained by this Node. The default
