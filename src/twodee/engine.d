@@ -8,6 +8,7 @@ module twodee.engine;
 
 import allegro5.allegro;
 import allegro5.allegro_image;
+import twodee.event;
 import twodee.game_state;
 import twodee.state_manager;
 
@@ -35,6 +36,8 @@ class Engine
       if (!al_install_keyboard())
          throw new Exception("Error initializing keyboard");
 
+      al_init_user_event_source(&customEventSource_);
+
       eventQueue_ = al_create_event_queue();
       if (eventQueue_ is null)
          throw new Exception("Error creating event queue.");
@@ -43,6 +46,7 @@ class Engine
                                al_get_display_event_source(display_));
       al_register_event_source(eventQueue_, al_get_mouse_event_source());
       al_register_event_source(eventQueue_, al_get_keyboard_event_source());
+      al_register_event_source(eventQueue_, &customEventSource_);
 
       stateManager_ = new StateManager(this);
    }
@@ -51,6 +55,8 @@ class Engine
    ~this()
    {
       al_destroy_event_queue(eventQueue_);
+
+      al_destroy_user_event_source(&customEventSource_);
 
       al_uninstall_keyboard();
 
@@ -74,15 +80,23 @@ class Engine
 
       while (!stateManager_.empty)
       {
+         // What time is it?
          double now = al_get_time();
          auto deltaTime = now - prevTime;
          prevTime = now;
 
+         // Generate tick event
+         ALLEGRO_EVENT tickEvent;
+         tickEvent.user.type = TWODEE_EVENT_TICK;
+         tickEvent.user.encodeDeltaTime(deltaTime);
+         al_emit_user_event(&customEventSource_, &tickEvent, null);
+
+         // Handle pending events
          ALLEGRO_EVENT event;
          while (al_get_next_event(eventQueue_, &event))
             stateManager_.onEvent(event);
 
-         stateManager_.onTick(deltaTime);
+         // Draw!
          al_set_target_backbuffer(display_);
          stateManager_.onDraw();
          al_flip_display();
@@ -91,6 +105,9 @@ class Engine
 
    /// The one and only display (window) where we show things.
    private ALLEGRO_DISPLAY* display_;
+
+   /// The source of custom events.
+   private ALLEGRO_EVENT_SOURCE customEventSource_;
 
    /// The one and only event queue.
    private ALLEGRO_EVENT_QUEUE* eventQueue_;

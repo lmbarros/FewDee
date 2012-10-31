@@ -8,6 +8,7 @@ module twodee.state_manager;
 
 import allegro5.allegro;
 import twodee.engine;
+import twodee.event;
 import twodee.game_state;
 
 
@@ -87,22 +88,6 @@ class StateManager
       state.stateManager_ = this;
    }
 
-   /**
-    * Called periodically. This is the place to update the world state.
-    *
-    * Parameters:
-    *   deltaTime = The time, in seconds, elapsed since the previous call to
-    *               onTick().
-    */
-   public void onTick(double deltaTime)
-   {
-      foreach(state; states_)
-      {
-         if (state.wantsTicks)
-            state.onTick(deltaTime);
-      }
-   }
-
    /// Called periodically. This is the place to do all the drawing.
    public void onDraw()
    {
@@ -124,7 +109,11 @@ class StateManager
    {
       foreach(state; states_)
       {
-         if (state.wantsEvents)
+         immutable wants = event.type == TWODEE_EVENT_TICK
+            ? state.wantsTicks
+            : state.wantsEvents;
+
+         if (wants)
             state.onEvent(event);
       }
    }

@@ -2,7 +2,10 @@
 
 import allegro5.allegro;
 
+import std.stdio;
+
 import twodee.engine;
+import twodee.event;
 import twodee.game_state;
 import twodee.guish;
 import twodee.state_manager;
@@ -28,8 +31,7 @@ class MyState: GameState
 
       //addEventHandler(ALLEGRO_EVENT_MOUSE_AXES, &sayWhereMouseIs);
       addEventHandler(ALLEGRO_EVENT_MOUSE_BUTTON_DOWN, &startAnimation);
-
-      import std.stdio;
+      addEventHandler(TWODEE_EVENT_TICK, &handleTick);
 
       guish_.addHandler(sprite_, EventType.MOUSE_ENTER,
                         delegate() { writeln("Mouse enter!"); });
@@ -53,8 +55,9 @@ class MyState: GameState
                         delegate() { writeln("Double click!"); });
    }
 
-   void onTick(double deltaTime)
+   void handleTick(in ref ALLEGRO_EVENT event)
    {
+      auto deltaTime = event.user.decodeDeltaTime();
       updater_.tick(deltaTime);
       guish_.tick(deltaTime);
    }
@@ -67,6 +70,7 @@ class MyState: GameState
 
    override public void onEvent(in ref ALLEGRO_EVENT event)
    {
+      // TODO: This sucks. I shouldn't have to override onEvent to use GUIsh.
       super.onEvent(event);
       guish_.onEvent(event);
    }

@@ -71,15 +71,6 @@ class GameState
       wantsToDraw = true;
    };
 
-   /**
-    * Called periodically. This is the place to update the world state.
-    *
-    * Parameters:
-    *   deltaTime = The time, in seconds, elapsed since the previous call to
-    *               onTick().
-    */
-   public void onTick(double deltaTime) { };
-
    /// Called periodically. This is the place to do all the drawing.
    public void onDraw() { };
 
