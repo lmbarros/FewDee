@@ -6,10 +6,6 @@ GUIsh: allow hierarchy of objects.
 
 Add means to remove objects/handlers from GUIsh.
 
-If handling of "real" events and "ticks" were more homogeneous, some
-code would be prettier. For example, no need to forward two different
-functions to a GUIshEventHandler.
-
 GUIsh what about z-order? Nodes have a "z" property; I can implement a
 picking visitor that takes it into account. Then, GUIsh should use
 this.

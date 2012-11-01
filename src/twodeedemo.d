@@ -59,7 +59,6 @@ class MyState: GameState
    {
       auto deltaTime = event.user.deltaTime;
       updater_.tick(deltaTime);
-      guish_.tick(deltaTime);
    }
 
    void onDraw()

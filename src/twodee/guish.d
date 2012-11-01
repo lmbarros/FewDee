@@ -8,6 +8,7 @@ module twodee.guish;
 
 import allegro5.allegro;
 import std.conv;
+import twodee.event;
 import twodee.node;
 
 
@@ -49,6 +50,9 @@ class GUIshEventGenerator
          case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
             return handleMouseButtonUpEvent(event);
 
+         case TWODEE_EVENT_TICK:
+            return handleTickEvent(event);
+
          default:
             return; // ignore
       }
@@ -56,7 +60,7 @@ class GUIshEventGenerator
 
 
    /**
-    * Must be called on every thick, so that the GUI-like events can be properly
+    * Handles tick events, so that the GUI-like events can be properly
     * generated.
     *
     * One could think that handling most of these events in a "mouse axis" event
@@ -65,9 +69,9 @@ class GUIshEventGenerator
     * are "relative": if a moving node crosses a static mouse pointer, the
     * events shall be generated. This is by design.
     */
-   public void tick(double deltaTime)
+   private void handleTickEvent(in ref ALLEGRO_EVENT event)
    {
-      time_ += deltaTime;
+      time_ += event.user.deltaTime;
 
       ALLEGRO_MOUSE_STATE mouseState;
       al_get_mouse_state(&mouseState);
