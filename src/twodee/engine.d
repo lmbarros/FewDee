@@ -88,7 +88,7 @@ class Engine
          // Generate tick event
          ALLEGRO_EVENT tickEvent;
          tickEvent.user.type = TWODEE_EVENT_TICK;
-         tickEvent.user.encodeDeltaTime(deltaTime);
+         tickEvent.user.deltaTime(deltaTime);
          al_emit_user_event(&customEventSource_, &tickEvent, null);
 
          // Handle pending events

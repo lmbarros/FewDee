@@ -57,7 +57,7 @@ class MyState: GameState
 
    void handleTick(in ref ALLEGRO_EVENT event)
    {
-      auto deltaTime = event.user.decodeDeltaTime();
+      auto deltaTime = event.user.deltaTime;
       updater_.tick(deltaTime);
       guish_.tick(deltaTime);
    }
