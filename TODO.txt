@@ -22,5 +22,5 @@ have updated bounding boxes.
 Unit tests: addChild(), removeChild(). Consider what happens when the
 same node is added as child twice.
 
-Engine: constructor should have scope(failure) statements to properly
-destriy stuff if it throws.
+Engine: consider using a mixin or whatever to encapsulate that
+"create, test-and-perhaps-throw, scope" idiom.

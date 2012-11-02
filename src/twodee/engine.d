@@ -22,25 +22,39 @@ class Engine
    {
       if (!al_init())
          throw new Exception("Initialization failed miserably");
+      scope (failure)
+         al_uninstall_system();
 
       if (!al_init_image_addon())
           throw new Exception("Error initializing image loaders");
+      scope (failure)
+         al_shutdown_image_addon();
 
       display_ = al_create_display(screenWidth, screenHeight);
       if (display_ is null)
          throw new Exception("Error creating display.");
+      scope (failure)
+         al_destroy_display(display_);
 
       if (!al_install_mouse())
          throw new Exception("Error initializing mouse");
+      scope (failure)
+         al_uninstall_mouse();
 
       if (!al_install_keyboard())
          throw new Exception("Error initializing keyboard");
+      scope (failure)
+         al_uninstall_keyboard();
 
       al_init_user_event_source(&customEventSource_);
+      scope (failure)
+         al_destroy_user_event_source(&customEventSource_);
 
       eventQueue_ = al_create_event_queue();
       if (eventQueue_ is null)
          throw new Exception("Error creating event queue.");
+      scope (failure)
+         al_destroy_event_queue(eventQueue_);
 
       al_register_event_source(eventQueue_,
                                al_get_display_event_source(display_));
