@@ -16,12 +16,53 @@ import twodee.node;
 /// The possible types of GUI-like events.
 enum EventType
 {
+   /**
+    * Mouse has moved on the registered object (either because the mouse pointer
+    * itself moved or because the object has moved). The event passed to the
+    * callback is of "user" type, without any useful information.
+    */
    MOUSE_MOVE,
+
+   /**
+    * Mouse has entered in the area of the registered object (either because the
+    * mouse pointer itself moved or because the object has moved). The event
+    * passed to the callback is of "user" type, without any useful information.
+    */
    MOUSE_ENTER,
+
+   /**
+    * Mouse has left the area of the registered object (either because the mouse
+    * pointer itself moved or because the object has moved). The event passed to
+    * the callback is of "user" type, without any useful information.
+    */
    MOUSE_LEAVE,
+
+   /**
+    * Mouse button was pressed down in the registered object. The event passed
+    * to the callback is of "mouse" type, and can be inspected to get
+    * information like which button was pressed.
+    */
    MOUSE_DOWN,
+
+   /**
+    * Mouse button was released in the registered object. The event passed to
+    * the callback is of "mouse" type, and can be inspected to get information
+    * like which button was released.
+    */
    MOUSE_UP,
+
+   /**
+    * Mouse button was clicked in the registered object. The event passed to the
+    * callback is of "mouse" type, and can be inspected to get information like
+    * which button was clicked.
+    */
    CLICK,
+
+   /**
+    * Mouse button was double-clicked in the registered object. The event passed
+    * to the callback is of "mouse" type, and can be inspected to get
+    * information like which button was double-clicked.
+    */
    DOUBLE_CLICK,
 }
 
@@ -31,10 +72,12 @@ enum EventType
  */
 class GUIshEventGenerator: EventHandler
 {
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   // TODO: must pass some parameter... need to know which mouse button was
-   //       pressed, for example.
-   public alias void delegate() EventCallback_t;
+   /**
+    * The type of callbacks called when GUIsh events happen. What exactly is
+    * passed in the "event"parameter depends on what event is being handled; for
+    * more information, please see the documentation of EventType.
+    */
+   public alias void delegate(ref in ALLEGRO_EVENT event) EventCallback_t;
 
    /// Handles incoming events.
    public bool handleEvent(in ref ALLEGRO_EVENT event)
@@ -116,10 +159,11 @@ class GUIshEventGenerator: EventHandler
     * Calls all event callbacks of a given event type registered for a given
     * node.
     */
-   private void callEventCallbacks(Node obj, EventType eventType)
+   private void callEventCallbacks(Node obj, EventType eventType,
+                                   in ref ALLEGRO_EVENT event)
    {
       foreach(callback; eventCallbacks_[obj][eventType])
-         callback();
+         callback(event);
    }
 
 
@@ -148,16 +192,19 @@ class GUIshEventGenerator: EventHandler
          if (prevNodeUnderMouse_ !is null
              && positionUnderMouse_ != prevPositionUnderMouse_)
          {
-            callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_MOVE);
+            callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_MOVE, event);
          }
       }
       else // nodeUnderMouse != prevNodeUnderMouse_
       {
          if (prevNodeUnderMouse_ !is null)
-            callEventCallbacks(prevNodeUnderMouse_, EventType.MOUSE_LEAVE);
+         {
+            callEventCallbacks(prevNodeUnderMouse_, EventType.MOUSE_LEAVE,
+                               event);
+         }
 
          if (nodeUnderMouse_ !is null)
-            callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_ENTER);
+            callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_ENTER, event);
       }
 
       return true;
@@ -174,7 +221,7 @@ class GUIshEventGenerator: EventHandler
    {
       // Trigger a "MouseDown" signal.
       if (nodeUnderMouse_ !is null)
-         callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_DOWN);
+         callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_DOWN, event);
 
       // Do the bookkeeping for "Click" and "DoubleClick"
       nodeThatGotMouseDown_[event.mouse.button] = nodeUnderMouse_;
@@ -197,17 +244,18 @@ class GUIshEventGenerator: EventHandler
       {
          immutable button = event.mouse.button;
 
-         callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_UP);
+         callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_UP, event);
 
          // Now, the trickier ones: "Click" and "DoubleClick"
          if (nodeUnderMouse_ == nodeThatGotMouseDown_[button])
          {
-            callEventCallbacks(nodeUnderMouse_, EventType.CLICK);
+            callEventCallbacks(nodeUnderMouse_, EventType.CLICK, event);
 
             if (time_ - timeOfLastClick_[button] < DOUBLE_CLICK_INTERVAL
                 && nodeUnderMouse_ == nodeThatGotClick_[button])
             {
-               callEventCallbacks(nodeUnderMouse_, EventType.DOUBLE_CLICK);
+               callEventCallbacks(nodeUnderMouse_, EventType.DOUBLE_CLICK,
+                                  event);
             }
 
             nodeThatGotClick_[button] = nodeUnderMouse_;

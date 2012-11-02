@@ -34,26 +34,33 @@ class MyState: GameState
       addEventCallback(ALLEGRO_EVENT_MOUSE_BUTTON_DOWN, &startAnimation);
       addEventCallback(TWODEE_EVENT_TICK, &handleTick);
 
-      guish_.addEventCallback(sprite_, EventType.MOUSE_ENTER,
-                              delegate() { writeln("Mouse enter!"); });
+      guish_.addEventCallback(
+         sprite_, EventType.MOUSE_ENTER,
+         delegate(in ref ALLEGRO_EVENT event) { writeln("Mouse enter!"); });
 
-      guish_.addEventCallback(sprite_, EventType.MOUSE_LEAVE,
-                              delegate() { writeln("Mouse leave!"); });
+      guish_.addEventCallback(
+         sprite_, EventType.MOUSE_LEAVE,
+         delegate(in ref ALLEGRO_EVENT event) { writeln("Mouse leave!"); });
 
-      guish_.addEventCallback(sprite_, EventType.MOUSE_MOVE,
-                              delegate() { writeln("Mouse move!"); });
+      guish_.addEventCallback(
+         sprite_, EventType.MOUSE_MOVE,
+         delegate(in ref ALLEGRO_EVENT event) { writeln("Mouse move!"); });
 
-      guish_.addEventCallback(sprite_, EventType.MOUSE_UP,
-                              delegate() { writeln("Mouse up!"); });
+      guish_.addEventCallback(
+         sprite_, EventType.MOUSE_UP,
+         delegate(in ref ALLEGRO_EVENT event) { writeln("Mouse up!"); });
 
-      guish_.addEventCallback(sprite_, EventType.MOUSE_DOWN,
-                              delegate() { writeln("Mouse down!"); });
+      guish_.addEventCallback(
+         sprite_, EventType.MOUSE_DOWN,
+         delegate(in ref ALLEGRO_EVENT event) { writeln("Mouse down!"); });
 
-      guish_.addEventCallback(sprite_, EventType.CLICK,
-                              delegate() { writeln("Click!"); });
+      guish_.addEventCallback(
+         sprite_, EventType.CLICK,
+         delegate(in ref ALLEGRO_EVENT event) { writeln("Click!"); });
 
-      guish_.addEventCallback(sprite_, EventType.DOUBLE_CLICK,
-                              delegate() { writeln("Double click!"); });
+      guish_.addEventCallback(
+         sprite_, EventType.DOUBLE_CLICK,
+         delegate(in ref ALLEGRO_EVENT event) { writeln("Double click!"); });
    }
 
    void handleTick(in ref ALLEGRO_EVENT event)
