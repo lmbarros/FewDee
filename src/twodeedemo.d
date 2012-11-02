@@ -20,6 +20,7 @@ class MyState: GameState
       updater_ = new Updater();
       guish_ = new GUIshEventGenerator();
       addEventHandler(guish_);
+      addEventHandler(updater_);
 
       sprite_ = new Sprite(64, 64);
       sprite_.addBitmap("data/flag_1.png");
@@ -32,7 +33,6 @@ class MyState: GameState
 
       //addEventCallback(ALLEGRO_EVENT_MOUSE_AXES, &sayWhereMouseIs);
       addEventCallback(ALLEGRO_EVENT_MOUSE_BUTTON_DOWN, &startAnimation);
-      addEventCallback(TWODEE_EVENT_TICK, &handleTick);
 
       guish_.addEventCallback(
          sprite_, EventType.MOUSE_ENTER,
@@ -61,12 +61,6 @@ class MyState: GameState
       guish_.addEventCallback(
          sprite_, EventType.DOUBLE_CLICK,
          delegate(in ref ALLEGRO_EVENT event) { writeln("Double click!"); });
-   }
-
-   void handleTick(in ref ALLEGRO_EVENT event)
-   {
-      auto deltaTime = event.user.deltaTime;
-      updater_.tick(deltaTime);
    }
 
    void onDraw()

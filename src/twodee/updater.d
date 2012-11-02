@@ -8,6 +8,8 @@ module twodee.updater;
 
 import allegro5.allegro;
 import std.conv;
+import twodee.event;
+import twodee.event_handler;
 
 
 /**
@@ -15,7 +17,7 @@ import std.conv;
  * thought as a simple way to run shortish animations, but can in fact be used
  * to do anything.
  */
-class Updater
+class Updater: EventHandler
 {
    /**
     * A function callable by an Updater. It must return true if it wants to be
@@ -29,21 +31,28 @@ class Updater
    public alias bool delegate(double deltaTime) func_t;
 
    /**
-    * Calls all updater functions and remove the ones that don't want to be
-    * called anymore. This must be called by the client.
+    * When getting a tick event, calls all updater functions and remove the ones
+    * that don't want to be called anymore.
     */
-   public void tick(double deltaT)
+   public bool handleEvent(in ref ALLEGRO_EVENT event)
    {
+      if (event.type != TWODEE_EVENT_TICK)
+         return false;
+
+      immutable deltaTime = event.user.deltaTime;
+
       func_t[] toRemove;
 
       foreach(func, dummy; funcs_)
       {
-         if (!func(deltaT))
+         if (!func(deltaTime))
             toRemove ~= func;
       }
 
       foreach(func; toRemove)
          funcs_.remove(func);
+
+      return true;
    }
 
    /// Adds an updater function to the Updater.
