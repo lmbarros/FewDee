@@ -7,6 +7,7 @@
 module twodee.game_state;
 
 import allegro5.allegro;
+import twodee.event_handler;
 import twodee.state_manager;
 
 
@@ -75,29 +76,47 @@ class GameState
    public void onDraw() { };
 
    /**
-    * Called when an event is received. Calls all event handlers registered for
-    * event.type.
+    * Called when an event is received. Calls all event callbacks registered for
+    * event.type and forwards the event to the registered event handlers.
     *
     * Parameters:
     *    event = The event received.
     */
    public void onEvent(in ref ALLEGRO_EVENT event)
    {
-      auto pCallbacks = event.type in eventHandlers_;
+      auto pCallbacks = event.type in eventCallbacks_;
       if (pCallbacks !is null)
       {
-         foreach(callback; *pCallbacks)
+         foreach (callback; *pCallbacks)
             callback(event);
       }
+
+      foreach (eventHandler; eventHandlers_)
+         eventHandler.handleEvent(event);
    }
 
+
    /**
-    * Adds an event handler for a given type. The event handler will be called
-    * whenever an event of the requested type arrives.
+    * Adds an event handler. Its handleEvent() method will be called from now on
+    * for every event handled by this game state.
+    *
+    * Parameters:
+    *    handler = The event handler to add.
     */
-   void addEventHandler(ALLEGRO_EVENT_TYPE type, EventHandler_t handler)
+   public void addEventHandler(EventHandler handler)
    {
-      eventHandlers_[type] ~= handler;
+      eventHandlers_ ~= handler;
+   }
+
+
+   /**
+    * Adds an event callback for a given type. The callback will be called
+    * whenever an event of the requested type arrives. It is OK to add multiple
+    * callbacks for the same event type; all of them will be called.
+    */
+   void addEventCallback(ALLEGRO_EVENT_TYPE type, EventCallback_t callback)
+   {
+      eventCallbacks_[type] ~= callback;
    }
 
    /// Does this GameState want to receive "tick" events?
@@ -133,13 +152,16 @@ class GameState
    /// Does this GameState want to draw?
    private bool wantsToDraw_ = true;
 
-   /// A type for an event handling callback.
-   protected alias void delegate(in ref ALLEGRO_EVENT event) EventHandler_t;
+   /// A type for an event callback.
+   protected alias void delegate(in ref ALLEGRO_EVENT event) EventCallback_t;
 
    /**
-    * The registered event handling callbacks. This is an associative array
-    * whose index is the event type, and whose value is an array with the
-    * registered event handlers for that type.
+    * The registered event callbacks. This is an associative array whose index
+    * is the event type, and whose value is an array with the registered
+    * callbacks for that type.
     */
-   EventHandler_t[][ALLEGRO_EVENT_TYPE] eventHandlers_;
+   private EventCallback_t[][ALLEGRO_EVENT_TYPE] eventCallbacks_;
+
+   /// The list of objects that want to receive events to handle them.
+   private EventHandler[] eventHandlers_;
 }

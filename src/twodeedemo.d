@@ -19,6 +19,7 @@ class MyState: GameState
    {
       updater_ = new Updater();
       guish_ = new GUIshEventGenerator();
+      addEventHandler(guish_);
 
       sprite_ = new Sprite(64, 64);
       sprite_.addBitmap("data/flag_1.png");
@@ -29,30 +30,30 @@ class MyState: GameState
       sprite_.top = 200;
       sprite_.left = 200;
 
-      //addEventHandler(ALLEGRO_EVENT_MOUSE_AXES, &sayWhereMouseIs);
-      addEventHandler(ALLEGRO_EVENT_MOUSE_BUTTON_DOWN, &startAnimation);
-      addEventHandler(TWODEE_EVENT_TICK, &handleTick);
+      //addEventCallback(ALLEGRO_EVENT_MOUSE_AXES, &sayWhereMouseIs);
+      addEventCallback(ALLEGRO_EVENT_MOUSE_BUTTON_DOWN, &startAnimation);
+      addEventCallback(TWODEE_EVENT_TICK, &handleTick);
 
-      guish_.addHandler(sprite_, EventType.MOUSE_ENTER,
-                        delegate() { writeln("Mouse enter!"); });
+      guish_.addEventCallback(sprite_, EventType.MOUSE_ENTER,
+                              delegate() { writeln("Mouse enter!"); });
 
-      guish_.addHandler(sprite_, EventType.MOUSE_LEAVE,
-                        delegate() { writeln("Mouse leave!"); });
+      guish_.addEventCallback(sprite_, EventType.MOUSE_LEAVE,
+                              delegate() { writeln("Mouse leave!"); });
 
-      guish_.addHandler(sprite_, EventType.MOUSE_MOVE,
-                        delegate() { writeln("Mouse move!"); });
+      guish_.addEventCallback(sprite_, EventType.MOUSE_MOVE,
+                              delegate() { writeln("Mouse move!"); });
 
-      guish_.addHandler(sprite_, EventType.MOUSE_UP,
-                        delegate() { writeln("Mouse up!"); });
+      guish_.addEventCallback(sprite_, EventType.MOUSE_UP,
+                              delegate() { writeln("Mouse up!"); });
 
-      guish_.addHandler(sprite_, EventType.MOUSE_DOWN,
-                        delegate() { writeln("Mouse down!"); });
+      guish_.addEventCallback(sprite_, EventType.MOUSE_DOWN,
+                              delegate() { writeln("Mouse down!"); });
 
-      guish_.addHandler(sprite_, EventType.CLICK,
-                        delegate() { writeln("Click!"); });
+      guish_.addEventCallback(sprite_, EventType.CLICK,
+                              delegate() { writeln("Click!"); });
 
-      guish_.addHandler(sprite_, EventType.DOUBLE_CLICK,
-                        delegate() { writeln("Double click!"); });
+      guish_.addEventCallback(sprite_, EventType.DOUBLE_CLICK,
+                              delegate() { writeln("Double click!"); });
    }
 
    void handleTick(in ref ALLEGRO_EVENT event)
@@ -66,14 +67,6 @@ class MyState: GameState
       al_clear_to_color(al_map_rgb(200, 200, 0));
       sprite_.draw();
    }
-
-   override public void onEvent(in ref ALLEGRO_EVENT event)
-   {
-      // TODO: This sucks. I shouldn't have to override onEvent to use GUIsh.
-      super.onEvent(event);
-      guish_.onEvent(event);
-   }
-
 
    void sayWhereMouseIs(in ref ALLEGRO_EVENT event)
    {

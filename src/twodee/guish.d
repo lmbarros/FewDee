@@ -9,6 +9,7 @@ module twodee.guish;
 import allegro5.allegro;
 import std.conv;
 import twodee.event;
+import twodee.event_handler;
 import twodee.node;
 
 
@@ -28,19 +29,15 @@ enum EventType
 /**
  * Generates GUI-like events for registered Nodes.
  */
-class GUIshEventGenerator
+class GUIshEventGenerator: EventHandler
 {
    // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    // TODO: must pass some parameter... need to know which mouse button was
    //       pressed, for example.
-   alias void delegate() handler_t;
+   public alias void delegate() EventCallback_t;
 
-
-   /**
-    * Must be called whenever an event arrives, so that the GUI-like events can
-    * be properly generated.
-    */
-   public void onEvent(in ref ALLEGRO_EVENT event)
+   /// Handles incoming events.
+   public bool handleEvent(in ref ALLEGRO_EVENT event)
    {
       switch (event.type)
       {
@@ -54,63 +51,24 @@ class GUIshEventGenerator
             return handleTickEvent(event);
 
          default:
-            return; // ignore
+            return false; // ignore
       }
    }
 
 
    /**
-    * Handles tick events, so that the GUI-like events can be properly
-    * generated.
-    *
-    * One could think that handling most of these events in a "mouse axis" event
-    * would work just as well and be more efficient. The truth is, it wouldn't
-    * work just as well. Mouse enter, mouse leave and mouse move events in GUIsh
-    * are "relative": if a moving node crosses a static mouse pointer, the
-    * events shall be generated. This is by design.
-    */
-   private void handleTickEvent(in ref ALLEGRO_EVENT event)
-   {
-      time_ += event.user.deltaTime;
-
-      ALLEGRO_MOUSE_STATE mouseState;
-      al_get_mouse_state(&mouseState);
-
-      updatePickingData(mouseState.x, mouseState.y);
-
-      // Trigger the events
-      if (nodeUnderMouse_ == prevNodeUnderMouse_)
-      {
-         if (prevNodeUnderMouse_ !is null
-             && positionUnderMouse_ != prevPositionUnderMouse_)
-         {
-            callHandlers(nodeUnderMouse_, EventType.MOUSE_MOVE);
-         }
-      }
-      else // nodeUnderMouse != prevNodeUnderMouse_
-      {
-         if (prevNodeUnderMouse_ !is null)
-            callHandlers(prevNodeUnderMouse_, EventType.MOUSE_LEAVE);
-
-         if (nodeUnderMouse_ !is null)
-            callHandlers(nodeUnderMouse_, EventType.MOUSE_ENTER);
-      }
-   }
-
-
-   /**
-    * Adds a handler for a GUI-like event.
+    * Adds a callback for a GUI-like event.
     *
     * Parameters:
     *   obj = The node receiving the event.
     *   event = The desired event type.
-    *   handler = The handler to run.
+    *   callback = The callback to run.
     */
-   public void addHandler(Node obj, EventType event,
-                          handler_t handler)
+   public void addEventCallback(Node obj, EventType event,
+                                EventCallback_t callback)
    {
       import std.stdio;
-      handlers_[obj][event] ~= handler;
+      eventCallbacks_[obj][event] ~= callback;
    }
 
 
@@ -129,7 +87,7 @@ class GUIshEventGenerator
    private void updatePickingData(float mouseX, float mouseY)
    {
       Node currentNodeUnderMouse = null;
-      foreach(obj, dummy; handlers_)
+      foreach(obj, dummy; eventCallbacks_)
       {
          if (obj.contains(mouseX, mouseY))
          {
@@ -155,18 +113,59 @@ class GUIshEventGenerator
 
 
    /**
-    * Calls all event handlers of a given event type registered for a given
+    * Calls all event callbacks of a given event type registered for a given
     * node.
     */
-   private void callHandlers(Node obj, EventType eventType)
+   private void callEventCallbacks(Node obj, EventType eventType)
    {
-      foreach(handler; handlers_[obj][eventType])
-         handler();
+      foreach(callback; eventCallbacks_[obj][eventType])
+         callback();
+   }
+
+
+   /**
+    * Handles tick events, so that the GUI-like events can be properly
+    * generated.
+    *
+    * One could think that handling most of these events in a "mouse axis" event
+    * would work just as well and be more efficient. The truth is, it wouldn't
+    * work just as well. Mouse enter, mouse leave and mouse move events in GUIsh
+    * are "relative": if a moving node crosses a static mouse pointer, the
+    * events shall be generated. This is by design.
+    */
+   private bool handleTickEvent(in ref ALLEGRO_EVENT event)
+   {
+      time_ += event.user.deltaTime;
+
+      ALLEGRO_MOUSE_STATE mouseState;
+      al_get_mouse_state(&mouseState);
+
+      updatePickingData(mouseState.x, mouseState.y);
+
+      // Trigger the events
+      if (nodeUnderMouse_ == prevNodeUnderMouse_)
+      {
+         if (prevNodeUnderMouse_ !is null
+             && positionUnderMouse_ != prevPositionUnderMouse_)
+         {
+            callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_MOVE);
+         }
+      }
+      else // nodeUnderMouse != prevNodeUnderMouse_
+      {
+         if (prevNodeUnderMouse_ !is null)
+            callEventCallbacks(prevNodeUnderMouse_, EventType.MOUSE_LEAVE);
+
+         if (nodeUnderMouse_ !is null)
+            callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_ENTER);
+      }
+
+      return true;
    }
 
 
    /// Handles a "mouse button down" event.
-   private void handleMouseButtonDownEvent(in ref ALLEGRO_EVENT event)
+   private bool handleMouseButtonDownEvent(in ref ALLEGRO_EVENT event)
    in
    {
       assert(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN);
@@ -175,15 +174,17 @@ class GUIshEventGenerator
    {
       // Trigger a "MouseDown" signal.
       if (nodeUnderMouse_ !is null)
-         callHandlers(nodeUnderMouse_, EventType.MOUSE_DOWN);
+         callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_DOWN);
 
       // Do the bookkeeping for "Click" and "DoubleClick"
       nodeThatGotMouseDown_[event.mouse.button] = nodeUnderMouse_;
+
+      return true;
    }
 
 
    /// Handles a "mouse button up" event.
-   private void handleMouseButtonUpEvent(in ref ALLEGRO_EVENT event)
+   private bool handleMouseButtonUpEvent(in ref ALLEGRO_EVENT event)
    in
    {
       assert(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP);
@@ -196,23 +197,25 @@ class GUIshEventGenerator
       {
          immutable button = event.mouse.button;
 
-         callHandlers(nodeUnderMouse_, EventType.MOUSE_UP);
+         callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_UP);
 
          // Now, the trickier ones: "Click" and "DoubleClick"
          if (nodeUnderMouse_ == nodeThatGotMouseDown_[button])
          {
-            callHandlers(nodeUnderMouse_, EventType.CLICK);
+            callEventCallbacks(nodeUnderMouse_, EventType.CLICK);
 
             if (time_ - timeOfLastClick_[button] < DOUBLE_CLICK_INTERVAL
                 && nodeUnderMouse_ == nodeThatGotClick_[button])
             {
-               callHandlers(nodeUnderMouse_, EventType.DOUBLE_CLICK);
+               callEventCallbacks(nodeUnderMouse_, EventType.DOUBLE_CLICK);
             }
 
             nodeThatGotClick_[button] = nodeUnderMouse_;
             timeOfLastClick_[button] = time_;
          }
       }
+
+      return true;
    }
 
 
@@ -220,10 +223,10 @@ class GUIshEventGenerator
    private double time_ = 0.0;
 
    /**
-    * All the event handlers. handlers_[MyNode][EventType.CLICK] gets an array
-    * with all handlers for the "click" event of MyNode.
+    * All the event callbacks. eventCallbacks_[MyNode][EventType.CLICK] gets an
+    * array with all callbacks for the "click" event of MyNode.
     */
-   private handler_t[][EventType][Node] handlers_;
+   private EventCallback_t[][EventType][Node] eventCallbacks_;
 
    /// The node currently under the mouse pointer.
    private Node nodeUnderMouse_;
