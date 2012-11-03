@@ -6,6 +6,8 @@
 
 module twodee.aabb;
 
+import std.conv;
+
 
 /**
  * An axis-aligned 2D bounding box. Which makes it a bounding rectangle, I feel
@@ -30,6 +32,13 @@ struct AABB
    public bool contains(float x, float y) const
    {
       return y >= top && y < bottom && x >= left && x < right;
+   }
+
+   /// Returns a string representation of the AABB.
+   public string toString() const
+   {
+      return "[" ~ to!string(top) ~ ", " ~ to!string(bottom)
+         ~ ", " ~ to!string(left) ~ ", " ~ to!string(right) ~ "]";
    }
 
    /// The AABB's top, measured from the top of the screen.
