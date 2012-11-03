@@ -41,3 +41,5 @@ standard updaters could work on instances of interfaces like
 "Positionable", "Colorable" and so on...
 
 Use x and y instead of top and left for Sprite and Text.
+
+Think about a sane way to do manage Allegro resources.
