@@ -20,5 +20,4 @@ twodeedemo: examples/twodeedemo.d twodee.a
 	dmd $(DMDFLAGS) $(DMDLINKFLAGS) -oftwodeedemo examples/twodeedemo.d twodee.a
 
 clean:
-	rm -f twodee.a twodeedemo.*
-
+	rm -f twodee.a twodeedemo twodeedemo.o
