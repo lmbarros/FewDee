@@ -47,7 +47,7 @@ class GameState
    }
    body
    {
-      stateManager_.popState();
+      stateManager_.replaceState(state);
    }
 
    /**
