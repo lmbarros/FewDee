@@ -1,23 +1,31 @@
+Pass the node to GUIsh event callbacks?
+
+GUIsh what about z-order? Drawables have a "z" property; I can
+implement a picking visitor that takes it into account. Then, GUIsh
+should use this. --> should "z" be a property of Node? How would this
+influence rendering order? Nope. "z" is Drawable's. Picking will pick
+Drawables only (and return a node path!). OSGUIsh can work with any
+node; will need to walk up the picked node path until finding a
+registered node (or not).
+
+Child nodes call a parents' method to tell to update their bounding
+boxes because their own bounding box changed. This way, we'll always
+have updated bounding boxes. [ initial implementation will always
+recompute the AABB; this faster method will be implemented if deemed
+necessary. ]
+
+GUIsh: allow hierarchy of objects.
+
 Sprite constructor taking arbitrary number of file names.
 
 Sprite.contains() -> by transparency? Multiple containment policies?
 
-GUIsh: allow hierarchy of objects.
-
 Add means to remove objects/handlers from GUIsh.
-
-GUIsh what about z-order? Nodes have a "z" property; I can implement a
-picking visitor that takes it into account. Then, GUIsh should use
-this.
 
 Create a "virtual screen" with a given "virtual size". Draw everything
 relative to this virtual screen. Scale when drawing. But allow to use
 "real pixels", too. (This would be an option when creating (or
 re-creating, if possible) the display).
-
-Child nodes call a parents' method to tell to update their bounding
-boxes because their own bounding box changed. This way, we'll always
-have updated bounding boxes.
 
 Unit tests: addChild(), removeChild(). Consider what happens when the
 same node is added as child twice.
