@@ -1,6 +1,8 @@
 
 
 import allegro5.allegro;
+import allegro5.allegro_font;
+import allegro5.allegro_ttf;
 
 import std.stdio;
 
@@ -10,6 +12,7 @@ import twodee.game_state;
 import twodee.guish;
 import twodee.state_manager;
 import twodee.sprite;
+import twodee.text;
 import twodee.updater;
 
 
@@ -30,6 +33,12 @@ class MyState: GameState
 
       sprite_.top = 200;
       sprite_.left = 200;
+
+      font_ = al_load_ttf_font("data/bluehigl.ttf", 50, 0);
+      text_ = new Text(font_, "Hi! Âçënts, tóô!");
+      text_.alignment = Text.Alignment.RIGHT;
+      text_.left = 400;
+      text_.top = 25;
 
       //addEventCallback(ALLEGRO_EVENT_MOUSE_AXES, &sayWhereMouseIs);
       addEventCallback(ALLEGRO_EVENT_MOUSE_BUTTON_DOWN, &startAnimation);
@@ -66,6 +75,7 @@ class MyState: GameState
    void onDraw()
    {
       al_clear_to_color(al_map_rgb(200, 200, 0));
+      text_.draw();
       sprite_.draw();
    }
 
@@ -93,6 +103,10 @@ class MyState: GameState
    private Updater updater_;
 
    private Sprite sprite_;
+
+   private ALLEGRO_FONT* font_;
+
+   private Text text_;
 
    private GUIshEventGenerator guish_;
 }

@@ -7,7 +7,7 @@ DMDFLAGS=-unittest $(DMDCOMMONFLAGS)
 # DMDFLAGS=-O -inline $(DMDCOMMONFLAGS)
 # DMDFLAGS=-debug $(DMDCOMMONFLAGS)
 
-DMDLINKFLAGS=twodee.a -L-lallegro -L-lallegro_image
+DMDLINKFLAGS=twodee.a -L-lallegro -L-lallegro_image -L-lallegro_font -L-lallegro_ttf
 
 all: twodee.a twodeedemo
 

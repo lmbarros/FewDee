@@ -7,6 +7,8 @@
 module twodee.engine;
 
 import allegro5.allegro;
+import allegro5.allegro_font;
+import allegro5.allegro_ttf;
 import allegro5.allegro_image;
 import twodee.event;
 import twodee.game_state;
@@ -33,7 +35,14 @@ class Engine
                           "Initialization failed miserably"));
 
       mixin (makeInitCode("al_init_image_addon()", "al_shutdown_image_addon()",
-                          "Error initializing image loaders"));
+                          "Error initializing image subsystem"));
+
+      mixin (makeInitCode("(al_init_font_addon(), true)",
+                          "al_shutdown_font_addon()",
+                          "Error initializing font subsystem"));
+
+      mixin (makeInitCode("al_init_ttf_addon()", "al_shutdown_ttf_addon()",
+                          "Error initializing font subsystem"));
 
       display_ = al_create_display(screenWidth, screenHeight);
       mixin (makeInitCode("(display_ !is null)", "al_destroy_display(display_)",
@@ -76,6 +85,10 @@ class Engine
 
       if (display_ !is null)
          al_destroy_display(display_);
+
+      al_shutdown_ttf_addon();
+
+      al_shutdown_font_addon();
 
       al_shutdown_image_addon();
 

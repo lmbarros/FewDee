@@ -43,3 +43,5 @@ standard updaters could work on instances of interfaces like
 Use x and y instead of top and left for Sprite and Text.
 
 Think about a sane way to do manage Allegro resources.
+
+Add Text vertical alignment.
