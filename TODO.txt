@@ -29,3 +29,15 @@ re-creating, if possible) the display).
 
 Unit tests: addChild(), removeChild(). Consider what happens when the
 same node is added as child twice.
+
+Create some standard updaters... like alpha interpolation, color
+interpolation. Perhaps sprite updater. Mover. Easing would be nice for
+everything...
+
+Consider creating a PositionableDrawable class, with x and y
+properties. Both Sprite and Text (at least) would inherit from
+it. Hum, or perhaps make it an interface implemented by both. The
+standard updaters could work on instances of interfaces like
+"Positionable", "Colorable" and so on...
+
+Use x and y instead of top and left for Sprite and Text.
