@@ -4,13 +4,13 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.guish;
+module twodee.sg.guish;
 
 import allegro5.allegro;
 import std.conv;
 import twodee.event;
 import twodee.event_handler;
-import twodee.node;
+import twodee.sg.node;
 
 
 /// The possible types of GUI-like events.

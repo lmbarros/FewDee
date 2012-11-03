@@ -13,7 +13,8 @@ all: twodee.a twodeedemo
 
 # The library
 twodee.a: src/twodee/*
-	dmd $(DMDFLAGS) -lib -oftwodee.a src/allegro5/*.d src/allegro5/internal/*.d src/twodee/*.d
+	dmd $(DMDFLAGS) -lib -oftwodee.a src/allegro5/*.d src/allegro5/internal/*.d \
+	   src/twodee/*.d src/twodee/sg/*.d
 
 twodeedemo: examples/twodeedemo.d twodee.a
 	dmd $(DMDFLAGS) $(DMDLINKFLAGS) -oftwodeedemo examples/twodeedemo.d twodee.a

@@ -9,11 +9,11 @@ import std.stdio;
 import twodee.engine;
 import twodee.event;
 import twodee.game_state;
-import twodee.guish;
 import twodee.state_manager;
-import twodee.sprite;
-import twodee.text;
 import twodee.updater;
+import twodee.sg.guish;
+import twodee.sg.sprite;
+import twodee.sg.text;
 
 
 class MyState: GameState

@@ -4,11 +4,11 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.node_visitor;
+module twodee.sg.node_visitor;
 
-import twodee.drawable;
-import twodee.group;
-import twodee.node;
+import twodee.sg.drawable;
+import twodee.sg.group;
+import twodee.sg.node;
 
 
 /**

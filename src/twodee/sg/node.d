@@ -4,10 +4,10 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.node;
+module twodee.sg.node;
 
 import twodee.aabb;
-import twodee.node_visitor;
+import twodee.sg.node_visitor;
 
 
 /// A scene graph node.

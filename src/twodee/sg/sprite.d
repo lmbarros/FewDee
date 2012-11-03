@@ -4,12 +4,12 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.sprite;
+module twodee.sg.sprite;
 
 import allegro5.allegro;
 import std.conv;
 import twodee.aabb;
-import twodee.drawable;
+import twodee.sg.drawable;
 
 
 /// A collection of same-sized bitmaps and a few additional bits.

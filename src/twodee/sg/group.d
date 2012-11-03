@@ -4,10 +4,10 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.group;
+module twodee.sg.group;
 
-import twodee.node;
-import twodee.node_visitor;
+import twodee.sg.node;
+import twodee.sg.node_visitor;
 
 
 /// A scene graph node that can have children.

@@ -4,12 +4,12 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.text;
+module twodee.sg.text;
 
 import allegro5.allegro;
 import allegro5.allegro_font;
 import twodee.aabb;
-import twodee.drawable;
+import twodee.sg.drawable;
 
 
 /// A scene graph Drawable that displays text.
