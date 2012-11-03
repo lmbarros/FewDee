@@ -9,11 +9,11 @@ module twodee.sprite;
 import allegro5.allegro;
 import std.conv;
 import twodee.aabb;
-import twodee.node;
+import twodee.drawable;
 
 
 /// A collection of same-sized bitmaps and a few additional bits.
-class Sprite: Node
+class Sprite: Drawable
 {
    /**
     * Constructs the Sprite, without adding any image to it.
@@ -105,20 +105,15 @@ class Sprite: Node
    /// The sprite height, in pixels.
    public @property float height() const { return height_; }
 
-   /**
-    * Draws current the Sprite bitmap to the current target.
-    *
-    * Parameters:
-    *    flags = The flags. As of now, ALLEGRO_FLIP_HORIZONTAL and
-    *       ALLEGRO_FLIP_VERTICAL are available.
-    */
-   void draw(int flags = 0)
+   /// Draws current the Sprite bitmap to the current target.
+   void draw()
    in
    {
       assert(currentIndex_ < bitmaps_.length);
    }
    body
    {
+      immutable flags = 0;
       al_draw_bitmap(bitmaps_[currentIndex_], left_, top_, flags);
    }
 
