@@ -51,3 +51,9 @@ any help?
 
 Make Sprite and Text dirty the AABB (instead of recomputing it) when
 assigning to the coordinates.
+
+For Sprite: there is a handy al_get_parent_bitmap() function; this
+would allow us to keep subbitmaps internally and return the "real"
+bitmap for sorting purposes. Anyway, must implement a benchmark to
+test how slower it is to render from different bitmaps versus from a
+single one versus sub-bitmaps.
