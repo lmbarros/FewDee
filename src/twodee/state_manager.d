@@ -27,7 +27,7 @@ import twodee.game_state;
  * Manager of Game States. Manages a stack of states and the provides the
  * necessary methods to handle it.
  */
-class StateManager
+struct StateManager
 {
    /// Returns the state at the top of the stack.
    public @property GameState top()
@@ -50,7 +50,7 @@ class StateManager
          states_[$-1].onBury();
 
       states_ ~= state;
-      state.stateManager_ = this;
+      state.stateManager_ = &this;
    }
 
    /// Pops the state on the top of the stack of Game States.
@@ -73,7 +73,7 @@ class StateManager
    body
    {
       states_[$-1] = state;
-      state.stateManager_ = this;
+      state.stateManager_ = &this;
    }
 
    /// Called periodically. This is the place to do all the drawing.
@@ -108,7 +108,4 @@ class StateManager
 
    /// An array of Game States, used as a stack.
    private GameState[] states_;
-
-   /// The engine where the state manager is running.
-   private Engine engine_;
 }

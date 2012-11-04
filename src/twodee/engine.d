@@ -16,9 +16,16 @@ import twodee.state_manager;
 
 /**
  * The Game Engine.
+ *
+ * This is a value type (struct), so that we guarantee that its destructor will
+ * be called when going out of scope. Notice, though, that an Engine is
+ * non-copyable.
  */
-class Engine
+struct Engine
 {
+   // Disable copy.
+   @disable this(this) { }
+
    /// Constructs the Engine
    this(uint screenWidth, uint screenHeight)
    {
@@ -68,8 +75,6 @@ class Engine
       al_register_event_source(eventQueue_, al_get_mouse_event_source());
       al_register_event_source(eventQueue_, al_get_keyboard_event_source());
       al_register_event_source(eventQueue_, &customEventSource_);
-
-      stateManager_ = new StateManager();
    }
 
    /// Destroys the Engine

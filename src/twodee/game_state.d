@@ -16,22 +16,12 @@ class GameState
 {
    /// Pushes a state on top of this one. onBury() will be called.
    protected void pushState(GameState state)
-   in
-   {
-      assert(stateManager_ !is null);
-   }
-   body
    {
       stateManager_.pushState(state);
    }
 
    /// Pops this state from the stack of Game States.
    public void popState()
-   in
-   {
-      assert(stateManager_ !is null);
-   }
-   body
    {
       stateManager_.popState();
    }
@@ -41,10 +31,6 @@ class GameState
     * one. onDigOut() and onBury() are not called.
     */
    public void replaceState(GameState state)
-   in
-   {
-      assert(stateManager_ !is null);
-   }
    body
    {
       stateManager_.replaceState(state);
@@ -138,10 +124,10 @@ class GameState
    public @property wantsToDraw(bool wants) { wantsToDraw_ = wants; }
 
    /**
-    * The StateManager managing this state. This is set by the StateManager
-    * itself, as soon as this is added to it.
+    * A pointer to the StateManager managing this state. This is set by the
+    * StateManager itself, as soon as this is added to it.
     */
-   package StateManager stateManager_;
+   package StateManager* stateManager_;
 
    /// Does this GameState want to receive "tick" events?
    private bool wantsTicks_ = true;
