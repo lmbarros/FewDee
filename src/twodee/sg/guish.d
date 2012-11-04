@@ -75,9 +75,12 @@ class GUIshEventGenerator: EventHandler
    /**
     * The type of callbacks called when GUIsh events happen. What exactly is
     * passed in the "event" parameter depends on what event is being handled;
-    * for more information, please see the documentation of EventType.
+    * for more information, please see the documentation of EventType. The
+    * "node" parameter gets the node on which the event was generated (for
+    * example, the node clicked).
     */
-   public alias void delegate(ref in ALLEGRO_EVENT event) EventCallback_t;
+   public alias void delegate(ref in ALLEGRO_EVENT event, Node node)
+      EventCallback_t;
 
    /// Handles incoming events.
    public bool handleEvent(in ref ALLEGRO_EVENT event)
@@ -159,11 +162,11 @@ class GUIshEventGenerator: EventHandler
     * Calls all event callbacks of a given event type registered for a given
     * node.
     */
-   private void callEventCallbacks(Node obj, EventType eventType,
+   private void callEventCallbacks(Node node, EventType eventType,
                                    in ref ALLEGRO_EVENT event)
    {
-      foreach(callback; eventCallbacks_[obj][eventType])
-         callback(event);
+      foreach(callback; eventCallbacks_[node][eventType])
+         callback(event, node);
    }
 
 

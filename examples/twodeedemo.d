@@ -33,31 +33,52 @@ class MyState: GameState
 
       guish_.addEventCallback(
          sprite_, EventType.MOUSE_ENTER,
-         delegate(in ref ALLEGRO_EVENT event) { writeln("Mouse enter!"); });
+         delegate(in ref ALLEGRO_EVENT event, Node node)
+         {
+            writeln("Mouse enter!");
+         });
 
       guish_.addEventCallback(
          sprite_, EventType.MOUSE_LEAVE,
-         delegate(in ref ALLEGRO_EVENT event) { writeln("Mouse leave!"); });
+         delegate(in ref ALLEGRO_EVENT event, Node node)
+         {
+            writeln("Mouse leave!");
+         });
 
       guish_.addEventCallback(
          sprite_, EventType.MOUSE_MOVE,
-         delegate(in ref ALLEGRO_EVENT event) { writeln("Mouse move!"); });
+         delegate(in ref ALLEGRO_EVENT event, Node node)
+         {
+            writeln("Mouse move!");
+         });
 
       guish_.addEventCallback(
          sprite_, EventType.MOUSE_UP,
-         delegate(in ref ALLEGRO_EVENT event) { writeln("Mouse up!"); });
+         delegate(in ref ALLEGRO_EVENT event, Node node)
+         {
+            writeln("Mouse up!");
+         });
 
       guish_.addEventCallback(
          sprite_, EventType.MOUSE_DOWN,
-         delegate(in ref ALLEGRO_EVENT event) { writeln("Mouse down!"); });
+         delegate(in ref ALLEGRO_EVENT event, Node node)
+         {
+            writeln("Mouse down!");
+         });
 
       guish_.addEventCallback(
          sprite_, EventType.CLICK,
-         delegate(in ref ALLEGRO_EVENT event) { writeln("Click!"); });
+         delegate(in ref ALLEGRO_EVENT event, Node node)
+         {
+            writeln("Click!");
+         });
 
       guish_.addEventCallback(
          sprite_, EventType.DOUBLE_CLICK,
-         delegate(in ref ALLEGRO_EVENT event) { writeln("Double click!"); });
+         delegate(in ref ALLEGRO_EVENT event, Node node)
+         {
+            writeln("Double click!");
+         });
    }
 
    void onDraw()
