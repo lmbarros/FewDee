@@ -48,3 +48,6 @@ pushState() in both of them? (Practical example: the player presses
 is killed by a bullet, which triggers a transition to the "game over"
 state.) Using Allegro events to manage the stack of states could be of
 any help?
+
+Make Sprite and Text dirty the AABB (instead of recomputing it) when
+assigning to the coordinates.
