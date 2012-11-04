@@ -74,8 +74,8 @@ class GUIshEventGenerator: EventHandler
 {
    /**
     * The type of callbacks called when GUIsh events happen. What exactly is
-    * passed in the "event"parameter depends on what event is being handled; for
-    * more information, please see the documentation of EventType.
+    * passed in the "event" parameter depends on what event is being handled;
+    * for more information, please see the documentation of EventType.
     */
    public alias void delegate(ref in ALLEGRO_EVENT event) EventCallback_t;
 
