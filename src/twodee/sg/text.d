@@ -9,12 +9,15 @@ module twodee.sg.text;
 import allegro5.allegro;
 import allegro5.allegro_font;
 import twodee.aabb;
+import twodee.positionable;
 import twodee.sg.drawable;
 
 
 /// A scene graph Drawable that displays text.
-class Text: Drawable
+class Text: Drawable, Positionable
 {
+   mixin PositionableDefaultImplementation!"recomputeAABB();";
+
    /// An enumeration of the possible text alignments.
    public enum Alignment
    {
@@ -51,7 +54,7 @@ class Text: Drawable
    public void draw()
    {
       al_draw_text(font_, ALLEGRO_COLOR(255, 255, 255, 255),
-                   left_, top_, alignment_, text_.ptr);
+                   x, y, alignment_, text_.ptr);
    }
 
    /// Returns the text bounding box.
@@ -66,26 +69,6 @@ class Text: Drawable
       alignment_ = alignment;
       recomputeAABB();
    }
-
-   /// The Text position, measured in pixels from the left of the screen.
-   public @property void left(float newLeft)
-   {
-      left_ = newLeft;
-      recomputeAABB();
-   }
-
-   /// The Text position, measured in pixels from the top of the screen.
-   public @property void top(float newTop)
-   {
-      top_ = newTop;
-      recomputeAABB();
-   }
-
-   /// The Text position, measured in pixels from the left of the screen.
-   public @property float left() const { return left_; }
-
-   /// The Text position, measured in pixels from the top of the screen.
-   public @property float top() const { return top_; }
 
    /// Recomputes the bounding box; stores it in aabb_.
    private void recomputeAABB()
@@ -102,9 +85,9 @@ class Text: Drawable
          case Alignment.CENTER: dx = bbw / 2.0; break;
       }
 
-      auto bbl = left + bbx - dx;
+      auto bbl = x + bbx - dx;
       auto bbr = bbl + bbw;
-      auto bbt = top + bby;
+      auto bbt = y + bby;
       auto bbb = bbt + bbh;
 
       aabb_ = AABB(bbt, bbb, bbl, bbr);
@@ -112,12 +95,6 @@ class Text: Drawable
 
    /// The font used to draw the text.
    private ALLEGRO_FONT* font_;
-
-   /// The Text position, in pixels from the top of the screen.
-   private float top_ = 0.0;
-
-   /// The Text position, in pixels from the left of the screen.
-   private float left_ = 0.0;
 
    /// The text itself.
    private string text_;

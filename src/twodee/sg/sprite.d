@@ -9,12 +9,15 @@ module twodee.sg.sprite;
 import allegro5.allegro;
 import std.conv;
 import twodee.aabb;
+import twodee.positionable;
 import twodee.sg.drawable;
 
 
 /// A collection of same-sized bitmaps and a few additional bits.
-class Sprite: Drawable
+class Sprite: Drawable, Positionable
 {
+   mixin PositionableDefaultImplementation!"recomputeAABB();";
+
    /**
     * Constructs the Sprite, without adding any image to it.
     *
@@ -79,26 +82,6 @@ class Sprite: Drawable
       currentIndex_ = newIndex;
    }
 
-   /// The Sprite position, measured in pixels from the left of the screen.
-   public @property void left(float newLeft)
-   {
-      left_ = newLeft;
-      aabb_ = AABB(top, top + height, left, left + width);
-   }
-
-   /// The Sprite position, measured in pixels from the top of the screen.
-   public @property void top(float newTop)
-   {
-      top_ = newTop;
-      aabb_ = AABB(top, top + height, left, left + width);
-   }
-
-   /// The Sprite position, measured in pixels from the left of the screen.
-   public @property float left() const { return left_; }
-
-   /// The Sprite position, measured in pixels from the top of the screen.
-   public @property float top() const { return top_; }
-
    /// The sprite width, in pixels.
    public @property float width() const { return width_; }
 
@@ -114,17 +97,17 @@ class Sprite: Drawable
    body
    {
       immutable flags = 0;
-      al_draw_bitmap(bitmaps_[currentIndex_], left_, top_, flags);
+      al_draw_bitmap(bitmaps_[currentIndex_], x, y, flags);
+   }
+
+   /// Recomputes the bounding box; stores it in aabb_.
+   private void recomputeAABB()
+   {
+      aabb_ = AABB(y, y + height, x, x + width);
    }
 
    /// The index (into bitmaps_) of current bitmap.
    size_t currentIndex_ = 0;
-
-   /// The Sprite position, in pixels from the top of the screen.
-   float top_;
-
-   /// The Sprite position, in pixels from the left of the screen.
-   float left_;
 
    /// Sprite width, in pixels.
    int width_;
@@ -138,13 +121,7 @@ class Sprite: Drawable
    /// Sprite center along the y axis.
    float centerY_;
 
-   /**
-    * The bounding box.
-    *
-    * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    * xxxxxxx top, left, width and height can be deduced from this! Get rid of
-    *         the redundancy (TODO).
-    */
+   /// The bounding box.
    AABB aabb_;
 
    /// The bitmaps.

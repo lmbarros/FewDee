@@ -15,6 +15,7 @@ public import twodee.engine;
 public import twodee.event;
 public import twodee.event_handler;
 public import twodee.game_state;
+public import twodee.positionable;
 public import twodee.state_manager;
 public import twodee.updater;
 public import twodee.sg.drawable;

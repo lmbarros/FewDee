@@ -19,14 +19,14 @@ class MyState: GameState
       sprite_.addBitmap("data/flag_1.png");
       sprite_.addBitmap("data/flag_3.png");
 
-      sprite_.top = 200;
-      sprite_.left = 200;
+      sprite_.x = 200;
+      sprite_.y = 200;
 
       font_ = al_load_ttf_font("data/bluehigl.ttf", 50, 0);
       text_ = new Text(font_, "Hi! Âçënts, tóô!");
       text_.alignment = Text.Alignment.RIGHT;
-      text_.left = 400;
-      text_.top = 25;
+      text_.x = 400;
+      text_.y = 25;
 
       //addEventCallback(ALLEGRO_EVENT_MOUSE_AXES, &sayWhereMouseIs);
       addEventCallback(ALLEGRO_EVENT_MOUSE_BUTTON_DOWN, &startAnimation);
