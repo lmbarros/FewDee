@@ -45,3 +45,10 @@ Use x and y instead of top and left for Sprite and Text.
 Think about a sane way to do manage Allegro resources.
 
 Add Text vertical alignment.
+
+What if a state gets two events in the same "turn" and calls
+pushState() in both of them? (Practical example: the player presses
+"ESC" to get to the "in-game menu" state , and in the same "turn" he
+is killed by a bullet, which triggers a transition to the "game over"
+state.) Using Allegro events to manage the stack of states could be of
+any help?

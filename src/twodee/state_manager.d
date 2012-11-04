@@ -11,18 +11,6 @@ import twodee.event;
 import twodee.game_state;
 
 
-//
-// TODO: - Use Allegro events to manage the stack of states?
-//
-//       - What if a state gets two events in the same "turn" and calls
-//         pushState() in both of them? (Practical example: the player presses
-//         "ESC" to get to the "in-game menu" state , and in the same "turn" he
-//         is killed by a bullet, which triggers a transition to the "game over"
-//         state.)
-//
-
-
-
 /**
  * Manager of Game States. Manages a stack of states and the provides the
  * necessary methods to handle it.
