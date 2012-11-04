@@ -7,7 +7,6 @@
 module twodee.state_manager;
 
 import allegro5.allegro;
-import twodee.engine;
 import twodee.event;
 import twodee.game_state;
 
@@ -30,17 +29,6 @@ import twodee.game_state;
  */
 class StateManager
 {
-   /**
-    * Constructs the StateManager.
-    *
-    * Parameters:
-    *    engine = The engine where this StateManager is running.
-    */
-   this(Engine engine)
-   {
-      engine_ = engine;
-   }
-
    /// Returns the state at the top of the stack.
    public @property GameState top()
    in

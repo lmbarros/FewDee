@@ -69,7 +69,7 @@ class Engine
       al_register_event_source(eventQueue_, al_get_keyboard_event_source());
       al_register_event_source(eventQueue_, &customEventSource_);
 
-      stateManager_ = new StateManager(this);
+      stateManager_ = new StateManager();
    }
 
    /// Destroys the Engine
