@@ -114,6 +114,6 @@ class MyState: GameState
 
 void main()
 {
-   auto engine = twodee.engine.Engine(640, 480);
+   auto engine = Engine(640, 480);
    engine.run(new MyState());
 }
