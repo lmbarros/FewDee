@@ -26,9 +26,27 @@ import twodee.game_state;
 /**
  * Manager of Game States. Manages a stack of states and the provides the
  * necessary methods to handle it.
+ *
+ * The StateManager owns the states it manages. It will call destroy() on these
+ * states as appropriate. This means that keeping external references to these
+ * states is a bad idea, since they may end up pointing to invalid (destroyed)
+ * states.
  */
 struct StateManager
 {
+   // Disable copy.
+   @disable this(this) { }
+
+   /**
+    * Destroys the StateManager. Ensures that the destructors of all remaining
+    * game states (if any) are called.
+    */
+   ~this()
+   {
+      foreach(state; states_)
+         destroy(state);
+   }
+
    /// Returns the state at the top of the stack.
    public @property GameState top()
    in
@@ -53,9 +71,18 @@ struct StateManager
       state.stateManager_ = &this;
    }
 
-   /// Pops the state on the top of the stack of Game States.
+   /**
+    * Pops the state on the top of the stack of Game States. The destructor of
+    * the popped state is called.
+    */
    void popState()
+   in
    {
+      assert(states_.length > 0);
+   }
+   body
+   {
+      destroy(states_[$-1]); // ensure that destructor is called
       states_ = states_[0 .. $-1];
       if (states_.length > 0)
          states_[$-1].onDigOut();
@@ -63,7 +90,8 @@ struct StateManager
 
    /**
     * Replaces the state in the top of the stack of Game States with a new
-    * one. onDigOut() and onBury() are not called.
+    * one. onDigOut() and onBury() are not called.  The destructor of the
+    * replaced state is called.
     */
    void replaceState(GameState state)
    in
@@ -72,6 +100,7 @@ struct StateManager
    }
    body
    {
+      destroy(states_[$-1]); // ensure that destructor is called
       states_[$-1] = state;
       state.stateManager_ = &this;
    }
