@@ -52,7 +52,7 @@ class Sprite: Drawable, Positionable
     *
     * Returns: The index of the added bitmap.
     */
-   size_t addBitmap(string fileName)
+   public size_t addBitmap(string fileName)
    {
       ALLEGRO_BITMAP* bitmap = al_load_bitmap(fileName.ptr);
       if (bitmap is null)
@@ -89,7 +89,7 @@ class Sprite: Drawable, Positionable
    public @property float height() const { return height_; }
 
    /// Draws current the Sprite bitmap to the current target.
-   void draw()
+   public void draw()
    in
    {
       assert(currentIndex_ < bitmaps_.length);
@@ -107,23 +107,23 @@ class Sprite: Drawable, Positionable
    }
 
    /// The index (into bitmaps_) of current bitmap.
-   size_t currentIndex_ = 0;
+   private size_t currentIndex_ = 0;
 
    /// Sprite width, in pixels.
-   int width_;
+   private int width_;
 
    /// Sprite height, in pixels.
-   int height_;
+   private int height_;
 
    /// Sprite center along the x axis.
-   float centerX_;
+   private float centerX_;
 
    /// Sprite center along the y axis.
-   float centerY_;
+   private float centerY_;
 
    /// The bounding box.
-   AABB aabb_;
+   private AABB aabb_;
 
    /// The bitmaps.
-   ALLEGRO_BITMAP*[] bitmaps_;
+   private ALLEGRO_BITMAP*[] bitmaps_;
 }
