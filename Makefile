@@ -15,7 +15,7 @@ DMDLINKFLAGS=twodee.a -L-lallegro -L-lallegro_image -L-lallegro_font -L-lallegro
 
 
 # All
-all: twodee.a twodeedemo.example states_simple.example
+all: twodee.a twodeedemo.example states_simple.example updater_simple.example
 
 
 # The library
@@ -25,8 +25,9 @@ twodee.a: src/twodee/*
 
 
 # The examples
-twodeedemo.example: examples/twodeedemo.d
-states_simple.example: examples/states_simple.d
+twodeedemo.example: examples/twodeedemo.d twodee.a
+states_simple.example: examples/states_simple.d twodee.a
+updater_simple.example: examples/updater_simple.d twodee.a
 
 
 # Clean
