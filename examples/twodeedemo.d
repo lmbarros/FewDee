@@ -1,19 +1,7 @@
 
 
-import allegro5.allegro;
-import allegro5.allegro_font;
-import allegro5.allegro_ttf;
-
 import std.stdio;
-
-import twodee.engine;
-import twodee.event;
-import twodee.game_state;
-import twodee.state_manager;
-import twodee.updater;
-import twodee.sg.guish;
-import twodee.sg.sprite;
-import twodee.sg.text;
+import twodee.all;
 
 
 class MyState: GameState

@@ -4,18 +4,9 @@
  * Authors: Leandro Motta Barros
  */
 
-import allegro5.allegro;
-import allegro5.allegro_font;
-import allegro5.allegro_ttf;
-
-import twodee.engine;
-import twodee.event;
-import twodee.game_state;
-import twodee.state_manager;
-import twodee.updater;
-
 import std.exception;
 import std.stdio;
+import twodee.all;
 
 
 class TheState: GameState
