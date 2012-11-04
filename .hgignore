@@ -3,3 +3,4 @@ syntax: glob
 twodeedemo
 *.o
 *.a
+*.example
