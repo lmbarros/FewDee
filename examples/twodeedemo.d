@@ -13,11 +13,15 @@ class MyState: GameState
       addEventHandler(guish_);
       addEventHandler(updater_);
 
+      bitmap1_ = al_load_bitmap("data/flag_1.png");
+      bitmap2_ = al_load_bitmap("data/flag_2.png");
+      bitmap3_ = al_load_bitmap("data/flag_3.png");
+
       sprite_ = new Sprite(64, 64);
-      sprite_.addBitmap("data/flag_1.png");
-      sprite_.addBitmap("data/flag_2.png");
-      sprite_.addBitmap("data/flag_1.png");
-      sprite_.addBitmap("data/flag_3.png");
+      sprite_.addBitmap(bitmap1_);
+      sprite_.addBitmap(bitmap2_);
+      sprite_.addBitmap(bitmap1_);
+      sprite_.addBitmap(bitmap3_);
 
       sprite_.x = 200;
       sprite_.y = 200;
@@ -114,6 +118,9 @@ class MyState: GameState
    private Sprite sprite_;
 
    private ALLEGRO_FONT* font_;
+   private ALLEGRO_BITMAP* bitmap1_;
+   private ALLEGRO_BITMAP* bitmap2_;
+   private ALLEGRO_BITMAP* bitmap3_;
 
    private Text text_;
 

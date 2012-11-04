@@ -24,24 +24,19 @@ class Sprite: Drawable, Positionable
     * Parameters:
     *    width = The Sprite width, in pixels.
     *    height = The Sprite height, in pixels.
-    *    centerX = The Sprite center along the x axis.
-    *    centerY = The Sprite center along the x axis.
+    *    centerX = The x coordinate of the Sprite center, in the local
+    *       coordinate system.
+    *    centerY = The y coordinate of the Sprite center, in the local
+    *       coordinate system.
     */
-   this(int width, int height, float centerX = 0.0, float centerY = 0.0)
+   this(float width, float height, float centerX = 0.0, float centerY = 0.0)
    {
       width_ = width;
       height_ = height;
       centerX_ = centerX;
       centerY_ = centerY;
 
-      aabb_ = AABB(0, height, 0, width);
-   }
-
-   /// Destroys the Sprite. Destroys all bitmaps.
-   ~this()
-   {
-      foreach(bitmap; bitmaps_)
-         al_destroy_bitmap(bitmap);
+      recomputeAABB();
    }
 
    /// Returns the node's bounding rectangle.
@@ -52,18 +47,19 @@ class Sprite: Drawable, Positionable
     *
     * Returns: The index of the added bitmap.
     */
-   public size_t addBitmap(string fileName)
+   public size_t addBitmap(ALLEGRO_BITMAP* bitmap)
+   in
    {
-      ALLEGRO_BITMAP* bitmap = al_load_bitmap(fileName.ptr);
-      if (bitmap is null)
-         throw new Exception("Error loading sprite bitmap '" ~ fileName ~ "'");
-
+      assert(bitmap !is null);
+   }
+   body
+   {
       immutable bmpWidth = al_get_bitmap_width(bitmap);
       immutable bmpHeight = al_get_bitmap_height(bitmap);
       if (bmpWidth != width_ || bmpHeight != height_)
       {
          throw new Exception(
-            "Wrong sized sprite bitmap '" ~ fileName ~ "'. " ~ "Expected "
+            "Wrong sized sprite bitmap. Expected "
             ~ to!string(width_) ~ "x" ~ to!string(height_) ~ ", got "
             ~ to!string(bmpWidth) ~ "x" ~ to!string(bmpHeight));
       }
@@ -88,7 +84,7 @@ class Sprite: Drawable, Positionable
    /// The sprite height, in pixels.
    public @property float height() const { return height_; }
 
-   /// Draws current the Sprite bitmap to the current target.
+   /// Draws the current Sprite bitmap to the current target.
    public void draw()
    in
    {
@@ -110,10 +106,10 @@ class Sprite: Drawable, Positionable
    private size_t currentIndex_ = 0;
 
    /// Sprite width, in pixels.
-   private int width_;
+   private float width_;
 
    /// Sprite height, in pixels.
-   private int height_;
+   private float height_;
 
    /// Sprite center along the x axis.
    private float centerX_;
