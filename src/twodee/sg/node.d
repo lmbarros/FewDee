@@ -19,12 +19,17 @@ class Node
       visitor.visit(this);
    }
 
-   /// Returns the node's bounding rectangle.
+   /**
+    * Returns the node's bounding rectangle. The returned rectangle shall be in
+    * the local coordinate system of this Node.
+    */
    abstract public @property AABB aabb() const;
 
    /**
-    * Checks whether a given point is contained by this Node. The default
-    * implementation uses a simple bounding box-based test.
+    * Checks whether a given point is contained by this Node. The point passed
+    * is assumed to be in the Node's local coordinate system.
+    *
+    * The default implementation uses a simple bounding box-based test.
     */
    public bool contains(float x, float y)
    {
