@@ -93,13 +93,15 @@ class Sprite: Drawable, Positionable
    body
    {
       immutable flags = 0;
-      al_draw_bitmap(bitmaps_[currentIndex_], x, y, flags);
+      al_draw_bitmap(bitmaps_[currentIndex_], x - centerX_, y - centerY_,
+                     flags);
    }
 
    /// Recomputes the bounding box; stores it in aabb_.
    private void recomputeAABB()
    {
-      aabb_ = AABB(y, y + height, x, x + width);
+      aabb_ = AABB(y - centerY_, y + height - centerY_,
+                   x - centerX_, x + width - centerX_);
    }
 
    /// The index (into bitmaps_) of current bitmap.
