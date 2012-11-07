@@ -9,6 +9,7 @@ module twodee.sg.node_visitor;
 import twodee.sg.drawable;
 import twodee.sg.group;
 import twodee.sg.node;
+import twodee.sg.srt;
 
 
 /**
@@ -25,4 +26,7 @@ class NodeVisitor
 
    /// Called when visiting a Group. Override as necessary in subclasses.
    public void visit(Group node) { }
+
+   /// Called when visiting a SRT. Override as necessary in subclasses.
+   public void visit(SRT node) { }
 }

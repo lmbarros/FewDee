@@ -24,4 +24,5 @@ public import twodee.sg.guish;
 public import twodee.sg.node;
 public import twodee.sg.node_visitor;
 public import twodee.sg.sprite;
+public import twodee.sg.srt;
 public import twodee.sg.text;
