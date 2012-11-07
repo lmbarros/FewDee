@@ -42,16 +42,16 @@ struct AABB
    }
 
    /// The AABB's top, measured from the top of the screen.
-   float top;
+   public float top;
 
    /// The AABB's bottom, measured from the top of the screen.
-   float bottom;
+   public float bottom;
 
    /// The AABB's left side, measured from the left of the screen.
-   float left;
+   public float left;
 
    /// The AABB's right side, measured from the left of the screen.
-   float right;
+   public float right;
 }
 
 
