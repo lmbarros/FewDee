@@ -6,6 +6,7 @@
 
 module twodee.sg.group;
 
+import twodee.aabb;
 import twodee.sg.node;
 import twodee.sg.node_visitor;
 
@@ -27,6 +28,22 @@ class Group: Node
 
       foreach(node; children_)
          node.accept(visitor);
+   }
+
+   /**
+    * Returns the node's bounding rectangle. The returned rectangle shall be in
+    * the local coordinate system of this Node.
+    */
+   public @property AABB aabb() const
+   {
+      if (children_.length == 0)
+         return EmptyAABB;
+
+      auto aabb = children_[0].aabb;
+      foreach(child; children_[1..$])
+         aabb.unionWith(child.aabb);
+
+      return aabb;
    }
 
    /// The child nodes of this Group.
