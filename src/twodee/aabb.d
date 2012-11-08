@@ -6,6 +6,7 @@
 
 module twodee.aabb;
 
+import std.algorithm;
 import std.conv;
 
 
@@ -22,6 +23,15 @@ struct AABB
       this.bottom = bottom;
       this.left = left;
       this.right = right;
+   }
+
+   /// Makes this AABB be the union of itself with the one passed as parameter.
+   void unionWith(in AABB other)
+   {
+      top = min(this.top, other.top);
+      bottom = max(this.bottom, other.bottom);
+      left = min(this.left, other.left);
+      right = max(this.right, other.right);
    }
 
    /**
@@ -55,6 +65,7 @@ struct AABB
 }
 
 
+// Tests AABB.contains()
 unittest
 {
    auto aabb = AABB(10.0, 30.0, 5.0, 40.0);
@@ -68,3 +79,32 @@ unittest
    assert(aabb.contains(5.0, 20.0)); // point along left segment
    assert(!aabb.contains(5.0, 40.0)); // point along right segment
 }
+
+
+// Tests AABB.unionWith()
+unittest
+{
+   auto aabb1 = AABB(-2, 10, 3, 8);
+   const aabb2 = AABB(-1, 11, 4, 8);
+
+   aabb1.unionWith(aabb2);
+   assert(aabb1.top == -2);
+   assert(aabb1.bottom == 11);
+   assert(aabb1.left == 3);
+   assert(aabb1.right == 8);
+
+   const aabb3 = AABB(3, 4, 5, 7);
+   aabb1.unionWith(aabb3);
+   assert(aabb1.top == -2);
+   assert(aabb1.bottom == 11);
+   assert(aabb1.left == 3);
+   assert(aabb1.right == 8);
+
+   const aabb4 = AABB(-100, 100, -100, 100);
+   aabb1.unionWith(aabb4);
+   assert(aabb1.top == -100);
+   assert(aabb1.bottom == 100);
+   assert(aabb1.left == -100);
+   assert(aabb1.right == 100);
+}
+
