@@ -34,6 +34,9 @@ class SRT: Group
    {
       if (isDirty_)
          al_build_transform(&transform_, tx, ty, sx, sy, r);
+
+      isDirty_ = false;
+
       return &transform_;
    }
 
