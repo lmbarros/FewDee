@@ -19,6 +19,7 @@ public import twodee.positionable;
 public import twodee.state_manager;
 public import twodee.updater;
 public import twodee.sg.drawable;
+public import twodee.sg.drawing_visitor;
 public import twodee.sg.group;
 public import twodee.sg.guish;
 public import twodee.sg.node;
