@@ -36,8 +36,6 @@ Create other interfaces: Rotationable (Sprite is), Colorable (Sprite
 and Text are). Perhaps an "Alphable", if Colorable doesn't work as
 such already.
 
-Use x and y instead of top and left for Sprite and Text.
-
 Think about a sane way to do manage Allegro resources.
 
 Add Text vertical alignment.
@@ -57,3 +55,7 @@ would allow us to keep subbitmaps internally and return the "real"
 bitmap for sorting purposes. Anyway, must implement a benchmark to
 test how slower it is to render from different bitmaps versus from a
 single one versus sub-bitmaps.
+
+Group.addChild(): accept multiple children at a time? Technically,
+would have to be renamed addChildren()... don't know if is necessary
+in practice... must think about it.
