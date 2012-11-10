@@ -91,9 +91,7 @@ class SRT: Group
    /// The scale along the y axis.
    private float sy_ = 1.0;
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   // radians? counter-clockwise?
-   /// The rotation.
+   /// The rotation, in radians. The angle grows in the clockwise direction.
    private float r_ = 0.0;
 
    /**
