@@ -33,7 +33,12 @@ class SRT: Group
    public @property const(ALLEGRO_TRANSFORM*) transform()
    {
       if (isDirty_)
-         al_build_transform(&transform_, tx, ty, sx, sy, r);
+      {
+         al_identity_transform(&transform_);
+         al_translate_transform(&transform_, tx, ty);
+         al_rotate_transform(&transform_, r);
+         al_scale_transform(&transform_, sx, sy);
+      }
 
       isDirty_ = false;
 
