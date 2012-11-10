@@ -77,10 +77,10 @@ class SRT: Group
    private float ty_ = 0.0;
 
    /// The scale along the x axis.
-   private float sx_ = 0.0;
+   private float sx_ = 1.0;
 
    /// The scale along the y axis.
-   private float sy_ = 0.0;
+   private float sy_ = 1.0;
 
    // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    // radians? counter-clockwise?
