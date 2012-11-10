@@ -24,10 +24,14 @@ class Group: Node
    /// Accepts a NodeVisitor. The Visitor pattern, you know.
    public override void accept(NodeVisitor visitor)
    {
+      visitor.pushNodeToNodePath(this);
+
       visitor.visit(this);
 
       foreach(node; children_)
          node.accept(visitor);
+
+      visitor.popNodeFromNodePath(this);
    }
 
    /**

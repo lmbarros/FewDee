@@ -16,7 +16,9 @@ class Node
    /// Accepts a NodeVisitor. The Visitor pattern, you know.
    public void accept(NodeVisitor visitor)
    {
+      visitor.pushNodeToNodePath(this);
       visitor.visit(this);
+      visitor.popNodeFromNodePath(this);
    }
 
    /**

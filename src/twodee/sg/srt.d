@@ -20,12 +20,14 @@ class SRT: Group
    /// Accepts a NodeVisitor. The Visitor pattern, you know.
    public override void accept(NodeVisitor visitor)
    {
-      // super.accept(visitor) ????? xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      visitor.pushNodeToNodePath(this);
 
       visitor.visit(this);
 
       foreach(node; children_)
          node.accept(visitor);
+
+      visitor.popNodeFromNodePath(this);
    }
 
    public @property const(ALLEGRO_TRANSFORM*) transform()
