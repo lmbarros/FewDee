@@ -6,12 +6,6 @@ Drawables only (and return a node path!). OSGUIsh can work with any
 node; will need to walk up the picked node path until finding a
 registered node (or not).
 
-Child nodes call a parents' method to tell to update their bounding
-boxes because their own bounding box changed. This way, we'll always
-have updated bounding boxes. [ initial implementation will always
-recompute the AABB; this faster method will be implemented if deemed
-necessary. ]
-
 GUIsh: allow hierarchy of objects.
 
 Sprite constructor taking arbitrary number of file names.
@@ -59,3 +53,25 @@ single one versus sub-bitmaps.
 Group.addChild(): accept multiple children at a time? Technically,
 would have to be renamed addChildren()... don't know if is necessary
 in practice... must think about it.
+
+Scene Graph: Support z-order. Just need to sort the Drawables by z
+before drawing (in DrawingVisitor), I guess.
+
+ Optimization
+--------------
+
+Child nodes call a parents' method to tell to update their bounding
+boxes because their own bounding box changed. This way, we'll always
+have updated bounding boxes. [ initial implementation will always
+recompute the AABB; this faster method will be implemented if deemed
+necessary. ]
+
+DrawingVisitor: Allow Drawables to share a common Transform. Then,
+sort by transform to spare a couple of calls to
+al_use_transform(). (Need to benchmark this; perhaps leave the sorting
+policy as something user-definable)
+
+DrawingVisitor: Add a 'bitmap' property to Drawables. Then, sort by
+bitmap to avoid changing texture from draw to draw. BTW, remember to
+take subbitmaps into account. (Need to benchmark this; perhaps leave
+the sorting policy as something user-definable)
