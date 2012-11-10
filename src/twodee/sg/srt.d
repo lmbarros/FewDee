@@ -30,6 +30,7 @@ class SRT: Group
       visitor.popNodeFromNodePath(this);
    }
 
+   /// Returns the transform represented by this SRT node.
    public @property const(ALLEGRO_TRANSFORM*) transform()
    {
       if (isDirty_)
@@ -97,7 +98,7 @@ class SRT: Group
 
    /**
     * The transform. When isDirty_ == true, it must be recomputed because at
-    * least one of tx, ty, sy, sy or r has been assigned a new value.
+    * least one of tx, ty, sx, sy or r has been assigned a new value.
     */
    private ALLEGRO_TRANSFORM transform_;
 }
