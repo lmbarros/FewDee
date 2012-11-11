@@ -57,6 +57,10 @@ in practice... must think about it.
 Scene Graph: Support z-order. Just need to sort the Drawables by z
 before drawing (in DrawingVisitor), I guess.
 
+Latest version of DAllegro includes a al_run_allegro() function that
+should be used instead of simply putting all the code directly on
+main() (for portability reasons). Check this out.
+
  Optimization
 --------------
 
