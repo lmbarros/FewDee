@@ -80,11 +80,12 @@ class TheState: GameState
       addEventCallback(TWODEE_EVENT_TICK,
                        delegate(in ref ALLEGRO_EVENT event)
                        {
-                          time += event.user.deltaTime;
+                          auto dt = event.user.deltaTime;
+                          time += dt;
                           sprSun.currentIndex = cast(int)(time*10) % 2;
 
-                          srtPlanet.r = srtPlanet.r + event.user.deltaTime;
-                          srtMoon.r = srtMoon.r + event.user.deltaTime*3;
+                          srtPlanet.r = srtPlanet.r + dt;
+                          srtMoon.r = srtMoon.r + dt * 3;
                        });
    }
 
