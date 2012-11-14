@@ -16,7 +16,7 @@ DMDLINKFLAGS=twodee.a -L-lallegro -L-lallegro_image -L-lallegro_font -L-lallegro
 
 # All
 all: twodee.a twodeedemo.example states_simple.example updater_simple.example \
-	   sg_solar_system.example
+	   sg_solar_system.example sg_parallax_scrolling.example
 
 
 # The library
@@ -30,7 +30,7 @@ twodeedemo.example: examples/twodeedemo.d twodee.a
 states_simple.example: examples/states_simple.d twodee.a
 updater_simple.example: examples/updater_simple.d twodee.a
 sg_solar_system.example: examples/sg_solar_system.d twodee.a
-
+sg_parallax_scrolling.d: examples/sg_parallax_scrolling.d twodee.a
 
 # Clean
 clean:
