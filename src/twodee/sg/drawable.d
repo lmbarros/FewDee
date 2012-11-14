@@ -17,7 +17,7 @@ class Drawable: Node
    abstract public void draw();
 
    /// Accepts a NodeVisitor. The Visitor pattern, you know.
-   public void accept(NodeVisitor visitor)
+   public override void accept(NodeVisitor visitor)
    {
       visitor.pushNodeToNodePath(this);
       visitor.visit(this);

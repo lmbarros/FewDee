@@ -144,7 +144,7 @@ class TheState: GameState
       al_destroy_bitmap(bmpWitch_);
    }
 
-   public void onDraw()
+   public override void onDraw()
    {
       al_clear_to_color(al_map_rgb(64, 64, 128));
 

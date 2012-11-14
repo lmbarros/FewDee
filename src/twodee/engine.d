@@ -67,7 +67,7 @@ struct Engine
 
       eventQueue_ = al_create_event_queue();
       mixin (makeInitCode("(eventQueue_ !is null)",
-                          "al_destroy_event_queue(eventQueue_);",
+                          "al_destroy_event_queue(eventQueue_)",
                           "Error creating event queue."));
 
       al_register_event_source(eventQueue_,

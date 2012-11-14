@@ -38,7 +38,7 @@ class Group: Node
     * Returns the node's bounding rectangle. The returned rectangle shall be in
     * the local coordinate system of this Node.
     */
-   public @property AABB aabb() const
+   public override @property AABB aabb() const
    {
       if (children_.length == 0)
          return EmptyAABB;

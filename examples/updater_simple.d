@@ -55,7 +55,7 @@ class TheState: GameState
          });
    }
 
-   public void onDraw()
+   public override void onDraw()
    {
       al_clear_to_color(al_map_rgb(50, 50, 50));
       drawText("Updater simple example", 30, 30);

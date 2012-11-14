@@ -85,7 +85,7 @@ class MyState: GameState
          });
    }
 
-   void onDraw()
+   public override void onDraw()
    {
       al_clear_to_color(al_map_rgb(200, 200, 0));
       text_.draw();

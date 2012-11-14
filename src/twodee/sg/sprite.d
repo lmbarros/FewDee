@@ -40,7 +40,7 @@ class Sprite: Drawable, Positionable
    }
 
    /// Returns the node's bounding rectangle.
-   public @property AABB aabb() const { return aabb_; }
+   public override @property AABB aabb() const { return aabb_; }
 
    /**
     * Adds a bitmap to the Sprite.
@@ -85,7 +85,7 @@ class Sprite: Drawable, Positionable
    public @property float height() const { return height_; }
 
    /// Draws the current Sprite bitmap to the current target.
-   public void draw()
+   public override void draw()
    in
    {
       assert(currentIndex_ < bitmaps_.length);

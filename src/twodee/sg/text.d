@@ -51,14 +51,14 @@ class Text: Drawable, Positionable
    }
 
    /// Draws the text to the current target bitmap.
-   public void draw()
+   public override void draw()
    {
       al_draw_text(font_, ALLEGRO_COLOR(255, 255, 255, 255),
                    x, y, alignment_, text_.ptr);
    }
 
    /// Returns the text bounding box.
-   public @property AABB aabb() const { return aabb_; }
+   public override @property AABB aabb() const { return aabb_; }
 
    /// Gets the text alignment.
    public @property Alignment alignment() const { return alignment_; }

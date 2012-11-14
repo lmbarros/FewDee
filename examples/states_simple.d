@@ -48,7 +48,7 @@ class InitialState: BaseState
                        });
    }
 
-   public void onDraw()
+   public override void onDraw()
    {
       al_clear_to_color(al_map_rgb(10, 10, 50));
       drawText("Initial State", 30, 30);
@@ -72,7 +72,7 @@ class StateA: BaseState
                        });
    }
 
-   public void onDraw()
+   public override void onDraw()
    {
       al_clear_to_color(al_map_rgb(50, 10, 10));
       drawText("State A", 30, 30);
@@ -95,7 +95,7 @@ class StateB: BaseState
                        });
    }
 
-   public void onDraw()
+   public override void onDraw()
    {
       al_clear_to_color(al_map_rgb(10, 50, 10));
       drawText("State B", 30, 30);
