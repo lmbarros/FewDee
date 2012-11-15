@@ -1,10 +1,11 @@
 GUIsh what about z-order? Drawables have a "z" property; I can
 implement a picking visitor that takes it into account. Then, GUIsh
-should use this. --> should "z" be a property of Node? How would this
-influence rendering order? Nope. "z" is Drawable's. Picking will pick
-Drawables only (and return a node path!). OSGUIsh can work with any
-node; will need to walk up the picked node path until finding a
-registered node (or not).
+should use this. Picking will pick Drawables only (and return a node
+path!).
+
+OSGUIsh can work with any node; GUIsh should allow that, too: any node
+should be registerable; will need to walk up the picked node path
+until finding a registered node (or not).
 
 GUIsh: allow hierarchy of objects.
 
@@ -51,12 +52,10 @@ Group.addChild(): accept multiple children at a time? Technically,
 would have to be renamed addChildren()... don't know if is necessary
 in practice... must think about it.
 
-Scene Graph: Support z-order. Just need to sort the Drawables by z
-before drawing (in DrawingVisitor), I guess.
-
 Latest version of DAllegro includes a al_run_allegro() function that
 should be used instead of simply putting all the code directly on
 main() (for portability reasons). Check this out.
+
 
  Optimization
 --------------

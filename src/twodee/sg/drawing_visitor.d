@@ -7,6 +7,7 @@
 module twodee.sg.drawing_visitor;
 
 import allegro5.allegro;
+import std.algorithm;
 import twodee.sg.drawable;
 import twodee.sg.node_visitor;
 import twodee.sg.srt;
@@ -41,6 +42,8 @@ class DrawingVisitor: NodeVisitor
    /// Draws all Drawables in collectedDrawables_, using the proper transforms.
    public void draw()
    {
+      sort!("a.d.z < b.d.z")(collectedDrawables_);
+
       foreach(collectedDrawable; collectedDrawables_)
       {
          al_use_transform(&collectedDrawable.t);
