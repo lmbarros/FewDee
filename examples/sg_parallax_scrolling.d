@@ -1,21 +1,76 @@
 /**
  * Some parallax scrolling, used to test scene graph z-order.
  *
+ * If the goal were to simply create a parallax scrolling effect like this, it
+ * would be more efficient (and I'd say that just as elegant) to not use the
+ * scene graph facilities: simply drawing the things in the order of their
+ * layers would do the trick. But I wanted some example to ensure that the scene
+ * graph rendering was respecting the z-order and this was the first thing I
+ * tought of.
+ *
  * Authors: Leandro Motta Barros
  */
 
+import std.algorithm;
 import std.exception;
 import std.random;
 import twodee.all;
 
 
-immutable WIDTH = 640;
-immutable HEIGHT = 480;
+enum WIDTH = 640;
+enum HEIGHT = 480;
+
+enum STAR_SIZE = 8;
+enum SMALL_CLOUD_SIZE = 64;
+enum LARGE_CLOUD_SIZE = 256;
+enum WITCH_SIZE = 64;
+
 
 class TheState: GameState
 {
    this()
    {
+      Sprite[] stars;
+      Sprite[] smallClouds;
+      Sprite[] largeClouds;
+
+      void addStar(float x)
+      {
+         auto s = new Sprite(STAR_SIZE, STAR_SIZE, STAR_SIZE/2, STAR_SIZE/2);
+         s.addBitmap(bmpStar_);
+         s.x = x;
+         s.y = uniform(0, HEIGHT);
+         s.z = -2.0;
+         stars ~= s;
+         root_.addChild(s);
+      }
+
+      void addSmallCloud(float x)
+      {
+         immutable sz = SMALL_CLOUD_SIZE;
+         immutable halfSz = SMALL_CLOUD_SIZE / 2;
+         auto s = new Sprite(sz, sz, halfSz, halfSz);
+         s.addBitmap(bmpSmallCloud_);
+         s.x = x;
+         s.y = uniform(0, HEIGHT);
+         s.z = -1.0;
+         smallClouds ~= s;
+         root_.addChild(s);
+      }
+
+      void addLargeCloud(float x)
+      {
+         immutable sz = LARGE_CLOUD_SIZE;
+         immutable halfSz = LARGE_CLOUD_SIZE / 2;
+         auto s = new Sprite(sz, sz, halfSz, halfSz);
+         s.addBitmap(bmpLargeCloud_);
+         s.x = x;
+         s.y = uniform(0, HEIGHT);
+         s.z = 1.0;
+         largeClouds ~= s;
+         root_.addChild(s);
+      }
+
       // Create the bitmaps
       bmpStar_ = al_load_bitmap("data/little_star.png");
       enforce(bmpStar_ !is null);
@@ -29,49 +84,18 @@ class TheState: GameState
       bmpWitch_ = al_load_bitmap("data/witch.png");
       enforce(bmpWitch_ !is null);
 
-      // Create the scene graph root
-      root_ = new Group();
+      // Create the scene graph
+      root_ = new twodee.sg.group.Group();
 
-      // Create a bunch of stars
-      Sprite[] stars;
-      foreach(i; 0..100)
-      {
-         auto s = new Sprite(8, 8, 4, 4);
-         s.addBitmap(bmpStar_);
-         s.x = uniform(0, WIDTH);
-         s.y = uniform(0, HEIGHT);
-         s.z = -2.0;
-         stars ~= s;
-         root_.addChild(s);
-      }
-
-      // Create some small clouds
-      Sprite[] smallClouds;
-      foreach(i; 0..10)
-      {
-         auto s = new Sprite(64, 64, 32, 32);
-         s.addBitmap(bmpSmallCloud_);
-         s.x = uniform(0, WIDTH);
-         s.y = uniform(0, HEIGHT);
-         s.z = -1.0;
-         smallClouds ~= s;
-         root_.addChild(s);
-      }
-
-      // Create a few large clouds
-      Sprite[] largeClouds;
       foreach(i; 0..3)
-      {
-         auto s = new Sprite(256, 256, 128, 128);
-         s.addBitmap(bmpLargeCloud_);
-         s.x = uniform(0, WIDTH);
-         s.y = uniform(0, HEIGHT);
-         s.z = 1.0;
-         largeClouds ~= s;
-         root_.addChild(s);
-      }
+         addLargeCloud(uniform(0, WIDTH));
 
-      // Create the one and only witch
+      foreach(i; 0..10)
+         addSmallCloud(uniform(0, WIDTH));
+
+      foreach(i; 0..100)
+         addStar(uniform(0, WIDTH));
+
       auto sprWitch = new Sprite(64, 64, 32, 32);
       sprWitch.addBitmap(bmpWitch_);
       sprWitch.x = WIDTH / 2;
@@ -94,45 +118,86 @@ class TheState: GameState
       enum smallCloudSpeed = 25;
       enum largeCloudSpeed = 60;
 
-      enum timeToCreateStar = 1.3;
-      enum timeToCreateSmallCloud = 5.5;
-      enum timeToCreateLargeCloud = 10.0;
+      enum timeToCreateStar = 0.953;
+      enum timeToCreateSmallCloud = 2.5;
+      enum timeToCreateLargeCloud = 5.0;
 
-      double starCountdown = timeToCreateStar;
-      double smallCloudCountdown = timeToCreateSmallCloud;
-      double largeCloudCountdown = timeToCreateLargeCloud;
+      auto starCountdown = timeToCreateStar;
+      auto smallCloudCountdown = timeToCreateSmallCloud;
+      auto largeCloudCountdown = timeToCreateLargeCloud;
 
       addEventCallback(TWODEE_EVENT_TICK,
                        delegate(in ref ALLEGRO_EVENT event)
                        {
                           auto dt = event.user.deltaTime;
                           time += dt;
-
-                          // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
                           starCountdown -= dt;
                           smallCloudCountdown -= dt;
                           largeCloudCountdown -= dt;
-                          // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+                          // Create new objects
+                          if (starCountdown <= 0.0)
+                          {
+                             starCountdown = uniform(
+                                timeToCreateStar / 2,
+                                timeToCreateStar * 2);
+                             addStar(WIDTH + STAR_SIZE);
+                          }
+
+                          if (smallCloudCountdown <= 0.0)
+                          {
+                             smallCloudCountdown = uniform(
+                                timeToCreateSmallCloud / 2,
+                                timeToCreateSmallCloud * 2);
+                             addSmallCloud(WIDTH + SMALL_CLOUD_SIZE);
+                          }
+
+                          if (largeCloudCountdown <= 0.0)
+                          {
+                             largeCloudCountdown = uniform(
+                                timeToCreateLargeCloud / 2,
+                                timeToCreateLargeCloud * 2);
+                             addLargeCloud(WIDTH + LARGE_CLOUD_SIZE);
+                          }
+
+                          // Update stars
                           foreach(s; stars)
                           {
                              s.x = s.x - starSpeed * dt;
+                             if (s.x + STAR_SIZE < 0.0)
+                                s.makeOrphan();
                           }
 
-                          foreach(s; smallClouds)
+                          stars = std.algorithm.remove
+                             !((a){ return (a.x + STAR_SIZE < 0.0);},
+                               SwapStrategy.unstable)
+                             (stars);
+
+                          // Update small clouds
+                          foreach (s; smallClouds)
                           {
                              s.x = s.x - smallCloudSpeed * dt;
+                             if (s.x + SMALL_CLOUD_SIZE < 0.0)
+                                s.makeOrphan();
                           }
 
-                          foreach(s; largeClouds)
+                          smallClouds = std.algorithm.remove
+                             !((a){ return (a.x + SMALL_CLOUD_SIZE < 0.0);},
+                               SwapStrategy.unstable)
+                             (smallClouds);
+
+                          // Update large clouds
+                          foreach (s; largeClouds)
                           {
                              s.x = s.x - largeCloudSpeed * dt;
+                             if (s.x + LARGE_CLOUD_SIZE < 0.0)
+                                s.makeOrphan();
                           }
 
-                          // sprSun.currentIndex = cast(int)(time*10) % 2;
-
-                          // srtPlanet.r = srtPlanet.r + event.user.deltaTime;
-                          // srtMoon.r = srtMoon.r + event.user.deltaTime*3;
+                          largeClouds = std.algorithm.remove
+                             !((a){ return (a.x + LARGE_CLOUD_SIZE < 0.0);},
+                               SwapStrategy.unstable)
+                             (largeClouds);
                        });
    }
 
@@ -158,7 +223,7 @@ class TheState: GameState
    private ALLEGRO_BITMAP* bmpLargeCloud_;
    private ALLEGRO_BITMAP* bmpWitch_;
 
-   private Group root_;
+   private twodee.sg.group.Group root_;
 }
 
 void main()
