@@ -32,7 +32,7 @@ interface Positionable
  * A default implementation for Positionable objects. The "postSet" parameter,
  * if not an empty string, shall contain code to be executed after one of the
  * position coordinates is changed. One typical action to perform after changing
- * the coordinates is to recompute the bounding box.
+ * the coordinates is to dirty the bounding box.
  */
 mixin template PositionableDefaultImplementation(string postSet = "")
 {

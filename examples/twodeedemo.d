@@ -17,7 +17,7 @@ class MyState: GameState
       bitmap2_ = al_load_bitmap("data/flag_2.png");
       bitmap3_ = al_load_bitmap("data/flag_3.png");
 
-      sprite_ = new Sprite(64, 64);
+      sprite_ = new Sprite(64, 64, 6, 61);
       sprite_.addBitmap(bitmap1_);
       sprite_.addBitmap(bitmap2_);
       sprite_.addBitmap(bitmap1_);
@@ -108,6 +108,7 @@ class MyState: GameState
             totalTime += deltaT;
             immutable size_t dt = cast(size_t)(totalTime * 5);
             sprite_.currentIndex = dt % 4;
+            sprite_.rotation = sprite_.rotation + deltaT;
 
             return totalTime < 2.0;
          });

@@ -24,9 +24,9 @@ Create some standard updaters... like alpha interpolation, color
 interpolation. Perhaps sprite updater. Mover. Easing would be nice for
 everything...
 
-Create other interfaces: Rotationable (Sprite is), Colorable (Sprite
-and Text are). Perhaps an "Alphable", if Colorable doesn't work as
-such already.
+Create other interfaces: Scalable (Sprite is), Colorable (Sprite and
+Text are). Perhaps an "Alphable", if Colorable doesn't work as such
+already.
 
 Think about a sane way to do manage Allegro resources.
 

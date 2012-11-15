@@ -10,13 +10,15 @@ import allegro5.allegro;
 import std.conv;
 import twodee.aabb;
 import twodee.positionable;
+import twodee.rotatable;
 import twodee.sg.drawable;
 
 
 /// A collection of same-sized bitmaps and a few additional bits.
-class Sprite: Drawable, Positionable
+class Sprite: Drawable, Positionable, Rotatable
 {
    mixin PositionableDefaultImplementation!"recomputeAABB();";
+   mixin RotatableDefaultImplementation!"recomputeAABB();";
 
    /**
     * Constructs the Sprite, without adding any image to it.
@@ -93,8 +95,23 @@ class Sprite: Drawable, Positionable
    body
    {
       immutable flags = 0;
-      al_draw_bitmap(bitmaps_[currentIndex_], x - centerX_, y - centerY_,
-                     flags);
+
+      // All al_draw_*_bitmap() functions end up calling the "complex"
+      // al_draw_tinted_scaled_rotated_bitmap(). So, we can always use this one
+      // without worrying about performance. (In fact, we may be gaining some
+      // performance, since we avoid a sequence of function calls that
+      // eventually reach the one we are using.)
+      al_draw_tinted_scaled_rotated_bitmap(
+         bitmaps_[currentIndex_],
+         al_map_rgba_f(1.0, 1.0, 1.0, 1.0),
+         centerX_,
+         centerY_,
+         x,
+         y,
+         1.0, // scale x
+         1.0, // scale y
+         rotation_,
+         flags);
    }
 
    /// Recomputes the bounding box; stores it in aabb_.
