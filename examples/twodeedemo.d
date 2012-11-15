@@ -26,6 +26,9 @@ class MyState: GameState
       sprite_.x = 200;
       sprite_.y = 200;
 
+      sprite_.scaleX = 2.0;
+      sprite_.scaleY = 3.0;
+
       sprite_.color = al_map_rgba_f(1.0, 1.0, 1.0, 0.2);
 
       font_ = al_load_ttf_font("data/bluehigl.ttf", 50, 0);

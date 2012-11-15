@@ -12,15 +12,17 @@ import twodee.colorable;
 import twodee.aabb;
 import twodee.positionable;
 import twodee.rotatable;
+import twodee.scalable;
 import twodee.sg.drawable;
 
 
 /// A collection of same-sized bitmaps and a few additional bits.
-class Sprite: Drawable, Positionable, Rotatable, Colorable
+class Sprite: Drawable, Positionable, Rotatable, Colorable, Scalable
 {
+   mixin ColorableDefaultImplementation;
    mixin PositionableDefaultImplementation!"recomputeAABB();";
    mixin RotatableDefaultImplementation!"recomputeAABB();";
-   mixin ColorableDefaultImplementation;
+   mixin ScalableDefaultImplementation!"recomputeAABB();";
 
    /**
     * Constructs the Sprite, without adding any image to it.
@@ -110,8 +112,8 @@ class Sprite: Drawable, Positionable, Rotatable, Colorable
          centerY_,
          x,
          y,
-         1.0, // scale x
-         1.0, // scale y
+         scaleX,
+         scaleY,
          rotation_,
          flags);
    }
