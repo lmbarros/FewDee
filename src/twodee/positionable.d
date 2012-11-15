@@ -42,7 +42,9 @@ mixin template PositionableDefaultImplementation(string postSet = "")
    {
       this.x_ = x;
       static if (postSet != "")
+      {
          mixin(postSet);
+      }
    }
 
    public @property float y() const { return y_; }
@@ -51,7 +53,9 @@ mixin template PositionableDefaultImplementation(string postSet = "")
    {
       this.y_ = y;
       static if (postSet != "")
+      {
          mixin(postSet);
+      }
    }
 
    private float x_ = 0.0;
