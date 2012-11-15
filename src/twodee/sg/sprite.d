@@ -8,6 +8,7 @@ module twodee.sg.sprite;
 
 import allegro5.allegro;
 import std.conv;
+import twodee.colorable;
 import twodee.aabb;
 import twodee.positionable;
 import twodee.rotatable;
@@ -15,10 +16,11 @@ import twodee.sg.drawable;
 
 
 /// A collection of same-sized bitmaps and a few additional bits.
-class Sprite: Drawable, Positionable, Rotatable
+class Sprite: Drawable, Positionable, Rotatable, Colorable
 {
    mixin PositionableDefaultImplementation!"recomputeAABB();";
    mixin RotatableDefaultImplementation!"recomputeAABB();";
+   mixin ColorableDefaultImplementation;
 
    /**
     * Constructs the Sprite, without adding any image to it.
@@ -103,7 +105,7 @@ class Sprite: Drawable, Positionable, Rotatable
       // eventually reach the one we are using.)
       al_draw_tinted_scaled_rotated_bitmap(
          bitmaps_[currentIndex_],
-         al_map_rgba_f(1.0, 1.0, 1.0, 1.0),
+         color,
          centerX_,
          centerY_,
          x,

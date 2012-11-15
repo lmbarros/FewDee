@@ -26,11 +26,14 @@ class MyState: GameState
       sprite_.x = 200;
       sprite_.y = 200;
 
+      sprite_.color = al_map_rgba_f(1.0, 1.0, 1.0, 0.2);
+
       font_ = al_load_ttf_font("data/bluehigl.ttf", 50, 0);
       text_ = new Text(font_, "Hi! Âçënts, tóô!");
       text_.alignment = Text.Alignment.RIGHT;
       text_.x = 400;
       text_.y = 25;
+      text_.color = al_map_rgba_f(0.2, 0.8, 0.2, 0.5);
 
       //addEventCallback(ALLEGRO_EVENT_MOUSE_AXES, &sayWhereMouseIs);
       addEventCallback(ALLEGRO_EVENT_MOUSE_BUTTON_DOWN, &startAnimation);

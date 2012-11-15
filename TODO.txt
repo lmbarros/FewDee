@@ -7,7 +7,8 @@ OSGUIsh can work with any node; GUIsh should allow that, too: any node
 should be registerable; will need to walk up the picked node path
 until finding a registered node (or not).
 
-GUIsh: allow hierarchy of objects.
+GUIsh: allow hierarchy of objects. (Will need to make AABBs much
+better on the way.)
 
 Sprite constructor taking arbitrary number of file names.
 
@@ -23,10 +24,6 @@ re-creating, if possible) the display).
 Create some standard updaters... like alpha interpolation, color
 interpolation. Perhaps sprite updater. Mover. Easing would be nice for
 everything...
-
-Create other interfaces: Scalable (Sprite is), Colorable (Sprite and
-Text are). Perhaps an "Alphable", if Colorable doesn't work as such
-already.
 
 Think about a sane way to do manage Allegro resources.
 
@@ -55,6 +52,8 @@ in practice... must think about it.
 Latest version of DAllegro includes a al_run_allegro() function that
 should be used instead of simply putting all the code directly on
 main() (for portability reasons). Check this out.
+
+Make Sprites' AABB work for rotated sprite. Same for SRT.
 
 
  Optimization

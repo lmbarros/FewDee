@@ -9,6 +9,7 @@ module twodee.sg.text;
 import allegro5.allegro;
 import allegro5.allegro_font;
 import twodee.aabb;
+import twodee.colorable;
 import twodee.positionable;
 import twodee.sg.drawable;
 
@@ -17,6 +18,7 @@ import twodee.sg.drawable;
 class Text: Drawable, Positionable
 {
    mixin PositionableDefaultImplementation!"recomputeAABB();";
+   mixin ColorableDefaultImplementation;
 
    /// An enumeration of the possible text alignments.
    public enum Alignment
@@ -53,8 +55,7 @@ class Text: Drawable, Positionable
    /// Draws the text to the current target bitmap.
    public override void draw()
    {
-      al_draw_text(font_, ALLEGRO_COLOR(255, 255, 255, 255),
-                   x, y, alignment_, text_.ptr);
+      al_draw_text(font_, color, x, y, alignment_, text_.ptr);
    }
 
    /// Returns the text bounding box.
