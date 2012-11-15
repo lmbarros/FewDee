@@ -17,7 +17,7 @@ import twodee.sg.drawable;
 /// A scene graph Drawable that displays text.
 class Text: Drawable, Positionable
 {
-   mixin PositionableDefaultImplementation!"recomputeAABB();";
+   mixin PositionableDefaultImplementation!"isAABBDirty_ = true;";
    mixin ColorableDefaultImplementation;
 
    /// An enumeration of the possible text alignments.
@@ -49,7 +49,6 @@ class Text: Drawable, Positionable
    {
       font_ = font;
       text_ = text;
-      recomputeAABB();
    }
 
    /// Draws the text to the current target bitmap.
@@ -58,8 +57,15 @@ class Text: Drawable, Positionable
       al_draw_text(font_, color, x, y, alignment_, text_.ptr);
    }
 
+
    /// Returns the text bounding box.
-   public override @property AABB aabb() const { return aabb_; }
+   public override @property AABB aabb()
+   {
+      if (isAABBDirty_)
+         recomputeAABB();
+      return aabb_;
+   }
+
 
    /// Gets the text alignment.
    public @property Alignment alignment() const { return alignment_; }
@@ -68,7 +74,7 @@ class Text: Drawable, Positionable
    public @property void alignment(Alignment alignment)
    {
       alignment_ = alignment;
-      recomputeAABB();
+      isAABBDirty_ = true;
    }
 
    /// Recomputes the bounding box; stores it in aabb_.
@@ -92,6 +98,8 @@ class Text: Drawable, Positionable
       auto bbb = bbt + bbh;
 
       aabb_ = AABB(bbt, bbb, bbl, bbr);
+
+      isAABBDirty_ = false;
    }
 
    /// The font used to draw the text.
@@ -105,4 +113,7 @@ class Text: Drawable, Positionable
 
    /// The Text's bounding box
    private AABB aabb_;
+
+   /// Is the bounding box dirty?
+   private bool isAABBDirty_ = true;
 }

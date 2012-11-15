@@ -27,7 +27,7 @@ class Node
     * Returns the node's bounding rectangle. The returned rectangle shall be in
     * the local coordinate system of this Node.
     */
-   abstract public @property AABB aabb() const;
+   abstract public @property AABB aabb();
 
 
    /**

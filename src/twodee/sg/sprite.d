@@ -20,9 +20,9 @@ import twodee.sg.drawable;
 class Sprite: Drawable, Positionable, Rotatable, Colorable, Scalable
 {
    mixin ColorableDefaultImplementation;
-   mixin PositionableDefaultImplementation!"recomputeAABB();";
-   mixin RotatableDefaultImplementation!"recomputeAABB();";
-   mixin ScalableDefaultImplementation!"recomputeAABB();";
+   mixin PositionableDefaultImplementation!"isAABBDirty_ = true;";
+   mixin RotatableDefaultImplementation!"isAABBDirty_ = true;";
+   mixin ScalableDefaultImplementation!"isAABBDirty_ = true;";
 
    /**
     * Constructs the Sprite, without adding any image to it.
@@ -41,12 +41,15 @@ class Sprite: Drawable, Positionable, Rotatable, Colorable, Scalable
       height_ = height;
       centerX_ = centerX;
       centerY_ = centerY;
-
-      recomputeAABB();
    }
 
    /// Returns the node's bounding rectangle.
-   public override @property AABB aabb() const { return aabb_; }
+   public override @property AABB aabb()
+   {
+      if (isAABBDirty_)
+         recomputeAABB();
+      return aabb_;
+   }
 
    /**
     * Adds a bitmap to the Sprite.
@@ -123,6 +126,8 @@ class Sprite: Drawable, Positionable, Rotatable, Colorable, Scalable
    {
       aabb_ = AABB(y - centerY_, y + height - centerY_,
                    x - centerX_, x + width - centerX_);
+
+      isAABBDirty_ = false;
    }
 
    /// The index (into bitmaps_) of current bitmap.
@@ -142,6 +147,9 @@ class Sprite: Drawable, Positionable, Rotatable, Colorable, Scalable
 
    /// The bounding box.
    private AABB aabb_;
+
+   /// Is the bounding box dirty?
+   private bool isAABBDirty_ = true;
 
    /// The bitmaps.
    private ALLEGRO_BITMAP*[] bitmaps_;
