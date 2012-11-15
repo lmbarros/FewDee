@@ -55,6 +55,10 @@ main() (for portability reasons). Check this out.
 
 Make Sprites' AABB work for rotated sprite. Same for SRT.
 
+Consider making Sprite and Text "base classes" (they would become more
+like wrappers around Allegro objects), and create SpriteNode and
+TextNode classes for the scene graph.
+
 
  Optimization
 --------------
