@@ -19,9 +19,6 @@ relative to this virtual screen. Scale when drawing. But allow to use
 "real pixels", too. (This would be an option when creating (or
 re-creating, if possible) the display).
 
-Unit tests: addChild(), removeChild(). Consider what happens when the
-same node is added as child twice.
-
 Create some standard updaters... like alpha interpolation, color
 interpolation. Perhaps sprite updater. Mover. Easing would be nice for
 everything...

@@ -7,6 +7,7 @@
 module twodee.sg.node;
 
 import twodee.aabb;
+import twodee.sg.group;
 import twodee.sg.node_visitor;
 
 
@@ -21,11 +22,13 @@ class Node
       visitor.popNodeFromNodePath(this);
    }
 
+
    /**
     * Returns the node's bounding rectangle. The returned rectangle shall be in
     * the local coordinate system of this Node.
     */
    abstract public @property AABB aabb() const;
+
 
    /**
     * Checks whether a given point is contained by this Node. The point passed
@@ -38,9 +41,42 @@ class Node
       return aabb.contains(x, y);
    }
 
+
+   /// Removes this node from all its parents.
+   public void makeOrphan()
+   {
+      foreach (parent; parents_)
+         parent.removeChild(this);
+   }
+
+   /// Returns the number of parents this node has.
+   public @property int numParents() const { return parents_.length; }
+
+   unittest
+   {
+      auto g1 = new Group();
+      auto g2 = new Group();
+      auto c = new Group();
+
+      // Add the same node to two parent nodes
+      assert(c.numParents == 0);
+      g1.addChild(c);
+      g2.addChild(c);
+      assert(c.numParents == 2);
+      assert(g1.numChildren == 1);
+      assert(g2.numChildren == 1);
+
+      // Remove the node from all parents
+      c.makeOrphan();
+      assert(c.numParents == 0);
+      assert(g1.numChildren == 0);
+      assert(g2.numChildren == 0);
+   }
+
+
    /**
     * This Node's parents. A node can be present in multiple points of the scene
     * graph, that's why multiple parents are possible.
     */
-   package Node[] parents_;
+   package Group[] parents_;
 }
