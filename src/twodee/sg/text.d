@@ -15,7 +15,7 @@ import twodee.sg.drawable;
 
 
 /// A scene graph Drawable that displays text.
-class Text: Drawable, Positionable
+class Text: Drawable, Positionable, Colorable
 {
    mixin PositionableDefaultImplementation!"isAABBDirty_ = true;";
    mixin ColorableDefaultImplementation;
