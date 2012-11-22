@@ -1,3 +1,12 @@
+Rename project. TwoDee is so great name that it is already
+used. FewDee seems OK and "free".
+
+Create some standard updaters... like alpha interpolation, color
+interpolation. Perhaps sprite updater. Mover. Easing would be nice for
+everything...
+
+Think about a sane way to do manage Allegro resources.
+
 GUIsh what about z-order? Drawables have a "z" property; I can
 implement a picking visitor that takes it into account. Then, GUIsh
 should use this. Picking will pick Drawables only (and return a node
@@ -20,12 +29,6 @@ Create a "virtual screen" with a given "virtual size". Draw everything
 relative to this virtual screen. Scale when drawing. But allow to use
 "real pixels", too. (This would be an option when creating (or
 re-creating, if possible) the display).
-
-Create some standard updaters... like alpha interpolation, color
-interpolation. Perhaps sprite updater. Mover. Easing would be nice for
-everything...
-
-Think about a sane way to do manage Allegro resources.
 
 Add Text vertical alignment.
 
