@@ -485,38 +485,73 @@ MakeExponentialInOutInterpolator(double from, double to, double duration = 1.0)
 }
 
 
-// xxxxxxxxxxxxxx what is s?
+/**
+ * Returns a Back interpolator that eases in.
+ *
+ * Parameters:
+ *    from = The starting value.
+ *    to = The target value.
+ *    amplitude = The larger this value, the more the function will overshot
+ *       the [from, to] range.
+ *    duration = The duration of the interpolation.
+ */
 public Interpolator_t
-MakeBackInInterpolator(double from, double to, double s = 1.70158, double duration = 1.0)
+MakeBackInInterpolator(double from, double to, double amplitude = 1.70158,
+                       double duration = 1.0)
 {
    return delegate(double t)
    {
       immutable c = to - from;
-      return c * (t /= duration) * t * ((s + 1) * t - s) + from;
+      return c * (t /= duration) * t * ((amplitude + 1) * t - amplitude) + from;
 	};
 }
 
+
+/**
+ * Returns a Back interpolator that eases out.
+ *
+ * Parameters:
+ *    from = The starting value.
+ *    to = The target value.
+ *    amplitude = The larger this value, the more the function will overshot
+ *       the [from, to] range.
+ *    duration = The duration of the interpolation.
+ */
 public Interpolator_t
-MakeBackOutInterpolator(double from, double to, double s = 1.70158, double duration = 1.0)
+MakeBackOutInterpolator(double from, double to, double amplitude = 1.70158,
+                        double duration = 1.0)
 {
    return delegate(double t)
    {
       immutable c = to - from;
-      return c * ((t = t / duration - 1) * t * ((s + 1) * t + s) + 1) + from;
+      return c
+         * ((t = t / duration - 1) * t * ((amplitude + 1) * t + amplitude) + 1)
+         + from;
 	};
 }
 
-// xxxxxxxxxxxxxxxxx does this work?!
+
+/**
+ * Returns a Back interpolator that eases in and out.
+ *
+ * Parameters:
+ *    from = The starting value.
+ *    to = The target value.
+ *    amplitude = The larger this value, the more the function will overshot
+ *       the [from, to] range.
+ *    duration = The duration of the interpolation.
+ */
 public Interpolator_t
-MakeBackInOutInterpolator(double from, double to, double s = 1.70158,
+MakeBackInOutInterpolator(double from, double to, double amplitude = 1.70158,
                           double duration = 1.0)
 {
    return delegate(double t)
    {
       immutable c = to - from;
+      immutable s = amplitude * 1.525;
 		if ((t /= duration / 2) < 1)
-         return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + from;
-		return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + from;
+         return c / 2 * (t * t * ((s + 1) * t - s)) + from;
+		return c / 2 * ((t -= 2) * t * ((s + 1) * t + s) + 2) + from;
 	};
 }
 

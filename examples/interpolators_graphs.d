@@ -36,6 +36,8 @@ Interpolator CurrentInterpolator = Interpolator.Linear;
 auto From = -10.0;
 auto To = 10.0;
 auto Duration = 1.0;
+auto Amplitude = 1.70158;
+
 Interpolator_t TheInterpolator;
 
 void RemakeInterpolator()
@@ -131,15 +133,18 @@ void RemakeInterpolator()
          break;
 
       case Interpolator.BackIn:
-         TheInterpolator = MakeBackInInterpolator(From, To, Duration);
+         TheInterpolator =
+            MakeBackInInterpolator(From, To, Amplitude, Duration);
          break;
 
       case Interpolator.BackOut:
-         TheInterpolator = MakeBackOutInterpolator(From, To, Duration);
+         TheInterpolator =
+            MakeBackOutInterpolator(From, To, Amplitude, Duration);
          break;
 
       case Interpolator.BackInOut:
-         TheInterpolator = MakeBackInOutInterpolator(From, To, Duration);
+         TheInterpolator =
+            MakeBackInOutInterpolator(From, To, Amplitude, Duration);
          break;
 
       case Interpolator.BounceIn:
@@ -279,6 +284,21 @@ class TheState: GameState
                                    To += 1.0;
 
                                 writefln("To = %s", To);
+                                RemakeInterpolator();
+
+                                break;
+                             }
+
+                             // Amplitude
+                             case ALLEGRO_KEY_A:
+                             {
+                                auto mod = event.keyboard.modifiers;
+                                if (mod & ALLEGRO_KEYMOD_SHIFT)
+                                   Amplitude -= 0.1;
+                                else
+                                   Amplitude += 0.1;
+
+                                writefln("Amplitude = %s", Amplitude);
                                 RemakeInterpolator();
 
                                 break;
