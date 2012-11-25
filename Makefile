@@ -30,7 +30,8 @@ twodeedemo.example: examples/twodeedemo.d twodee.a
 states_simple.example: examples/states_simple.d twodee.a
 updater_simple.example: examples/updater_simple.d twodee.a
 sg_solar_system.example: examples/sg_solar_system.d twodee.a
-sg_parallax_scrolling.d: examples/sg_parallax_scrolling.d twodee.a
+sg_parallax_scrolling.example: examples/sg_parallax_scrolling.d twodee.a
+
 
 # Clean
 clean:
