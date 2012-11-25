@@ -67,8 +67,8 @@ MakeQuadraticInInterpolator(double from, double to, double duration = 1.0)
    return delegate(double t)
    {
       immutable c = to - from;
-		return c * (t /= duration) * t + from;
-	};
+      return c * (t /= duration) * t + from;
+   };
 }
 
 
@@ -87,7 +87,7 @@ MakeQuadraticOutInterpolator(double from, double to, double duration = 1.0)
    {
       immutable c = to - from;
       return -c * ( t/= duration) * (t - 2) + from;
-	};
+   };
 }
 
 
@@ -105,10 +105,10 @@ MakeQuadraticInOutInterpolator(double from, double to, double duration = 1.0)
    return delegate(double t)
    {
       immutable c = to - from;
-		if ( (t /= duration / 2) < 1)
+      if ( (t /= duration / 2) < 1)
          return c / 2 * t * t + from;
-		return -c / 2 * ((--t) * (t - 2) - 1) + from;
-	};
+      return -c / 2 * ((--t) * (t - 2) - 1) + from;
+   };
 }
 
 
@@ -127,7 +127,7 @@ MakeCubicInInterpolator(double from, double to, double duration = 1.0)
    {
       immutable c = to - from;
       return c * (t /= duration) * t * t + from;
-	};
+   };
 }
 
 
@@ -146,7 +146,7 @@ MakeCubicOutInterpolator(double from, double to, double duration = 1.0)
    {
       immutable c = to - from;
       return c * ((t = t / duration - 1) * t * t + 1) + from;
-	};
+   };
 }
 
 
@@ -164,10 +164,10 @@ MakeCubicInOutInterpolator(double from, double to, double duration = 1.0)
    return delegate(double t)
    {
       immutable c = to - from;
-		if ((t /= duration / 2) < 1)
+      if ((t /= duration / 2) < 1)
          return c / 2 * t * t * t + from;
-		return c / 2 * ((t -= 2) * t * t + 2) + from;
- 	};
+      return c / 2 * ((t -= 2) * t * t + 2) + from;
+    };
 }
 
 
@@ -223,9 +223,9 @@ MakeQuarticInOutInterpolator(double from, double to, double duration = 1.0)
    return delegate(double t)
    {
       immutable c = to - from;
-		if ((t /= duration / 2) < 1)
+      if ((t /= duration / 2) < 1)
          return c / 2 * t * t * t * t + from;
-		return -c / 2 * ((t -= 2) * t * t * t - 2) + from;
+      return -c / 2 * ((t -= 2) * t * t * t - 2) + from;
    };
 }
 
@@ -284,7 +284,7 @@ MakeQuinticInOutInterpolator(double from, double to, double duration = 1.0)
       immutable c = to - from;
       if ((t /= duration / 2) < 1)
          return c / 2 * t * t * t * t * t + from;
-		return c / 2 * ((t -= 2) * t * t * t * t + 2) + from;
+      return c / 2 * ((t -= 2) * t * t * t * t + 2) + from;
 
    };
 }
@@ -305,7 +305,7 @@ MakeSineInInterpolator(double from, double to, double duration = 1.0)
    {
       immutable c = to - from;
       return -c * cos(t / duration * (PI / 2)) + c + from;
-	};
+   };
 }
 
 
@@ -324,7 +324,7 @@ MakeSineOutInterpolator(double from, double to, double duration = 1.0)
    {
       immutable c = to - from;
       return c * sin(t / duration * (PI / 2)) + from;
-	};
+   };
 }
 
 
@@ -342,8 +342,8 @@ MakeSineInOutInterpolator(double from, double to, double duration = 1.0)
    return delegate(double t)
    {
       immutable c = to - from;
-		return -c / 2 * (cos(PI * t / duration) - 1) + from;
-	};
+      return -c / 2 * (cos(PI * t / duration) - 1) + from;
+   };
 }
 
 
@@ -366,7 +366,7 @@ MakeCircleInInterpolator(double from, double to, double duration = 1.0)
       if (t >= duration)
          return to;
       return -c * (sqrt(1 - (t /= duration) * t) - 1) + from;
-	};
+   };
 }
 
 
@@ -388,8 +388,8 @@ MakeCircleOutInterpolator(double from, double to, double duration = 1.0)
          return from;
       if (t >= duration)
          return to;
-		return c * sqrt(1 - (t = t / duration - 1) * t) + from;
-	};
+      return c * sqrt(1 - (t = t / duration - 1) * t) + from;
+   };
 }
 
 
@@ -411,10 +411,10 @@ MakeCircleInOutInterpolator(double from, double to, double duration = 1.0)
          return from;
       if (t >= duration)
          return to;
-		if ((t /= duration / 2) < 1)
+      if ((t /= duration / 2) < 1)
          return -c / 2 * (sqrt(1 - t * t) - 1) + from;
-		return c / 2 * (sqrt(1 - (t -= 2) * t) + 1) + from;
-	};
+      return c / 2 * (sqrt(1 - (t -= 2) * t) + 1) + from;
+   };
 }
 
 
@@ -435,7 +435,7 @@ MakeExponentialInInterpolator(double from, double to, double duration = 1.0)
       return (t == 0)
          ? from
          : c * 2 ^^ (10 * (t / duration - 1)) + from;
-	};
+   };
 }
 
 
@@ -456,7 +456,7 @@ MakeExponentialOutInterpolator(double from, double to, double duration = 1.0)
       return (t == duration)
          ? from + c
          : c * (-2 ^^ (-10 * t / duration) + 1) + from;
-	};
+   };
 }
 
 
@@ -474,14 +474,14 @@ MakeExponentialInOutInterpolator(double from, double to, double duration = 1.0)
    return delegate(double t)
    {
       immutable c = to - from;
-		if (t == 0)
+      if (t == 0)
          return from;
-		if (t == duration)
+      if (t == duration)
          return from + c;
-		if ((t /= duration / 2) < 1)
+      if ((t /= duration / 2) < 1)
          return c / 2 * 2 ^^ (10 * (t - 1)) + from;
-		return c / 2 * (-2 ^^ (-10 * --t) + 2) + from;
-	};
+      return c / 2 * (-2 ^^ (-10 * --t) + 2) + from;
+   };
 }
 
 
@@ -503,7 +503,7 @@ MakeBackInInterpolator(double from, double to, double amplitude = 1.70158,
    {
       immutable c = to - from;
       return c * (t /= duration) * t * ((amplitude + 1) * t - amplitude) + from;
-	};
+   };
 }
 
 
@@ -527,7 +527,7 @@ MakeBackOutInterpolator(double from, double to, double amplitude = 1.70158,
       return c
          * ((t = t / duration - 1) * t * ((amplitude + 1) * t + amplitude) + 1)
          + from;
-	};
+   };
 }
 
 
@@ -549,10 +549,10 @@ MakeBackInOutInterpolator(double from, double to, double amplitude = 1.70158,
    {
       immutable c = to - from;
       immutable s = amplitude * 1.525;
-		if ((t /= duration / 2) < 1)
+      if ((t /= duration / 2) < 1)
          return c / 2 * (t * t * ((s + 1) * t - s)) + from;
-		return c / 2 * ((t -= 2) * t * ((s + 1) * t + s) + 2) + from;
-	};
+      return c / 2 * ((t -= 2) * t * ((s + 1) * t + s) + 2) + from;
+   };
 }
 
 
@@ -576,7 +576,7 @@ MakeBounceInInterpolator(double from, double to, double duration = 1.0)
    {
       immutable c = to - from;
       return bounceInterpolatorHelper(t, from, c, duration);
-	};
+   };
 }
 
 public Interpolator_t
@@ -586,7 +586,7 @@ MakeBounceOutInterpolator(double from, double to, double duration = 1.0)
    {
       immutable c = to - from;
       return c - bounceInterpolatorHelper(duration - t, 0, c, duration) + from;
-	};
+   };
 }
 
 public Interpolator_t
@@ -595,11 +595,11 @@ MakeBounceInOutInterpolator(double from, double to, double duration = 1.0)
    return delegate(double t)
    {
       immutable c = to - from;
-		if (t < duration/2)
+      if (t < duration/2)
          return bounceInterpolatorHelper(t * 2, 0, c, duration) * .5 + from;
-		else
+      else
          return bounceInterpolatorHelper(t * 2 - duration, 0, c, duration) * .5 + c * .5 + from;
-	};
+   };
 }
 
 
@@ -617,25 +617,25 @@ MakeElasticInInterpolator(double from, double to, double a = double.nan,
       immutable c = to - from;
       double s;
 
-		if (t == 0)
+      if (t == 0)
          return from;
       if ((t /= duration) == 1)
          return from + c;
       if (isnan(p))
          p = duration * .3;
 
-		if (isnan(a) || a < abs(c))
+      if (isnan(a) || a < abs(c))
       {
          a = c;
          s = p / 4;
       }
-		else
+      else
       {
          s = p / (2 * PI) * asin(c / a);
       }
 
-		return -(a * pow(2, 10 * (t -= 1)) * sin((t * duration - s) * (2 * PI) / p)) + from;
-	};
+      return -(a * pow(2, 10 * (t -= 1)) * sin((t * duration - s) * (2 * PI) / p)) + from;
+   };
 }
 
 public Interpolator_t
@@ -647,24 +647,24 @@ MakeElasticOutInterpolator(double from, double to, double a = double.nan,
       immutable c = to - from;
       double s;
 
-		if (t == 0)
+      if (t == 0)
          return from;
       if ((t /= duration) == 1)
          return from + c;
       if (isnan(p))
          p = duration * .3;
-		if (isnan(a) || a < abs(c))
+      if (isnan(a) || a < abs(c))
       {
          a = c;
          s = p / 4;
       }
-		else
+      else
       {
          s = p / (2 * PI) * asin (c / a);
       }
 
-		return (a * pow(2, -10 * t) * sin((t * duration - s) * (2 * PI) / p) + c + from);
-	};
+      return (a * pow(2, -10 * t) * sin((t * duration - s) * (2 * PI) / p) + c + from);
+   };
 }
 
 public Interpolator_t
@@ -676,27 +676,27 @@ MakeElasticInOutInterpolator(double from, double to, double a = double.nan,
       immutable c = to - from;
       double s;
 
-		if (t == 0)
+      if (t == 0)
          return from;
       if ((t /= duration / 2) == 2)
          return from + c;
       if (isnan(p))
          p = duration * (.3 * 1.5);
-		if (isnan(a) || a < abs(c))
+      if (isnan(a) || a < abs(c))
       {
          a = c;
          s = p / 4;
       }
-		else
+      else
       {
          s = p / (2 * PI) * asin(c / a);
       }
 
-		if (t < 1)
+      if (t < 1)
          return -.5 * (a * pow(2, 10 * (t -= 1)) * sin((t * duration - s) * (2 * PI) /p)) + from;
 
-		return a * pow(2, -10 * (t -= 1)) * sin((t * duration - s) * (2 * PI) / p ) * .5 + c + from;
-	};
+      return a * pow(2, -10 * (t -= 1)) * sin((t * duration - s) * (2 * PI) / p ) * .5 + c + from;
+   };
 }
 
 
