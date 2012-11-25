@@ -426,20 +426,15 @@ MakeCircleInOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-// These seem to have the "in the limits of range conditionals". Check for
-// values really "out of range"
-//
-// Use operator ^^
-//
-// Must check the behavior again... I did some silly mistake the first time I tried...
 public Interpolator_t
 MakeExponentialInInterpolator(double from, double to, double duration = 1.0)
 {
    return delegate(double t)
    {
       immutable c = to - from;
-      return (t == 0) ? from : c * pow(2, 10 * (t / duration - 1)) + from;
+      return (t == 0)
+         ? from
+         : c * 2 ^^ (10 * (t / duration - 1)) + from;
 	};
 }
 
@@ -458,7 +453,9 @@ MakeExponentialOutInterpolator(double from, double to, double duration = 1.0)
    return delegate(double t)
    {
       immutable c = to - from;
-      return (t == duration) ? from + c : c * (-pow(2, -10 * t / duration) + 1) + from;
+      return (t == duration)
+         ? from + c
+         : c * (-2 ^^ (-10 * t / duration) + 1) + from;
 	};
 }
 
@@ -482,8 +479,8 @@ MakeExponentialInOutInterpolator(double from, double to, double duration = 1.0)
 		if (t == duration)
          return from + c;
 		if ((t /= duration / 2) < 1)
-         return c / 2 * pow(2, 10 * (t - 1)) + from;
-		return c / 2 * (-pow(2, -10 * --t) + 2) + from;
+         return c / 2 * 2 ^^ (10 * (t - 1)) + from;
+		return c / 2 * (-2 ^^ (-10 * --t) + 2) + from;
 	};
 }
 
