@@ -36,7 +36,8 @@ Interpolator CurrentInterpolator = Interpolator.Linear;
 auto From = -10.0;
 auto To = 10.0;
 auto Duration = 1.0;
-auto Amplitude = 1.70158;
+auto Amplitude = 2.0;
+auto Period = 0.3;
 
 Interpolator_t TheInterpolator;
 
@@ -160,15 +161,18 @@ void RemakeInterpolator()
          break;
 
       case Interpolator.ElasticIn:
-         TheInterpolator = MakeElasticInInterpolator(From, To, Duration);
+         TheInterpolator =
+            MakeElasticInInterpolator(From, To, Amplitude, Period, Duration);
          break;
 
       case Interpolator.ElasticOut:
-         TheInterpolator = MakeElasticOutInterpolator(From, To, Duration);
+         TheInterpolator =
+            MakeElasticOutInterpolator(From, To, Amplitude, Period, Duration);
          break;
 
       case Interpolator.ElasticInOut:
-         TheInterpolator = MakeElasticInOutInterpolator(From, To, Duration);
+         TheInterpolator =
+            MakeElasticInOutInterpolator(From, To, Amplitude, Period, Duration);
          break;
 
       case Interpolator.Count:
@@ -299,6 +303,21 @@ class TheState: GameState
                                    Amplitude += 0.1;
 
                                 writefln("Amplitude = %s", Amplitude);
+                                RemakeInterpolator();
+
+                                break;
+                             }
+
+                             // Period
+                             case ALLEGRO_KEY_P:
+                             {
+                                auto mod = event.keyboard.modifiers;
+                                if (mod & ALLEGRO_KEYMOD_SHIFT)
+                                   Period -= 0.1;
+                                else
+                                   Period += 0.1;
+
+                                writefln("Period = %s", Period);
                                 RemakeInterpolator();
 
                                 break;

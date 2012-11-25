@@ -640,95 +640,119 @@ MakeBounceInOutInterpolator(double from, double to, double duration = 1.0)
 //
 // check limits
 //
-// p has default value...
+// period has default value...
 public Interpolator_t
-MakeElasticInInterpolator(double from, double to, double a = double.nan,
-                          double p = double.nan, double duration = 1.0)
+MakeElasticInInterpolator(double from, double to, double amplitude = double.nan,
+                          double period = double.nan, double duration = 1.0)
 {
+   immutable c = to - from;
+   double s;
+
+   if (isnan(period))
+      period = duration * .3;
+
+   if (isnan(amplitude) || amplitude < abs(c))
+   {
+      amplitude = c;
+      s = period / 4;
+   }
+   else
+   {
+      s = period / (2 * PI) * asin(c / amplitude);
+   }
+
    return delegate(double t)
    {
-      immutable c = to - from;
-      double s;
-
       if (t == 0)
          return from;
+
       if ((t /= duration) == 1)
          return from + c;
-      if (isnan(p))
-         p = duration * .3;
 
-      if (isnan(a) || a < abs(c))
-      {
-         a = c;
-         s = p / 4;
-      }
-      else
-      {
-         s = p / (2 * PI) * asin(c / a);
-      }
-
-      return -(a * pow(2, 10 * (t -= 1)) * sin((t * duration - s) * (2 * PI) / p)) + from;
+      return -(amplitude * pow(2, 10 * (t -= 1))
+               * sin((t * duration - s) * (2 * PI) / period))
+         + from;
    };
 }
 
 public Interpolator_t
-MakeElasticOutInterpolator(double from, double to, double a = double.nan,
-                           double p = double.nan, double duration = 1.0)
+MakeElasticOutInterpolator(double from, double to,
+                           double amplitude = double.nan,
+                           double period = double.nan, double duration = 1.0)
 {
+   immutable c = to - from;
+   double s;
+
+   if (isnan(period))
+      period = duration * .3;
+
+   if (isnan(amplitude) || amplitude < abs(c))
+   {
+      amplitude = c;
+      s = period / 4;
+   }
+   else
+   {
+      s = period / (2 * PI) * asin (c / amplitude);
+   }
+
    return delegate(double t)
    {
-      immutable c = to - from;
-      double s;
-
       if (t == 0)
          return from;
+
       if ((t /= duration) == 1)
          return from + c;
-      if (isnan(p))
-         p = duration * .3;
-      if (isnan(a) || a < abs(c))
-      {
-         a = c;
-         s = p / 4;
-      }
-      else
-      {
-         s = p / (2 * PI) * asin (c / a);
-      }
 
-      return (a * pow(2, -10 * t) * sin((t * duration - s) * (2 * PI) / p) + c + from);
+      return amplitude * pow(2, -10 * t)
+         * sin((t * duration - s) * (2 * PI) / period)
+         + c + from;
    };
 }
 
 public Interpolator_t
-MakeElasticInOutInterpolator(double from, double to, double a = double.nan,
-                             double p = double.nan, double duration = 1.0)
+MakeElasticInOutInterpolator(double from, double to,
+                             double amplitude = double.nan,
+                             double period = double.nan, double duration = 1.0)
 {
+   immutable c = to - from;
+   double s;
+
+   if (isnan(period))
+      period = duration * (.3 * 1.5);
+
+   if (isnan(amplitude) || amplitude < abs(c))
+   {
+      amplitude = c;
+      s = period / 4;
+   }
+   else
+   {
+      s = period / (2 * PI) * asin(c / amplitude);
+   }
+
    return delegate(double t)
    {
-      immutable c = to - from;
-      double s;
-
       if (t == 0)
          return from;
+
       if ((t /= duration / 2) == 2)
          return from + c;
-      if (isnan(p))
-         p = duration * (.3 * 1.5);
-      if (isnan(a) || a < abs(c))
-      {
-         a = c;
-         s = p / 4;
-      }
-      else
-      {
-         s = p / (2 * PI) * asin(c / a);
-      }
 
       if (t < 1)
-         return -.5 * (a * pow(2, 10 * (t -= 1)) * sin((t * duration - s) * (2 * PI) /p)) + from;
+      {
+         return -.5
+            * (amplitude
+               * pow(2, 10 * (t -= 1))
+               * sin((t * duration - s) * (2 * PI) /period))
+            + from;
+      }
 
-      return a * pow(2, -10 * (t -= 1)) * sin((t * duration - s) * (2 * PI) / p ) * .5 + c + from;
+      return amplitude
+         * pow(2, -10 * (t -= 1))
+         * sin((t * duration - s) * (2 * PI) / period)
+         * .5
+         + c + from;
    };
 }
 
