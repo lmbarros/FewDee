@@ -5,7 +5,7 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.positionable;
+module fewdee.positionable;
 
 
 /**

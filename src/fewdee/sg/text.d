@@ -4,14 +4,14 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.sg.text;
+module fewdee.sg.text;
 
 import allegro5.allegro;
 import allegro5.allegro_font;
-import twodee.aabb;
-import twodee.colorable;
-import twodee.positionable;
-import twodee.sg.drawable;
+import fewdee.aabb;
+import fewdee.colorable;
+import fewdee.positionable;
+import fewdee.sg.drawable;
 
 
 /// A scene graph Drawable that displays text.

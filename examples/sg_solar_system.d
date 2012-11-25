@@ -1,11 +1,11 @@
 /**
- * The good and old solar system graphics programming exercise, now in TwoDee!
+ * The good and old solar system graphics programming exercise.
  *
  * Authors: Leandro Motta Barros
  */
 
 import std.exception;
-import twodee.all;
+import fewdee.all;
 
 
 immutable WIDTH = 640;
@@ -77,7 +77,7 @@ class TheState: GameState
       // Animate!
       double time = 0;
 
-      addEventCallback(TWODEE_EVENT_TICK,
+      addEventCallback(FEWDEE_EVENT_TICK,
                        delegate(in ref ALLEGRO_EVENT event)
                        {
                           auto dt = event.user.deltaTime;

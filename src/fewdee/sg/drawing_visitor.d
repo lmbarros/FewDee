@@ -4,13 +4,13 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.sg.drawing_visitor;
+module fewdee.sg.drawing_visitor;
 
 import allegro5.allegro;
 import std.algorithm;
-import twodee.sg.drawable;
-import twodee.sg.node_visitor;
-import twodee.sg.srt;
+import fewdee.sg.drawable;
+import fewdee.sg.node_visitor;
+import fewdee.sg.srt;
 
 
 /**

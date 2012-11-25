@@ -4,16 +4,16 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.sg.sprite;
+module fewdee.sg.sprite;
 
 import allegro5.allegro;
 import std.conv;
-import twodee.colorable;
-import twodee.aabb;
-import twodee.positionable;
-import twodee.rotatable;
-import twodee.scalable;
-import twodee.sg.drawable;
+import fewdee.colorable;
+import fewdee.aabb;
+import fewdee.positionable;
+import fewdee.rotatable;
+import fewdee.scalable;
+import fewdee.sg.drawable;
 
 
 /// A collection of same-sized bitmaps and a few additional bits.

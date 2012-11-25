@@ -4,7 +4,7 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.colorable;
+module fewdee.colorable;
 
 import allegro5.allegro;
 

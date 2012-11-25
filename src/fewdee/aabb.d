@@ -4,7 +4,7 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.aabb;
+module fewdee.aabb;
 
 import std.algorithm;
 import std.conv;

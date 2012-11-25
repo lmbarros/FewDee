@@ -1,6 +1,3 @@
-Rename project. TwoDee is so great name that it is already
-used. FewDee seems OK and "free".
-
 Create some standard updaters... like alpha interpolation, color
 interpolation. Perhaps sprite updater. Mover. Easing would be nice for
 everything...

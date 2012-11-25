@@ -4,13 +4,13 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.sg.guish;
+module fewdee.sg.guish;
 
 import allegro5.allegro;
 import std.conv;
-import twodee.event;
-import twodee.event_handler;
-import twodee.sg.node;
+import fewdee.event;
+import fewdee.event_handler;
+import fewdee.sg.node;
 
 
 /// The possible types of GUI-like events.
@@ -93,7 +93,7 @@ class GUIshEventGenerator: EventHandler
          case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
             return handleMouseButtonUpEvent(event);
 
-         case TWODEE_EVENT_TICK:
+         case FEWDEE_EVENT_TICK:
             return handleTickEvent(event);
 
          default:

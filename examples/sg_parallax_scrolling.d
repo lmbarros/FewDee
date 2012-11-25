@@ -14,7 +14,7 @@
 import std.algorithm;
 import std.exception;
 import std.random;
-import twodee.all;
+import fewdee.all;
 
 
 enum WIDTH = 640;
@@ -85,7 +85,7 @@ class TheState: GameState
       enforce(bmpWitch_ !is null);
 
       // Create the scene graph
-      root_ = new twodee.sg.group.Group();
+      root_ = new fewdee.sg.group.Group();
 
       foreach(i; 0..3)
          addLargeCloud(uniform(0, WIDTH));
@@ -126,7 +126,7 @@ class TheState: GameState
       auto smallCloudCountdown = timeToCreateSmallCloud;
       auto largeCloudCountdown = timeToCreateLargeCloud;
 
-      addEventCallback(TWODEE_EVENT_TICK,
+      addEventCallback(FEWDEE_EVENT_TICK,
                        delegate(in ref ALLEGRO_EVENT event)
                        {
                           auto dt = event.user.deltaTime;
@@ -223,7 +223,7 @@ class TheState: GameState
    private ALLEGRO_BITMAP* bmpLargeCloud_;
    private ALLEGRO_BITMAP* bmpWitch_;
 
-   private twodee.sg.group.Group root_;
+   private fewdee.sg.group.Group root_;
 }
 
 void main()

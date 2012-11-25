@@ -7,35 +7,35 @@ DMDFLAGS=-unittest -w $(DMDCOMMONFLAGS)
 # DMDFLAGS=-O -inline $(DMDCOMMONFLAGS)
 # DMDFLAGS=-debug -gc $(DMDCOMMONFLAGS)
 
-DMDLINKFLAGS=twodee.a -L-lallegro -L-lallegro_image -L-lallegro_font \
+DMDLINKFLAGS=fewdee.a -L-lallegro -L-lallegro_image -L-lallegro_font \
    -L-lallegro_ttf -L-lallegro_primitives
 
 # Implicit rule to build an example
 %.example: examples/%.d
-	dmd $(DMDFLAGS) $(DMDLINKFLAGS) -of$@ $< twodee.a
+	dmd $(DMDFLAGS) $(DMDLINKFLAGS) -of$@ $< fewdee.a
 
 
 # All
-all: twodee.a twodeedemo.example states_simple.example updater_simple.example \
+all: fewdee.a fewdeedemo.example states_simple.example updater_simple.example \
      sg_solar_system.example sg_parallax_scrolling.example \
      interpolators_graphs.example
 
 
 # The library
-twodee.a: src/twodee/*
-	dmd $(DMDFLAGS) -lib -oftwodee.a src/allegro5/*.d src/allegro5/internal/*.d \
-	   src/twodee/*.d src/twodee/sg/*.d
+fewdee.a: src/fewdee/*
+	dmd $(DMDFLAGS) -lib -offewdee.a src/allegro5/*.d src/allegro5/internal/*.d \
+	   src/fewdee/*.d src/fewdee/sg/*.d
 
 
 # The examples
-twodeedemo.example: examples/twodeedemo.d twodee.a
-states_simple.example: examples/states_simple.d twodee.a
-updater_simple.example: examples/updater_simple.d twodee.a
-sg_solar_system.example: examples/sg_solar_system.d twodee.a
-sg_parallax_scrolling.example: examples/sg_parallax_scrolling.d twodee.a
-interpolators_graphs.example: examples/interpolators_graphs.d twodee.a
+fewdeedemo.example: examples/fewdeedemo.d fewdee.a
+states_simple.example: examples/states_simple.d fewdee.a
+updater_simple.example: examples/updater_simple.d fewdee.a
+sg_solar_system.example: examples/sg_solar_system.d fewdee.a
+sg_parallax_scrolling.example: examples/sg_parallax_scrolling.d fewdee.a
+interpolators_graphs.example: examples/interpolators_graphs.d fewdee.a
 
 
 # Clean
 clean:
-	rm -f twodee.a *.o *.example
+	rm -f fewdee.a *.o *.example

@@ -1,10 +1,10 @@
 /**
- * TwoDee events and event-related stuff.
+ * FewDee events and event-related stuff.
  *
  * Authors: Leandro Motta Barros
  */
 
-module twodee.event;
+module fewdee.event;
 
 import allegro5.allegro;
 import std.math;
@@ -18,13 +18,13 @@ enum
     *
     * See_Also: deltaTime.
     */
-   TWODEE_EVENT_TICK = ALLEGRO_GET_EVENT_TYPE('T','w','o','D'),
+   FEWDEE_EVENT_TICK = ALLEGRO_GET_EVENT_TYPE('T','w','o','D'),
 }
 
 
 /**
  * Encodes a delta time (in seconds) and stores it in a given ALLEGRO_USER_EVENT
- * (assumed to be of type TWODEE_EVENT_TICK).
+ * (assumed to be of type FEWDEE_EVENT_TICK).
  *
  * D's uniform function call syntax and properties allow to use this just as if
  * an ALLEGRO_USER_EVENT had a deltaTime member.
@@ -40,7 +40,7 @@ enum
 
 /**
  * Decodes the delta time stored in a given ALLEGRO_USER_EVENT (assumed to be of
- * type TWODEE_EVENT_TICK) and returns it (as the time in seconds elapsed during
+ * type FEWDEE_EVENT_TICK) and returns it (as the time in seconds elapsed during
  * that tick).
  *
  * D's uniform function call syntax and properties allow to use this just as if

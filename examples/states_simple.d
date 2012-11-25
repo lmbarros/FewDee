@@ -6,7 +6,7 @@
  */
 
 import std.exception;
-import twodee.all;
+import fewdee.all;
 
 
 // All states in this example are very similar to each other. To avoid

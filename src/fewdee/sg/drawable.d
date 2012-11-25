@@ -4,10 +4,10 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.sg.drawable;
+module fewdee.sg.drawable;
 
-import twodee.sg.node;
-import twodee.sg.node_visitor;
+import fewdee.sg.node;
+import fewdee.sg.node_visitor;
 
 
 /// A scene graph node that can draw itself.

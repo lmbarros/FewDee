@@ -4,7 +4,7 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.scalable;
+module fewdee.scalable;
 
 
 /// Interface to be implemented by everything that can be scaled.

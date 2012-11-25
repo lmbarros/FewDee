@@ -8,7 +8,7 @@
 import std.conv;
 import std.exception;
 import std.stdio;
-import twodee.all;
+import fewdee.all;
 
 
 immutable WIDTH = 640;

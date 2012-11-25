@@ -4,12 +4,12 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.updater;
+module fewdee.updater;
 
 import allegro5.allegro;
 import std.conv;
-import twodee.event;
-import twodee.event_handler;
+import fewdee.event;
+import fewdee.event_handler;
 
 
 /**
@@ -36,7 +36,7 @@ class Updater: EventHandler
     */
    public bool handleEvent(in ref ALLEGRO_EVENT event)
    {
-      if (event.type != TWODEE_EVENT_TICK)
+      if (event.type != FEWDEE_EVENT_TICK)
          return false;
 
       immutable deltaTime = event.user.deltaTime;

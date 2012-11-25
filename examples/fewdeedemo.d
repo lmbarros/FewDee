@@ -1,7 +1,7 @@
 
 
 import std.stdio;
-import twodee.all;
+import fewdee.all;
 
 
 class MyState: GameState

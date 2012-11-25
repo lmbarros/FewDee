@@ -6,7 +6,7 @@
 
 import std.exception;
 import std.stdio;
-import twodee.all;
+import fewdee.all;
 
 
 class TheState: GameState

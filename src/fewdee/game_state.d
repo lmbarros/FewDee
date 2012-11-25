@@ -4,11 +4,11 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.game_state;
+module fewdee.game_state;
 
 import allegro5.allegro;
-import twodee.event_handler;
-import twodee.state_manager;
+import fewdee.event_handler;
+import fewdee.state_manager;
 
 
 /// Base class for the states the game can be in.

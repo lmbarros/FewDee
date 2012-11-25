@@ -4,11 +4,11 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.state_manager;
+module fewdee.state_manager;
 
 import allegro5.allegro;
-import twodee.event;
-import twodee.game_state;
+import fewdee.event;
+import fewdee.game_state;
 
 
 /**
@@ -114,7 +114,7 @@ struct StateManager
    {
       foreach(state; states_)
       {
-         immutable wants = event.type == TWODEE_EVENT_TICK
+         immutable wants = event.type == FEWDEE_EVENT_TICK
             ? state.wantsTicks
             : state.wantsEvents;
 

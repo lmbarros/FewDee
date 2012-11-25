@@ -4,12 +4,12 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.sg.node_visitor;
+module fewdee.sg.node_visitor;
 
-import twodee.sg.drawable;
-import twodee.sg.group;
-import twodee.sg.node;
-import twodee.sg.srt;
+import fewdee.sg.drawable;
+import fewdee.sg.group;
+import fewdee.sg.node;
+import fewdee.sg.srt;
 
 
 /**

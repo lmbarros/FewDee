@@ -4,7 +4,7 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.rotatable;
+module fewdee.rotatable;
 
 
 /**

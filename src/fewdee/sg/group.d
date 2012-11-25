@@ -4,11 +4,11 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.sg.group;
+module fewdee.sg.group;
 
-import twodee.aabb;
-import twodee.sg.node;
-import twodee.sg.node_visitor;
+import fewdee.aabb;
+import fewdee.sg.node;
+import fewdee.sg.node_visitor;
 
 
 /// A scene graph node that can have children.

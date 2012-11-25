@@ -4,16 +4,16 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.engine;
+module fewdee.engine;
 
 import allegro5.allegro;
 import allegro5.allegro_font;
 import allegro5.allegro_ttf;
 import allegro5.allegro_image;
 import allegro5.allegro_primitives;
-import twodee.event;
-import twodee.game_state;
-import twodee.state_manager;
+import fewdee.event;
+import fewdee.game_state;
+import fewdee.state_manager;
 
 /**
  * The Game Engine.
@@ -124,7 +124,7 @@ struct Engine
 
          // Generate tick event
          ALLEGRO_EVENT tickEvent;
-         tickEvent.user.type = TWODEE_EVENT_TICK;
+         tickEvent.user.type = FEWDEE_EVENT_TICK;
          tickEvent.user.deltaTime(deltaTime);
          al_emit_user_event(&customEventSource_, &tickEvent, null);
 

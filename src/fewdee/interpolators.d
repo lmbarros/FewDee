@@ -10,7 +10,7 @@
  * See_Also: http://robertpenner.com/easing
  */
 
-module twodee.interpolators;
+module fewdee.interpolators;
 
 import std.math;
 

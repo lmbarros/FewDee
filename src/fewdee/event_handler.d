@@ -4,7 +4,7 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.event_handler;
+module fewdee.event_handler;
 
 import allegro5.allegro;
 

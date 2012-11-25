@@ -4,11 +4,11 @@
  * Authors: Leandro Motta Barros
  */
 
-module twodee.sg.srt;
+module fewdee.sg.srt;
 
 import allegro5.allegro;
-import twodee.sg.group;
-import twodee.sg.node_visitor;
+import fewdee.sg.group;
+import fewdee.sg.node_visitor;
 
 
 /**
