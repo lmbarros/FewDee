@@ -636,11 +636,21 @@ MakeBounceInOutInterpolator(double from, double to, double duration = 1.0)
 }
 
 
-// use operator ^^
-//
-// check limits
-//
-// period has default value...
+/**
+ * Returns an Elastic interpolator that eases in.
+ *
+ * Parameters:
+ *    from = The starting value.
+ *    to = The target value.
+ *    amplitude = The larger this value, the larger the "ripples" will be. Only
+ *       values larger than the difference between from and to will make the
+ *       "ripples" actually larger. When passing a NaN (the default), this is
+ *       initialized with the difference between from and to.
+ *    period = The closer this value is to zero, the more "ripples" will be.
+ *       When passing a NaN (the default), a pleasant-looking value (which is
+ *       about a third of the duration) will be used.
+ *    duration = The duration of the interpolation.
+ */
 public Interpolator_t
 MakeElasticInInterpolator(double from, double to, double amplitude = double.nan,
                           double period = double.nan, double duration = 1.0)
@@ -669,12 +679,28 @@ MakeElasticInInterpolator(double from, double to, double amplitude = double.nan,
       if ((t /= duration) == 1)
          return from + c;
 
-      return -(amplitude * pow(2, 10 * (t -= 1))
+      return -(amplitude * 2 ^^ (10 * (t -= 1))
                * sin((t * duration - s) * (2 * PI) / period))
          + from;
    };
 }
 
+
+/**
+ * Returns an Elastic interpolator that eases out.
+ *
+ * Parameters:
+ *    from = The starting value.
+ *    to = The target value.
+ *    amplitude = The larger this value, the larger the "ripples" will be. Only
+ *       values larger than the difference between from and to will make the
+ *       "ripples" actually larger. When passing a NaN (the default), this is
+ *       initialized with the difference between from and to.
+ *    period = The closer this value is to zero, the more "ripples" will be.
+ *       When passing a NaN (the default), a pleasant-looking value (which is
+ *       about a third of the duration) will be used.
+ *    duration = The duration of the interpolation.
+ */
 public Interpolator_t
 MakeElasticOutInterpolator(double from, double to,
                            double amplitude = double.nan,
@@ -704,12 +730,28 @@ MakeElasticOutInterpolator(double from, double to,
       if ((t /= duration) == 1)
          return from + c;
 
-      return amplitude * pow(2, -10 * t)
+      return amplitude * 2 ^^ (-10 * t)
          * sin((t * duration - s) * (2 * PI) / period)
          + c + from;
    };
 }
 
+
+/**
+ * Returns an Elastic interpolator that eases in and out.
+ *
+ * Parameters:
+ *    from = The starting value.
+ *    to = The target value.
+ *    amplitude = The larger this value, the larger the "ripples" will be. Only
+ *       values larger than the difference between from and to will make the
+ *       "ripples" actually larger. When passing a NaN (the default), this is
+ *       initialized with the difference between from and to.
+ *    period = The closer this value is to zero, the more "ripples" will be.
+ *       When passing a NaN (the default), a pleasant-looking value (which is
+ *       about a third of the duration) will be used.
+ *    duration = The duration of the interpolation.
+ */
 public Interpolator_t
 MakeElasticInOutInterpolator(double from, double to,
                              double amplitude = double.nan,
@@ -743,8 +785,8 @@ MakeElasticInOutInterpolator(double from, double to,
       {
          return -.5
             * (amplitude
-               * pow(2, 10 * (t -= 1))
-               * sin((t * duration - s) * (2 * PI) /period))
+               * 2 ^^ (10 * (t -= 1))
+               * sin((t * duration - s) * (2 * PI) / period))
             + from;
       }
 
