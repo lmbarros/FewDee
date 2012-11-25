@@ -45,9 +45,10 @@ public alias double delegate(double t) Interpolator_t;
 public Interpolator_t
 MakeLinearInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return c * t / duration + from;
    };
 }
@@ -64,9 +65,10 @@ MakeLinearInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeQuadraticInInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return c * (t /= duration) * t + from;
    };
 }
@@ -83,9 +85,10 @@ MakeQuadraticInInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeQuadraticOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return -c * ( t/= duration) * (t - 2) + from;
    };
 }
@@ -102,9 +105,10 @@ MakeQuadraticOutInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeQuadraticInOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       if ( (t /= duration / 2) < 1)
          return c / 2 * t * t + from;
       return -c / 2 * ((--t) * (t - 2) - 1) + from;
@@ -123,9 +127,10 @@ MakeQuadraticInOutInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeCubicInInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return c * (t /= duration) * t * t + from;
    };
 }
@@ -142,9 +147,10 @@ MakeCubicInInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeCubicOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return c * ((t = t / duration - 1) * t * t + 1) + from;
    };
 }
@@ -161,9 +167,10 @@ MakeCubicOutInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeCubicInOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       if ((t /= duration / 2) < 1)
          return c / 2 * t * t * t + from;
       return c / 2 * ((t -= 2) * t * t + 2) + from;
@@ -182,9 +189,10 @@ MakeCubicInOutInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeQuarticInInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return c * (t /= duration) * t * t * t + from;
    };
 }
@@ -201,9 +209,10 @@ MakeQuarticInInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeQuarticOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return -c * ((t = t / duration - 1) * t * t * t - 1) + from;
    };
 }
@@ -220,9 +229,10 @@ MakeQuarticOutInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeQuarticInOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       if ((t /= duration / 2) < 1)
          return c / 2 * t * t * t * t + from;
       return -c / 2 * ((t -= 2) * t * t * t - 2) + from;
@@ -241,9 +251,10 @@ MakeQuarticInOutInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeQuinticInInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return c * (t /= duration) * t * t * t * t + from;
    };
 }
@@ -260,9 +271,10 @@ MakeQuinticInInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeQuinticOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return c * ((t = t / duration - 1) * t * t * t * t + 1) + from;
    };
 }
@@ -279,9 +291,10 @@ MakeQuinticOutInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeQuinticInOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       if ((t /= duration / 2) < 1)
          return c / 2 * t * t * t * t * t + from;
       return c / 2 * ((t -= 2) * t * t * t * t + 2) + from;
@@ -301,9 +314,10 @@ MakeQuinticInOutInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeSineInInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return -c * cos(t / duration * (PI / 2)) + c + from;
    };
 }
@@ -320,9 +334,10 @@ MakeSineInInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeSineOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return c * sin(t / duration * (PI / 2)) + from;
    };
 }
@@ -339,9 +354,10 @@ MakeSineOutInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeSineInOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return -c / 2 * (cos(PI * t / duration) - 1) + from;
    };
 }
@@ -358,13 +374,16 @@ MakeSineInOutInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeCircleInInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       if (t <= 0)
          return from;
+
       if (t >= duration)
          return to;
+
       return -c * (sqrt(1 - (t /= duration) * t) - 1) + from;
    };
 }
@@ -381,13 +400,16 @@ MakeCircleInInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeCircleOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       if (t <= 0)
          return from;
+
       if (t >= duration)
          return to;
+
       return c * sqrt(1 - (t = t / duration - 1) * t) + from;
    };
 }
@@ -404,15 +426,19 @@ MakeCircleOutInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeCircleInOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       if (t <= 0)
          return from;
+
       if (t >= duration)
          return to;
+
       if ((t /= duration / 2) < 1)
          return -c / 2 * (sqrt(1 - t * t) - 1) + from;
+
       return c / 2 * (sqrt(1 - (t -= 2) * t) + 1) + from;
    };
 }
@@ -429,9 +455,10 @@ MakeCircleInOutInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeExponentialInInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return (t == 0)
          ? from
          : c * 2 ^^ (10 * (t / duration - 1)) + from;
@@ -450,9 +477,10 @@ MakeExponentialInInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeExponentialOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return (t == duration)
          ? from + c
          : c * (-2 ^^ (-10 * t / duration) + 1) + from;
@@ -471,15 +499,19 @@ MakeExponentialOutInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeExponentialInOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       if (t == 0)
          return from;
+
       if (t == duration)
          return from + c;
+
       if ((t /= duration / 2) < 1)
          return c / 2 * 2 ^^ (10 * (t - 1)) + from;
+
       return c / 2 * (-2 ^^ (-10 * --t) + 2) + from;
    };
 }
@@ -499,9 +531,10 @@ public Interpolator_t
 MakeBackInInterpolator(double from, double to, double amplitude = 1.70158,
                        double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return c * (t /= duration) * t * ((amplitude + 1) * t - amplitude) + from;
    };
 }
@@ -521,9 +554,10 @@ public Interpolator_t
 MakeBackOutInterpolator(double from, double to, double amplitude = 1.70158,
                         double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return c
          * ((t = t / duration - 1) * t * ((amplitude + 1) * t + amplitude) + 1)
          + from;
@@ -545,12 +579,14 @@ public Interpolator_t
 MakeBackInOutInterpolator(double from, double to, double amplitude = 1.70158,
                           double duration = 1.0)
 {
+   immutable c = to - from;
+   immutable s = amplitude * 1.525;
+
    return delegate(double t)
    {
-      immutable c = to - from;
-      immutable s = amplitude * 1.525;
       if ((t /= duration / 2) < 1)
          return c / 2 * (t * t * ((s + 1) * t - s)) + from;
+
       return c / 2 * ((t -= 2) * t * ((s + 1) * t + s) + 2) + from;
    };
 }
@@ -582,9 +618,10 @@ bounceInterpolatorHelper(double t, double from, double c, double duration)
 public Interpolator_t
 MakeBounceInInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return bounceInterpolatorHelper(t, from, c, duration);
    };
 }
@@ -601,9 +638,10 @@ MakeBounceInInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeBounceOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       return c - bounceInterpolatorHelper(duration - t, 0, c, duration) + from;
    };
 }
@@ -620,9 +658,10 @@ MakeBounceOutInterpolator(double from, double to, double duration = 1.0)
 public Interpolator_t
 MakeBounceInOutInterpolator(double from, double to, double duration = 1.0)
 {
+   immutable c = to - from;
+
    return delegate(double t)
    {
-      immutable c = to - from;
       if (t < duration/2)
       {
          return bounceInterpolatorHelper(t * 2, 0, c, duration) * .5 + from;
@@ -796,19 +835,6 @@ MakeElasticInOutInterpolator(double from, double to,
          * .5
          + c + from;
    };
-}
-
-
-
-void main()
-{
-   // ./interpolators | gnuplot -e "plot '-' with lines; pause mouse"
-
-   import std.stdio;
-
-   auto interp = MakeElasticOutInterpolator(0, 12.0);
-   for (auto t = 0.0; t <= 0.999; t += 0.001)
-      writefln("%s\t%s", t, interp(t));
 }
 
 
