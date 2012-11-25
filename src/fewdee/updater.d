@@ -17,7 +17,7 @@ import fewdee.event_handler;
  * thought as a simple way to run shortish animations, but can in fact be used
  * to do anything.
  */
-class Updater: EventHandler
+public class Updater: EventHandler
 {
    /**
     * A function callable by an Updater. It must return true if it wants to be
