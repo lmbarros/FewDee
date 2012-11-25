@@ -355,15 +355,16 @@ MakeSineInOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-// doesn't like values out of the range (-t, t). Maybe I should add a
-// conditional and return 'from' or 'to' when out-of-range.
 public Interpolator_t
 MakeCircleInInterpolator(double from, double to, double duration = 1.0)
 {
    return delegate(double t)
    {
       immutable c = to - from;
+      if (t <= 0)
+         return from;
+      if (t >= duration)
+         return to;
       return -c * (sqrt(1 - (t /= duration) * t) - 1) + from;
 	};
 }
@@ -383,6 +384,10 @@ MakeCircleOutInterpolator(double from, double to, double duration = 1.0)
    return delegate(double t)
    {
       immutable c = to - from;
+      if (t <= 0)
+         return from;
+      if (t >= duration)
+         return to;
 		return c * sqrt(1 - (t = t / duration - 1) * t) + from;
 	};
 }
@@ -402,6 +407,10 @@ MakeCircleInOutInterpolator(double from, double to, double duration = 1.0)
    return delegate(double t)
    {
       immutable c = to - from;
+      if (t <= 0)
+         return from;
+      if (t >= duration)
+         return to;
 		if ((t /= duration / 2) < 1)
          return -c / 2 * (sqrt(1 - t * t) - 1) + from;
 		return c / 2 * (sqrt(1 - (t -= 2) * t) + 1) + from;
