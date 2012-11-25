@@ -557,7 +557,8 @@ MakeBackInOutInterpolator(double from, double to, double amplitude = 1.70158,
 
 
 /// Helper function used by Bounce interpolators.
-private double bounceInterpolatorHelper(double t, double from, double c, double duration)
+private double
+bounceInterpolatorHelper(double t, double from, double c, double duration)
 {
    if ((t /= duration) < (1 / 2.75))
       return c * (7.5625 * t * t) + from;
@@ -569,6 +570,15 @@ private double bounceInterpolatorHelper(double t, double from, double c, double 
       return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + from;
 }
 
+
+/**
+ * Returns a Bounce interpolator that eases in.
+ *
+ * Parameters:
+ *    from = The starting value.
+ *    to = The target value.
+ *    duration = The duration of the interpolation.
+ */
 public Interpolator_t
 MakeBounceInInterpolator(double from, double to, double duration = 1.0)
 {
@@ -579,6 +589,15 @@ MakeBounceInInterpolator(double from, double to, double duration = 1.0)
    };
 }
 
+
+/**
+ * Returns a Bounce interpolator that eases out.
+ *
+ * Parameters:
+ *    from = The starting value.
+ *    to = The target value.
+ *    duration = The duration of the interpolation.
+ */
 public Interpolator_t
 MakeBounceOutInterpolator(double from, double to, double duration = 1.0)
 {
@@ -589,6 +608,15 @@ MakeBounceOutInterpolator(double from, double to, double duration = 1.0)
    };
 }
 
+
+/**
+ * Returns a Bounce interpolator that eases in and out.
+ *
+ * Parameters:
+ *    from = The starting value.
+ *    to = The target value.
+ *    duration = The duration of the interpolation.
+ */
 public Interpolator_t
 MakeBounceInOutInterpolator(double from, double to, double duration = 1.0)
 {
@@ -596,9 +624,14 @@ MakeBounceInOutInterpolator(double from, double to, double duration = 1.0)
    {
       immutable c = to - from;
       if (t < duration/2)
+      {
          return bounceInterpolatorHelper(t * 2, 0, c, duration) * .5 + from;
+      }
       else
-         return bounceInterpolatorHelper(t * 2 - duration, 0, c, duration) * .5 + c * .5 + from;
+      {
+         return bounceInterpolatorHelper(t * 2 - duration, 0, c, duration)
+            * .5 + c * .5 + from;
+      }
    };
 }
 
