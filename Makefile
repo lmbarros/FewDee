@@ -7,7 +7,8 @@ DMDFLAGS=-unittest -w $(DMDCOMMONFLAGS)
 # DMDFLAGS=-O -inline $(DMDCOMMONFLAGS)
 # DMDFLAGS=-debug -gc $(DMDCOMMONFLAGS)
 
-DMDLINKFLAGS=twodee.a -L-lallegro -L-lallegro_image -L-lallegro_font -L-lallegro_ttf
+DMDLINKFLAGS=twodee.a -L-lallegro -L-lallegro_image -L-lallegro_font \
+   -L-lallegro_ttf -L-lallegro_primitives
 
 # Implicit rule to build an example
 %.example: examples/%.d

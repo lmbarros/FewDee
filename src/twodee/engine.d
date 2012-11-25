@@ -10,6 +10,7 @@ import allegro5.allegro;
 import allegro5.allegro_font;
 import allegro5.allegro_ttf;
 import allegro5.allegro_image;
+import allegro5.allegro_primitives;
 import twodee.event;
 import twodee.game_state;
 import twodee.state_manager;
@@ -51,6 +52,10 @@ struct Engine
       mixin (makeInitCode("al_init_ttf_addon()", "al_shutdown_ttf_addon()",
                           "Error initializing font subsystem"));
 
+      mixin (makeInitCode("al_init_primitives_addon()",
+                          "al_shutdown_primitives_addon()",
+                          "Error initializing font subsystem"));
+
       display_ = al_create_display(screenWidth, screenHeight);
       mixin (makeInitCode("(display_ !is null)", "al_destroy_display(display_)",
                           "Error creating display."));
@@ -90,6 +95,8 @@ struct Engine
 
       if (display_ !is null)
          al_destroy_display(display_);
+
+      al_shutdown_primitives_addon();
 
       al_shutdown_ttf_addon();
 

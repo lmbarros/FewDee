@@ -9,6 +9,7 @@ module twodee.all;
 public import allegro5.allegro;
 public import allegro5.allegro_font;
 public import allegro5.allegro_ttf;
+public import allegro5.allegro_primitives;
 
 public import twodee.aabb;
 public import twodee.engine;
