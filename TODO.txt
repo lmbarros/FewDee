@@ -22,6 +22,9 @@ Sprite.contains() -> by transparency? Multiple containment policies?
 
 Add means to remove objects/handlers from GUIsh.
 
+Add means to remove objects/handlers from Updater. If necessary, make
+the canned updaters compatible with this.
+
 Create a "virtual screen" with a given "virtual size". Draw everything
 relative to this virtual screen. Scale when drawing. But allow to use
 "real pixels", too. (This would be an option when creating (or
