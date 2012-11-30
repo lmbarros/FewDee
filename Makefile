@@ -17,8 +17,8 @@ DMDLINKFLAGS=fewdee.a -L-lallegro -L-lallegro_image -L-lallegro_font \
 
 # All
 all: fewdee.a fewdeedemo.example states_simple.example updater_simple.example \
-     sg_solar_system.example sg_parallax_scrolling.example \
-     interpolators_graphs.example
+     updater_canned.example sg_solar_system.example \
+     sg_parallax_scrolling.example interpolators_graphs.example
 
 
 # The library
@@ -31,6 +31,7 @@ fewdee.a: src/fewdee/*
 fewdeedemo.example: examples/fewdeedemo.d fewdee.a
 states_simple.example: examples/states_simple.d fewdee.a
 updater_simple.example: examples/updater_simple.d fewdee.a
+updater_canned.example: examples/updater_canned.d fewdee.a
 sg_solar_system.example: examples/sg_solar_system.d fewdee.a
 sg_parallax_scrolling.example: examples/sg_parallax_scrolling.d fewdee.a
 interpolators_graphs.example: examples/interpolators_graphs.d fewdee.a

@@ -20,6 +20,7 @@ public import fewdee.interpolators;
 public import fewdee.positionable;
 public import fewdee.state_manager;
 public import fewdee.updater;
+public import fewdee.updaters;
 public import fewdee.sg.drawable;
 public import fewdee.sg.drawing_visitor;
 public import fewdee.sg.group;

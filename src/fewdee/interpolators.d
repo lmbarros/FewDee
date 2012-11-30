@@ -35,6 +35,16 @@ public alias double delegate(double t) Interpolator_t;
 
 
 /**
+ * A generic interpolator maker interface. Most interpolators follow this
+ * interface. xxxxxxxxxxx actually no; they are functions, not delegates!
+ * For those which don't, an adapter function is provided.
+ * xxxxxx make adapter functions xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ */
+public alias Interpolator_t delegate(double from, double to, double duration)
+   GenericInterpolatorMaker_t;
+
+
+/**
  * Returns a Linear interpolator.
  *
  * Parameters:
@@ -837,6 +847,18 @@ MakeElasticInOutInterpolator(double from, double to,
    };
 }
 
+// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+// This is still a bit cumbersome... need to create one Maker function for each
+// of these other interpolators.
+GenericInterpolatorMaker_t
+MakeGenericElasticInOutInterpolatorMaker(double amplitude = double.nan,
+                                         double period = double.nan)
+{
+   return delegate(from, to, duration)
+   {
+      return MakeElasticInOutInterpolator(from, to, amplitude, period, duration);
+   };
+}
 
 
 // TERMS OF USE - EASING EQUATIONS
