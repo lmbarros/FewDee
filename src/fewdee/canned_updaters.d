@@ -4,7 +4,7 @@
  * Authors: Leandro Motta Barros
  */
 
-module fewdee.updaters;
+module fewdee.canned_updaters;
 
 import fewdee.interpolators;
 import fewdee.positionable;
@@ -12,10 +12,11 @@ import fewdee.updater;
 
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-// Add one of those neat template conditions
+// xxxxxxxxxxxx Docs!
 public void addPositionUpdater(T)(Updater updater, Positionable target,
                                   float destX, float destY, double duration,
                                   T maker)
+   if (__traits(isFloating, maker(0.0, 0.0, 1.0)(0.0)))
 {
    double t = 0.0;
 

@@ -12,6 +12,7 @@ public import allegro5.allegro_ttf;
 public import allegro5.allegro_primitives;
 
 public import fewdee.aabb;
+public import fewdee.canned_updaters;
 public import fewdee.engine;
 public import fewdee.event;
 public import fewdee.event_handler;
@@ -20,7 +21,6 @@ public import fewdee.interpolators;
 public import fewdee.positionable;
 public import fewdee.state_manager;
 public import fewdee.updater;
-public import fewdee.updaters;
 public import fewdee.sg.drawable;
 public import fewdee.sg.drawing_visitor;
 public import fewdee.sg.group;
