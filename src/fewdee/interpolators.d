@@ -35,13 +35,15 @@ public alias double delegate(double t) Interpolator_t;
 
 
 /**
- * A generic interpolator maker interface. Most interpolators follow this
- * interface. xxxxxxxxxxx actually no; they are functions, not delegates!
- * For those which don't, an adapter function is provided.
- * xxxxxx make adapter functions xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ * A generic interpolator maker interface (a delegate). Most interpolator makers
+ * are implemented as functions that have exactly this same signature. However,
+ * some interpolators (elastic and back interpolators, as I write this) accept
+ * some extra parameters, and thus have a different interface. For these
+ * nonstandard interpolator makers, there are adapters, which return one
+ * delegate of this type.
  */
 public alias Interpolator_t delegate(double from, double to, double duration)
-   GenericInterpolatorMaker_t;
+   GenericInterpolatorMakerDelegate_t;
 
 
 /**
@@ -602,6 +604,39 @@ MakeBackInOutInterpolator(double from, double to, double amplitude = 1.70158,
 }
 
 
+/// Helper to create a generic interpolator from a "back in interpolator".
+GenericInterpolatorMakerDelegate_t
+MakeGenericBackInInterpolatorMaker(double amplitude = 1.70158)
+{
+   return delegate(from, to, duration)
+   {
+      return MakeBackInInterpolator(from, to, amplitude, duration);
+   };
+}
+
+
+/// Helper to create a generic interpolator from a "back out interpolator".
+GenericInterpolatorMakerDelegate_t
+MakeGenericBackOutInterpolatorMaker(double amplitude = 1.70158)
+{
+   return delegate(from, to, duration)
+   {
+      return MakeBackOutInterpolator(from, to, amplitude, duration);
+   };
+}
+
+
+/// Helper to create a generic interpolator from a "back in/out interpolator".
+GenericInterpolatorMakerDelegate_t
+MakeGenericBackInOutInterpolatorMaker(double amplitude = 1.70158)
+{
+   return delegate(from, to, duration)
+   {
+      return MakeBackInOutInterpolator(from, to, amplitude, duration);
+   };
+}
+
+
 /// Helper function used by Bounce interpolators.
 private double
 bounceInterpolatorHelper(double t, double from, double c, double duration)
@@ -847,10 +882,36 @@ MakeElasticInOutInterpolator(double from, double to,
    };
 }
 
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-// This is still a bit cumbersome... need to create one Maker function for each
-// of these other interpolators.
-GenericInterpolatorMaker_t
+
+/// Helper to create a generic interpolator from an "elastic in interpolator".
+GenericInterpolatorMakerDelegate_t
+MakeGenericElasticInInterpolatorMaker(double amplitude = double.nan,
+                                         double period = double.nan)
+{
+   return delegate(from, to, duration)
+   {
+      return MakeElasticOutInterpolator(from, to, amplitude, period, duration);
+   };
+}
+
+
+/// Helper to create a generic interpolator from an "elastic out interpolator".
+GenericInterpolatorMakerDelegate_t
+MakeGenericElasticOutInterpolatorMaker(double amplitude = double.nan,
+                                         double period = double.nan)
+{
+   return delegate(from, to, duration)
+   {
+      return MakeElasticOutInterpolator(from, to, amplitude, period, duration);
+   };
+}
+
+
+/**
+ * Helper to create a generic interpolator from an "elastic in/out
+ * interpolator".
+ */
+GenericInterpolatorMakerDelegate_t
 MakeGenericElasticInOutInterpolatorMaker(double amplitude = double.nan,
                                          double period = double.nan)
 {
