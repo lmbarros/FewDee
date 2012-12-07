@@ -80,6 +80,13 @@ struct Engine
       al_register_event_source(eventQueue_, al_get_mouse_event_source());
       al_register_event_source(eventQueue_, al_get_keyboard_event_source());
       al_register_event_source(eventQueue_, &customEventSource_);
+
+      // Don't use pre-multiplied alpha by default
+      al_set_blender(ALLEGRO_BLEND_OPERATIONS.ALLEGRO_ADD,
+                     ALLEGRO_BLEND_MODE.ALLEGRO_ALPHA,
+                     ALLEGRO_BLEND_MODE.ALLEGRO_INVERSE_ALPHA);
+
+      al_set_new_bitmap_flags(ALLEGRO_NO_PREMULTIPLIED_ALPHA);
    }
 
    /// Destroys the Engine
