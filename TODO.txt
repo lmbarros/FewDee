@@ -1,7 +1,3 @@
-Create some standard updaters... like alpha interpolation, color
-interpolation. Perhaps sprite updater. Mover. Easing would be nice for
-everything...
-
 Think about a sane way to do manage Allegro resources.
 
 GUIsh what about z-order? Drawables have a "z" property; I can
