@@ -86,7 +86,9 @@ struct Engine
                      ALLEGRO_BLEND_MODE.ALLEGRO_ALPHA,
                      ALLEGRO_BLEND_MODE.ALLEGRO_INVERSE_ALPHA);
 
-      al_set_new_bitmap_flags(ALLEGRO_NO_PREMULTIPLIED_ALPHA);
+      al_set_new_bitmap_flags(ALLEGRO_NO_PREMULTIPLIED_ALPHA
+                              | ALLEGRO_MIN_LINEAR
+                              | ALLEGRO_MAG_LINEAR);
    }
 
    /// Destroys the Engine
