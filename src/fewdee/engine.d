@@ -66,6 +66,9 @@ struct Engine
       mixin (makeInitCode("al_install_keyboard()", "al_uninstall_keyboard()",
                           "Error initializing keyboard"));
 
+      mixin (makeInitCode("al_install_joystick()", "al_uninstall_joystick()",
+                          "Error initializing joystick"));
+
       al_init_user_event_source(&customEventSource_);
       scope (failure)
          al_destroy_user_event_source(&customEventSource_);
@@ -79,6 +82,7 @@ struct Engine
                                al_get_display_event_source(display_));
       al_register_event_source(eventQueue_, al_get_mouse_event_source());
       al_register_event_source(eventQueue_, al_get_keyboard_event_source());
+      al_register_event_source(eventQueue_, al_get_joystick_event_source());
       al_register_event_source(eventQueue_, &customEventSource_);
 
       // Don't use pre-multiplied alpha by default
@@ -97,6 +101,8 @@ struct Engine
       al_destroy_event_queue(eventQueue_);
 
       al_destroy_user_event_source(&customEventSource_);
+
+      al_uninstall_joystick();
 
       al_uninstall_keyboard();
 

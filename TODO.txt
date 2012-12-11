@@ -55,9 +55,9 @@ Consider making Sprite and Text "base classes" (they would become more
 like wrappers around Allegro objects), and create SpriteNode and
 TextNode classes for the scene graph.
 
-Abstracted input: create a layer that translates low-level commands
-from various input devices to high-level commands like "walk left",
-"jump" and "fire". Should be easy to customize.
+[WIP] Abstracted input: create a layer that translates low-level
+commands from various input devices to high-level commands like "walk
+left", "jump" and "fire". Should be easy to customize.
 
 
  Optimization
