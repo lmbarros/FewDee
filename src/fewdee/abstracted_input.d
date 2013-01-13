@@ -269,7 +269,7 @@ class AbstractedInput(HighLevelCommandsEnum): EventHandler
     *
     * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     * xxxxx BTW, what if we add a callback but don't add a mapping? Must add
-    * this to a test casel it should break, at least.
+    * this to a test case; it shouldn't break, at least.
     */
    HighLevelCommandCallback_t[][HighLevelCommandsEnum] callbacks_;
 }
