@@ -21,6 +21,8 @@ Add means to remove objects/handlers from GUIsh.
 Add means to remove objects/handlers from Updater. If necessary, make
 the canned updaters compatible with this.
 
+Add means to remove objects/handlers from Abstracted Input.
+
 Create a "virtual screen" with a given "virtual size". Draw everything
 relative to this virtual screen. Scale when drawing. But allow to use
 "real pixels", too. (This would be an option when creating (or
@@ -58,9 +60,9 @@ TextNode classes for the scene graph.
 Consider using premultiplied alpha by default. Think on a nice way to
 represent colors in the API.
 
-[WIP] Abstracted input: create a layer that translates low-level
-commands from various input devices to high-level commands like "walk
-left", "jump" and "fire". Should be easy to customize.
+Add more Command Triggers, including one to recognize sequences of
+keys (both with time-constraints, like in fighting games, and without,
+like in IDKFA).
 
 
  Optimization

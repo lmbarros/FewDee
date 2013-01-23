@@ -13,6 +13,7 @@ enum TheCommands
 {
    JUMP,
    FIRE,
+   NOTHING,
 }
 
 class TheState: GameState
@@ -36,6 +37,10 @@ class TheState: GameState
 
       abstractedInput_.addCallback(TheCommands.JUMP, &DoJump);
       abstractedInput_.addCallback(TheCommands.FIRE, &DoFire);
+
+      // This is just to ensure that we can add a callback for which there is no
+      // associated mapping.
+      abstractedInput_.addCallback(TheCommands.NOTHING, &DoNothing);
 
       // Quit if ESC is pressed
       addEventCallback(ALLEGRO_EVENT_KEY_DOWN,
@@ -73,6 +78,11 @@ class TheState: GameState
    void DoFire(in ref HighLevelCommandCallbackParam param)
    {
       writeln("FIRE!", param.sourceIsKeyboard ? " (keyboard)" : "");
+   }
+
+   void DoNothing(in ref HighLevelCommandCallbackParam param)
+   {
+      writeln("NOTHING!");
    }
 
    protected ALLEGRO_FONT* font_;

@@ -58,28 +58,24 @@ alias void delegate(in ref HighLevelCommandCallbackParam param)
 
 
 /**
- * A CommandTranslator_t is a delegate that verifies if a low-level Allegro
- * event can be translated to a specific high-level command. The event parameter
- * is the low-level Allegro event. In the param parameter, the delegate passes
- * whatever it wants to be passed to whoever will handle the high-level
- * command. A CommandTranslator_t shall return true if it recognized the
- * low-level event as the high-level command it is trying to recognize, or false
- * otherwise.
- *
- * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
- * xxxxxx rename to CommandTrigger_t?
+ * A CommandTrigger_t is a delegate that verifies if a given low-level Allegro
+ * event has triggered a specific high-level command. The event parameter is the
+ * low-level Allegro event. In the param parameter, the delegate passes whatever
+ * it wants to be passed to whoever will handle the high-level command. A
+ * CommandTrigger_t shall return true the low-level has triggered the high-level
+ * command it is trying to recognize, or false otherwise.
  */
 alias
    bool delegate(in ref ALLEGRO_EVENT event,
                  out HighLevelCommandCallbackParam param)
-   CommandTranslator_t;
+   CommandTrigger_t;
 
 
 /**
- * Creates a command translator that recognizes key presses as the low-level
- * event.
+ * Creates a command trigger that triggers a high-level command in response to
+ * key presses.
  */
-CommandTranslator_t keyPress(int keyCode)
+CommandTrigger_t keyPress(int keyCode)
 {
    return delegate(in ref ALLEGRO_EVENT event,
                    out HighLevelCommandCallbackParam param)
@@ -97,10 +93,10 @@ CommandTranslator_t keyPress(int keyCode)
 
 
 /**
- * Creates a command translator that recognizes joystick button presses as the
- * low-level event.
+ * Creates a command trigger that triggers a high-level command in response to a
+ * joystick button press.
  */
-CommandTranslator_t joyButtonPress(int button)
+CommandTrigger_t joyButtonPress(int button)
 {
    return delegate(in ref ALLEGRO_EVENT event,
                    out HighLevelCommandCallbackParam param)
@@ -175,12 +171,8 @@ class AbstractedInput(HighLevelCommandsEnum)
     *       command was issued.
     *    highLevelCommand = The high-level command to trigger when the
     *       lowLevelCommand is issued.
-    *
-    * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    * xxxxxxxxxxxx return something identifying the mapping, so that we can
-    * remove it afterward
     */
-   public void addMapping(CommandTranslator_t lowLevelCommand,
+   public void addMapping(CommandTrigger_t lowLevelCommand,
                           HighLevelCommandsEnum highLevelCommand)
    {
       mappings_ ~= mapping_t(lowLevelCommand, highLevelCommand);
@@ -204,7 +196,7 @@ class AbstractedInput(HighLevelCommandsEnum)
    /// A structure storing one mapping from a low-level to a high-level command.
    private struct mapping_t
    {
-      public CommandTranslator_t lowLevelCommand;
+      public CommandTrigger_t lowLevelCommand;
       public HighLevelCommandsEnum highLevelCommand;
    }
 
@@ -215,10 +207,6 @@ class AbstractedInput(HighLevelCommandsEnum)
     * The callbacks to be called in response to high-level commands. This is a
     * map, indexed by the high-level command. It value is an array containing
     * all the callbacks to be called when that high-level command is triggered.
-    *
-    * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    * xxxxx BTW, what if we add a callback but don't add a mapping? Must add
-    * this to a test case; it shouldn't break, at least.
     */
    HighLevelCommandCallback_t[][HighLevelCommandsEnum] callbacks_;
 }
