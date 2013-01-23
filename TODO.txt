@@ -55,6 +55,9 @@ Consider making Sprite and Text "base classes" (they would become more
 like wrappers around Allegro objects), and create SpriteNode and
 TextNode classes for the scene graph.
 
+Consider using premultiplied alpha by default. Think on a nice way to
+represent colors in the API.
+
 [WIP] Abstracted input: create a layer that translates low-level
 commands from various input devices to high-level commands like "walk
 left", "jump" and "fire". Should be easy to customize.
@@ -78,3 +81,13 @@ DrawingVisitor: Add a 'bitmap' property to Drawables. Then, sort by
 bitmap to avoid changing texture from draw to draw. BTW, remember to
 take subbitmaps into account. (Need to benchmark this; perhaps leave
 the sorting policy as something user-definable)
+
+ Longer term
+-------------
+
+Consider hiding Allegro completely. Or perhaps allow multiple
+back-ends.
+
+Think about a decent way to represent input devices uniquely. Also,
+consider that joysticks can be plugged or unplugged at any time. This
+should be supported.
