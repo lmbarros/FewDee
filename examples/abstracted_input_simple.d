@@ -37,9 +37,6 @@ class TheState: GameState
       abstractedInput_.addCallback(TheCommands.JUMP, &DoJump);
       abstractedInput_.addCallback(TheCommands.FIRE, &DoFire);
 
-
-      /// xxxxxxx
-
       // Quit if ESC is pressed
       addEventCallback(ALLEGRO_EVENT_KEY_DOWN,
                        delegate(in ref ALLEGRO_EVENT event)
@@ -70,14 +67,13 @@ class TheState: GameState
 
    void DoJump(in ref HighLevelCommandCallbackParam param)
    {
-      writeln("JUMP!");
+      writeln("JUMP!", param.sourceIsKeyboard ? " (keyboard)" : "");
    }
 
    void DoFire(in ref HighLevelCommandCallbackParam param)
    {
-      writeln("FIRE!");
+      writeln("FIRE!", param.sourceIsKeyboard ? " (keyboard)" : "");
    }
-
 
    protected ALLEGRO_FONT* font_;
 
