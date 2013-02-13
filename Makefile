@@ -10,6 +10,9 @@ DMDFLAGS=-unittest -w $(DMDCOMMONFLAGS)
 DMDLINKFLAGS=fewdee.a -L-lallegro -L-lallegro_image -L-lallegro_font \
    -L-lallegro_ttf -L-lallegro_primitives
 
+FEWDEE_SOURCES=src/allegro5/*.d src/allegro5/internal/*.d \
+   src/fewdee/*.d src/fewdee/sg/*.d
+
 # Implicit rule to build an example
 %.example: examples/%.d
 	dmd $(DMDFLAGS) $(DMDLINKFLAGS) -of$@ $< fewdee.a
@@ -24,8 +27,7 @@ all: fewdee.a fewdeedemo.example states_simple.example updater_simple.example \
 
 # The library
 fewdee.a: src/fewdee/*
-	dmd $(DMDFLAGS) -lib -offewdee.a src/allegro5/*.d src/allegro5/internal/*.d \
-	   src/fewdee/*.d src/fewdee/sg/*.d
+	dmd $(DMDFLAGS) -lib -offewdee.a $(FEWDEE_SOURCES)
 
 
 # The examples
@@ -39,6 +41,14 @@ interpolators_graphs.example: examples/interpolators_graphs.d fewdee.a
 abstracted_input_simple.example: examples/abstracted_input_simple.d fewdee.a
 
 
+# Unit tests
+fewdee_unit_tests: $(FEWDEE_SOURCES) src/fewdee_unit_tests.d
+	dmd $(DMDFLAGS) src/fewdee_unit_tests.d $(FEWDEE_SOURCES)
+
+test: fewdee_unit_tests
+	./fewdee_unit_tests
+
+
 # Clean
 clean:
-	rm -f fewdee.a *.o *.example
+	rm -f fewdee.a *.o *.example fewdee_unit_tests
