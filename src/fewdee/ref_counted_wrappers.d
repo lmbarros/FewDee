@@ -29,20 +29,30 @@ mixin template RefCountedWrapper(T)
    if (isPointer!T && !is(T == class))
 {
    /**
-    * Doc-me xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    * A structure containing the reference-counted data, the reference counter
+    * itself and some related functions.
     */
    private struct RefCountedStore
    {
+      /**
+       * The structure storing the reference-counted data and the reference
+       * counter itslef.
+       */
       private struct StoreData
       {
+         /// The reference-counted data.
          T _payload;
+
+         /// The reference counter.
          size_t _count;
       }
 
+      /// The reference-counted data and the counter itself.
       private StoreData* _store;
 
       /**
-       * Doc-me xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+       * Allocates the reference-counted "store" from the heap and initializes
+       * the reference-counter.
        */
       private void initialize()
       {
@@ -81,30 +91,18 @@ mixin template RefCountedWrapper(T)
       }
    }
 
-   // Doc-me xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   /**
+    * The storage implementation structure, where reference-counted data and the
+    * counter are stored.
+    */
    RefCountedStore _refCounted;
 
-   // Doc-me xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   // ----------------------------------------------------------------------------------------
-   /// Returns storage implementation struct.
+   /// Returns storage implementation structure.
    @property nothrow @safe
    ref inout(RefCountedStore) refCountedStore() inout
    {
       return _refCounted;
    }
-
-   // xxxxxxxxxxxxxx sublasses define this as desired? Or this calls a create()
-   // method that must be overloaded in concrete implementations (er,
-   // instantiations)?
-
-   // /**
-   //  * Constructor that initializes the payload.
-   //  * Postcondition: $(D refCountedIsInitialized)
-   //  */
-   // this(A...)(auto ref A args) if (A.length > 0)
-   // {
-   //    _refCounted.initialize(args);
-   // }
 
    /**
     * Constructor (postblit) that tracks the reference count appropriately. If
@@ -120,8 +118,8 @@ mixin template RefCountedWrapper(T)
    /**
     * Destructor that tracks the reference count appropriately. If $(D
     * !refCountedIsInitialized), does nothing. When the reference count goes
-    * down to zero, calls $(D destroy) against the payload and calls $(D free)
-    * to deallocate the corresponding resource.
+    * down to zero, calls $(D dispose()) to free the wrapped resource and $(D
+    * free())s the reference-counted storage structure.
     */
     ~this()
     {
@@ -133,18 +131,16 @@ mixin template RefCountedWrapper(T)
         if (--_refCounted._store._count)
             return;
 
-        // Done, deallocate
+        // Reference counter is zero, deallocate
         this.dispose();
         free(_refCounted._store);
         _refCounted._store = null;
     }
 
-    /**
-     * Assignment operators
-     */
+    /// Assignment operator.
     void opAssign(typeof(this) rhs)
     {
-        swap(_refCounted._store, rhs._refCounted._store);
+       swap(_refCounted._store, rhs._refCounted._store);
     }
 
     /// Ditto
@@ -154,17 +150,14 @@ mixin template RefCountedWrapper(T)
        move(rhs, _refCounted._store._payload);
     }
 
-
-    // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    // Can't use inout here because of potential mutation
+    /// Returns the wrapped resource.
     @property ref T refCountedPayload()
     {
        _refCounted.ensureInitialized();
        return _refCounted._store._payload;
     }
 
-    // // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    // // xxxxxx why both versions of refCountedPayload()?
+    // /// Ditto
     // @property nothrow @safe
     // ref inout(T) refCountedPayload() inout
     // {
@@ -172,16 +165,9 @@ mixin template RefCountedWrapper(T)
     //    return _refCounted._store._payload;
     // }
 
-    // // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    // void init(T)(T data)
-    // {
-    //    _refCounted.ensureInitialized();
-    //    _refCounted._store._payload = data;
-    // }
-
     /**
-     * Returns a reference to the payload. Calls $(D
-     * refCountedEnsureInitialized()).
+     * Allows to use the wrapper when the wrapped resource is expected. Calls
+     * $(D refCountedEnsureInitialized()).
      */
     alias refCountedPayload this;
 }
@@ -431,20 +417,26 @@ unittest
 }
 
 
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-// // std.algrithm.swap() must work with ref-counted stuff.
-// unittest
-// {
-//    auto t1 = Thing(123);
-//    auto t2 = Thing(456);
-//    swap(t1, t2);
+// Note: std.algorithm.swap() will not work with ref-counted objects
+// (std.typecons.RefCounted doesn't work either if the wrapped resource is a
+// pointer). Right now, I don't know enough D to fix this is a reasonable time,
+// I'll leave this test disabled.
+version (none)
+{
+   // std.algrithm.swap() must work with ref-counted stuff.
+   unittest
+   {
+      auto t1 = Thing(123);
+      auto t2 = Thing(456);
+      swap(t1, t2);
 
-//    assert(t1._refCounted._store._count == 1);
-//    assert(t2._refCounted._store._count == 1);
-//    assert(t1.value == 456);
-//    assert(t2.value == 123);
-//    assert(false);
-// }
+      assert(t1._refCounted._store._count == 1);
+      assert(t2._refCounted._store._count == 1);
+      assert(t1.value == 456);
+      assert(t2.value == 123);
+      assert(false);
+   }
+}
 
 
 // DMD used to have a bug related to struct destructors not being called on
