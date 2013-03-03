@@ -14,6 +14,7 @@ import std.algorithm;
 import std.exception;
 import std.traits;
 import allegro5.allegro;
+import allegro5.allegro_font;
 
 
 /**
@@ -459,7 +460,7 @@ unittest
 //
 
 
-/// A reference-counted wrapper around an ALLEGRO_BITMAP.
+/// A reference-counted wrapper around an ALLEGRO_BITMAP*.
 struct AllegroBitmap
 {
    mixin RefCountedWrapper!(ALLEGRO_BITMAP*);
@@ -480,5 +481,27 @@ struct AllegroBitmap
    private void dispose()
    {
       al_destroy_bitmap(refCountedPayload);
+   }
+}
+
+
+/// A reference-counted wrapper around an ALLEGRO_FONT*.
+struct AllegroFont
+{
+   mixin RefCountedWrapper!(ALLEGRO_FONT*);
+
+   /**
+    * Constructs a new font, loading data from a given file, and crating the
+    * font glyphs at the given size (in pixels).
+    */
+   public this(string fontFile, uint size)
+   {
+      refCountedPayload = al_load_font(fontFile.ptr, size, 0);
+   }
+
+   /// Deallocates the font. Called when the reference-count goes to zero.
+   private void dispose()
+   {
+      al_destroy_font(refCountedPayload);
    }
 }

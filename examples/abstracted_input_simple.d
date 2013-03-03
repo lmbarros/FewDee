@@ -20,7 +20,7 @@ class TheState: GameState
 {
    this()
    {
-      font_ = al_load_ttf_font("data/bluehigl.ttf", 30, 0);
+      font_ = AllegroFont("data/bluehigl.ttf", 30);
       enforce(font_ !is null);
 
       // Create the AbstractedInput and add it to the list of event handlers
@@ -49,11 +49,6 @@ class TheState: GameState
                           if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
                              popState();
                        });
-   }
-
-   ~this()
-   {
-      al_destroy_font(font_);
    }
 
    public override void onDraw()
@@ -85,7 +80,7 @@ class TheState: GameState
       writeln("NOTHING!");
    }
 
-   protected ALLEGRO_FONT* font_;
+   protected AllegroFont font_;
 
    private AbstractedInput!TheCommands abstractedInput_;
 }

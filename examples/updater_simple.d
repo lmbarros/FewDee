@@ -13,7 +13,7 @@ class TheState: GameState
 {
    this()
    {
-      font_ = al_load_ttf_font("data/bluehigl.ttf", 30, 0);
+      font_ = AllegroFont("data/bluehigl.ttf", 30);
       enforce(font_ !is null);
 
       // Create the updater and add it to the list of event handlers (which are
@@ -34,11 +34,6 @@ class TheState: GameState
                           if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
                              popState();
                        });
-   }
-
-   ~this()
-   {
-      al_destroy_font(font_);
    }
 
    // Here we create a closure and add it to the Updater. This will run for one
@@ -69,7 +64,7 @@ class TheState: GameState
                    text.ptr);
    }
 
-   protected ALLEGRO_FONT* font_;
+   protected AllegroFont font_;
 
    private Updater updater_;
 }

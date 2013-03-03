@@ -1,3 +1,6 @@
+Check how exactly font sizes are specified in Allegro. Ensure that
+AllegroFont works as documented.
+
 Think about a sane way to do manage Allegro resources.
 
 Go back to premultiplied alpha. Now that I understand it, it makes

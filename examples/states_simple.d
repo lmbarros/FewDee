@@ -15,13 +15,8 @@ class BaseState: GameState
 {
    this()
    {
-      font_ = al_load_ttf_font("data/bluehigl.ttf", 30, 0);
+      font_ = AllegroFont("data/bluehigl.ttf", 30);
       enforce(font_ !is null);
-   }
-
-   ~this()
-   {
-      al_destroy_font(font_);
    }
 
    protected void drawText(string text, float x, float y)
@@ -30,7 +25,7 @@ class BaseState: GameState
                    text.ptr);
    }
 
-   protected ALLEGRO_FONT* font_;
+   protected AllegroFont font_;
 }
 
 
