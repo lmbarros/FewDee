@@ -20,6 +20,7 @@ public import fewdee.event_handler;
 public import fewdee.game_state;
 public import fewdee.interpolators;
 public import fewdee.positionable;
+public import fewdee.ref_counted_wrappers;
 public import fewdee.state_manager;
 public import fewdee.updater;
 public import fewdee.sg.drawable;

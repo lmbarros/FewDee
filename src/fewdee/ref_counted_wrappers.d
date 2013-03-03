@@ -459,22 +459,24 @@ unittest
 //
 
 
-// Doc-me! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-// postconds _handle !is null?
-struct Bitmap
+/// A reference-counted wrapper around an ALLEGRO_BITMAP.
+struct AllegroBitmap
 {
    mixin RefCountedWrapper!(ALLEGRO_BITMAP*);
 
+   /// Constructs a new bitmap with the given dimensions.
    public this(uint width, uint height)
    {
       refCountedPayload = al_create_bitmap(width, height);
    }
 
+   /// Constructs a new bitmap and load its contents from the given image file.
    public this(string fileName)
    {
       refCountedPayload = al_load_bitmap(fileName.ptr);
    }
 
+   /// Deallocates the bitmap. Called when the reference-count goes to zero.
    private void dispose()
    {
       al_destroy_bitmap(refCountedPayload);
