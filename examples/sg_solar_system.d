@@ -16,7 +16,7 @@ class TheState: GameState
    this()
    {
       // Create the bitmaps
-      bmpAll_ = al_load_bitmap("data/solar_system.png");
+      bmpAll_ = AllegroBitmap("data/solar_system.png");
       enforce(bmpAll_ !is null);
 
       bmpSun1_ = al_create_sub_bitmap(bmpAll_, 0, 0, 64, 64);
@@ -89,15 +89,6 @@ class TheState: GameState
                        });
    }
 
-   ~this()
-   {
-      al_destroy_bitmap(bmpSun1_);
-      al_destroy_bitmap(bmpSun2_);
-      al_destroy_bitmap(bmpPlanet_);
-      al_destroy_bitmap(bmpMoon_);
-      al_destroy_bitmap(bmpAll_);
-   }
-
    public override void onDraw()
    {
       al_clear_to_color(al_map_rgb(16, 16, 32));
@@ -107,11 +98,11 @@ class TheState: GameState
       dv.draw();
    }
 
-   private ALLEGRO_BITMAP* bmpAll_;
-   private ALLEGRO_BITMAP* bmpSun1_;
-   private ALLEGRO_BITMAP* bmpSun2_;
-   private ALLEGRO_BITMAP* bmpPlanet_;
-   private ALLEGRO_BITMAP* bmpMoon_;
+   private AllegroBitmap bmpAll_;
+   private AllegroBitmap bmpSun1_;
+   private AllegroBitmap bmpSun2_;
+   private AllegroBitmap bmpPlanet_;
+   private AllegroBitmap bmpMoon_;
 
    private SRT srtRoot_;
 }

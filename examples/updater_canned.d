@@ -18,7 +18,7 @@ class TheState: GameState
    this()
    {
       // Initialize stuff
-      bitmap_ = al_load_bitmap("data/white_circle.png");
+      bitmap_ = AllegroBitmap("data/white_circle.png");
       enforce(bitmap_ !is null);
 
       sprite_ = new Sprite(64, 64, 32, 32);
@@ -227,18 +227,13 @@ class TheState: GameState
                        });
    }
 
-   ~this()
-   {
-      al_destroy_bitmap(bitmap_);
-   }
-
    public override void onDraw()
    {
       al_clear_to_color(al_map_rgb_f(0.1, 0.1, 0.1));
       sprite_.draw();
    }
 
-   private ALLEGRO_BITMAP* bitmap_;
+   private AllegroBitmap bitmap_;
    private Sprite sprite_;
    private Updater updater_;
 }

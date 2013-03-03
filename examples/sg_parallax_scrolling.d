@@ -72,16 +72,16 @@ class TheState: GameState
       }
 
       // Create the bitmaps
-      bmpStar_ = al_load_bitmap("data/little_star.png");
+      bmpStar_ = AllegroBitmap("data/little_star.png");
       enforce(bmpStar_ !is null);
 
-      bmpSmallCloud_ = al_load_bitmap("data/small_cloud.png");
+      bmpSmallCloud_ = AllegroBitmap("data/small_cloud.png");
       enforce(bmpSmallCloud_ !is null);
 
-      bmpLargeCloud_ = al_load_bitmap("data/large_cloud.png");
+      bmpLargeCloud_ = AllegroBitmap("data/large_cloud.png");
       enforce(bmpLargeCloud_ !is null);
 
-      bmpWitch_ = al_load_bitmap("data/witch.png");
+      bmpWitch_ = AllegroBitmap("data/witch.png");
       enforce(bmpWitch_ !is null);
 
       // Create the scene graph
@@ -201,14 +201,6 @@ class TheState: GameState
                        });
    }
 
-   ~this()
-   {
-      al_destroy_bitmap(bmpStar_);
-      al_destroy_bitmap(bmpSmallCloud_);
-      al_destroy_bitmap(bmpLargeCloud_);
-      al_destroy_bitmap(bmpWitch_);
-   }
-
    public override void onDraw()
    {
       al_clear_to_color(al_map_rgb(64, 64, 128));
@@ -218,10 +210,10 @@ class TheState: GameState
       dv.draw();
    }
 
-   private ALLEGRO_BITMAP* bmpStar_;
-   private ALLEGRO_BITMAP* bmpSmallCloud_;
-   private ALLEGRO_BITMAP* bmpLargeCloud_;
-   private ALLEGRO_BITMAP* bmpWitch_;
+   private AllegroBitmap bmpStar_;
+   private AllegroBitmap bmpSmallCloud_;
+   private AllegroBitmap bmpLargeCloud_;
+   private AllegroBitmap bmpWitch_;
 
    private fewdee.sg.group.Group root_;
 }

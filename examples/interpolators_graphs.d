@@ -228,7 +228,7 @@ class TheState: GameState
    this()
    {
       // Load the background image
-      bmpBG_ = al_load_bitmap("data/interpolators_graphs_bg.png");
+      bmpBG_ = AllegroBitmap("data/interpolators_graphs_bg.png");
       enforce(bmpBG_ !is null);
 
       // Quit if ESC is pressed
@@ -357,11 +357,6 @@ class TheState: GameState
       RemakeInterpolator();
    }
 
-   ~this()
-   {
-      al_destroy_bitmap(bmpBG_);
-   }
-
    public override void onDraw()
    {
       al_clear_to_color(al_map_rgb(255, 255, 255));
@@ -369,7 +364,7 @@ class TheState: GameState
       DrawGraph();
    }
 
-   private ALLEGRO_BITMAP* bmpBG_;
+   private AllegroBitmap bmpBG_;
 }
 
 void main()
