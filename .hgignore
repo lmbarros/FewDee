@@ -3,3 +3,4 @@ syntax: glob
 *.o
 *.a
 *.example
+utils/test_joysticks
