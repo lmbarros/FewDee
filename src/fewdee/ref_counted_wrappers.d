@@ -460,6 +460,27 @@ unittest
 //
 
 
+/// A reference-counted wrapper around an ALLEGRO_DISPLAY*.
+struct AllegroDisplay
+{
+   mixin RefCountedWrapper!(ALLEGRO_DISPLAY*);
+
+   /// Constructs a new display, with the given dimensions.
+   public this(int width, int height)
+   {
+      refCountedPayload = al_create_display(width, height);
+      import std.stdio; writefln("Created display %s", refCountedPayload);
+   }
+
+   /// Deallocates the bitmap. Called when the reference-count goes to zero.
+   private void dispose()
+   {
+      al_destroy_display(refCountedPayload);
+      import std.stdio; writefln("Destroyed display %s", refCountedPayload);
+   }
+}
+
+
 /// A reference-counted wrapper around an ALLEGRO_BITMAP*.
 struct AllegroBitmap
 {
