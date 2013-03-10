@@ -41,6 +41,14 @@ class MyState: GameState
       //addEventCallback(ALLEGRO_EVENT_MOUSE_AXES, &sayWhereMouseIs);
       addEventCallback(ALLEGRO_EVENT_MOUSE_BUTTON_DOWN, &startAnimation);
 
+      // Quit if ESC is pressed
+      addEventCallback(ALLEGRO_EVENT_KEY_DOWN,
+                       delegate(in ref ALLEGRO_EVENT event)
+                       {
+                          if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+                             popState();
+                       });
+
       guish_.addEventCallback(
          sprite_, EventType.MOUSE_ENTER,
          delegate(in ref ALLEGRO_EVENT event, Node node)
