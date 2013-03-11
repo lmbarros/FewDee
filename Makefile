@@ -2,8 +2,8 @@
 # Not exactly an award-wining build system, but should work for now
 #
 
-DMDCOMMONFLAGS=-Isrc
-DMDFLAGS=-unittest -w $(DMDCOMMONFLAGS)
+DMDCOMMONFLAGS=-Isrc -w -wi
+DMDFLAGS=-unittest $(DMDCOMMONFLAGS)
 # DMDFLAGS=-O -inline $(DMDCOMMONFLAGS)
 # DMDFLAGS=-debug -gc $(DMDCOMMONFLAGS)
 
