@@ -12,8 +12,8 @@ import fewdee.game_state;
 
 
 /**
- * Manager of Game States. Manages a stack of states and the provides the
- * necessary methods to handle it.
+ * Manager of Game States. Manages a stack of states and provides the necessary
+ * methods to handle it.
  *
  * The StateManager owns the states it manages. It will call destroy() on these
  * states as appropriate. This means that keeping external references to these
