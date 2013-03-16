@@ -145,6 +145,6 @@ class MyState: GameState
 
 void main()
 {
-   auto engine = Engine(640, 480);
-   engine.run(new MyState());
+   scope crank = new fewdee.engine.Crank();
+   fewdee.engine.run(new MyState());
 }

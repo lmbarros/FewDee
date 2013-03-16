@@ -87,6 +87,6 @@ class TheState: GameState
 
 void main()
 {
-   auto engine = Engine(640, 480);
-   engine.run(new TheState());
+   scope crank = new fewdee.engine.Crank();
+   fewdee.engine.run(new TheState());
 }

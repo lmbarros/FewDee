@@ -101,6 +101,6 @@ class StateB: BaseState
 
 void main()
 {
-   auto engine = Engine(640, 480);
-   engine.run(new InitialState());
+   scope crank = new fewdee.engine.Crank();
+   fewdee.engine.run(new InitialState());
 }
