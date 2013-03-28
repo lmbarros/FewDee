@@ -32,7 +32,18 @@ Add means to remove objects/handlers from GUIsh.
 Add means to remove objects/handlers from Updater. If necessary, make
 the canned updaters compatible with this.
 
-Add means to remove objects/handlers from Abstracted Input.
+Add means to remove objects/handlers from AbstractedInput.
+
+Think about ways to make AbstractedInput more usable. Think about
+moving a character around. There is a set of low-level events (left
+key up, right_key_down...) that work together to generate the
+high-level commands (Think about diagonals; specially in a discrete
+grid; if "up" and "left" are pressed within a very short period, we
+want diagonal walking events. This is no one-to-one, as the current
+design assumes). And even then, the high-level commands could be
+implemented in different ways; do we have a "start walking right"
+command? Or we want to manage a "currently walking right" state? Or
+perhaps generate a sequence of "walked one step to the right" events?
 
 Create a "virtual screen" with a given "virtual size". Draw everything
 relative to this virtual screen. Scale when drawing. But allow to use
