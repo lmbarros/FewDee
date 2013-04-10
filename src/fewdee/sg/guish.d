@@ -113,7 +113,6 @@ class GUIshEventGenerator: EventHandler
    public void addEventCallback(Node obj, EventType event,
                                 EventCallback_t callback)
    {
-      import std.stdio;
       eventCallbacks_[obj][event] ~= callback;
    }
 
