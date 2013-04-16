@@ -106,6 +106,9 @@ bitmap to avoid changing texture from draw to draw. BTW, remember to
 take subbitmaps into account. (Need to benchmark this; perhaps leave
 the sorting policy as something user-definable)
 
+Consider replacing fewdee.all' with 'fewdee._'. This seems to be an
+emerging standard in the D community.
+
  Longer term
 -------------
 
