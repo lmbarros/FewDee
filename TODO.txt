@@ -1,7 +1,44 @@
 Check how exactly font sizes are specified in Allegro. Ensure that
 AllegroFont works as documented.
 
-Think about a sane way to do manage Allegro resources.
+Think about a sane way to do manage Allegro resources. Some ideas and
+thoughts:
+   - Not all resources have a 1:1 mapping between files and the
+     resources themselves. Case in point: one bitmap may contain
+     several images which are intented to be used separately (a sprite
+     sheet); furthermore, a single "sprite template" could reference
+     many of these "sub bitmaps".
+   - A resource manager is a global thing, since resources may be
+     shared between different game states (and someone could use a
+     resource manager without using game states).
+   - It might not be a bad idea to have resources manually freed. They
+     are usually allocated and de-allocated at very specific moments
+     (loading a new level, for example); it's not like, say, memory,
+     which is allocated and free everywhere. The idea is: "resource
+     manager, please load MyFont.ttf, size 22 and associate with the
+     strinf 'NiceFont'." When no longer needed, we can say "resource
+     manager, free 'NiceFont' please." If anyone is still referencing
+     that font, that's their problem, the program will explode.
+   - To ease a manual freeing mechanism, we can have a regexp-based
+     freeing scheme. Like "free all resources matching '*-level_1-*',
+     please".
+   - It would be possible to create some kind of "RAII proxy" to a
+     resource manager. Adding resources to this "proxy" would add the
+     resource to the resource manager. But the proxy remembers which
+     resources it has added, so it cann free them when
+     destroyed. (Would need to be 'scope'.)
+   - A resource manager will free (say, call the free() method) of all
+     its resources when it gets destroyed. Perhaps it should be
+     'scope'.
+   - So, resources don't have to reference counted. Bye bye those
+     ref-counted Allegro wrappers.
+   - Question: one big resource manager for all resource types or one
+     resource manager per resource type (perhaps even user-defined
+     resources)? In the latter case, maybe a template or a mixin could
+     provide most of the implementation.
+   - The resource manager would be, perhaps, the point where we chose
+     between a real file system or an archive file
+     system. Perhaps. Must think about this.
 
 Go back to premultiplied alpha. Now that I understand it, it makes
 much more sense. Maybe (this is longer term) I should have some way to
