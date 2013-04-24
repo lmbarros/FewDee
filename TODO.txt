@@ -81,6 +81,20 @@ design assumes). And even then, the high-level commands could be
 implemented in different ways; do we have a "start walking right"
 command? Or we want to manage a "currently walking right" state? Or
 perhaps generate a sequence of "walked one step to the right" events?
+   - Here's the result of some recent thinking about it: The problem
+     is that the current design always maps events to commands, while
+     sometimes we simply want to update some state that can be queried
+     by the game at some specific moment. So, in addition to executing
+     callbacks, AbstractedInput should be able to maintain some state
+     updated as the user generates low-level events.
+   - What kind of state? Boolean, integer, floating point, perhaps
+     even "enum". A "direction" state, for 4- or 8-directions would be
+     very useful, too.
+   - We could call state changed callbacks (but I don't know if this
+     would be useful).
+   - Different strategies for state updates should be usable. For
+     example, a float state could gradually go back to zero in the
+     absence of an input signal, or keep the value "forever".
 
 Create a "virtual screen" with a given "virtual size". Draw everything
 relative to this virtual screen. Scale when drawing. But allow to use
