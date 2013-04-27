@@ -1,11 +1,11 @@
 /**
  * Various means to interpolate between two values.
  *
- * Authors: Robert Penner (author of the original Action Script code) and
- *    Leandro Motta Barros (D version).
+ * Authors: Leandro Motta Barros, based on Action Script code originally written
+ *     by Robert Penner.
  *
- * License: Three-clause BSD license. (This is different from most code in this
- *    library, which is under the MIT license.)
+ * License: MIT license. (Robert Penner's original code was under a three-clause
+ *    BSD license.)
  *
  * See_Also: http://robertpenner.com/easing
  */
@@ -1097,37 +1097,3 @@ MakeGenericElasticInOutInterpolatorMaker(double amplitude = double.nan,
       return MakeElasticInOutInterpolator(from, to, amplitude, period, duration);
    };
 }
-
-
-// TERMS OF USE - EASING EQUATIONS
-//
-// Open source under the BSD License.
-//
-// Copyright © 2001 Robert Penner
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//
-//     Redistributions of source code must retain the above copyright notice,
-//     this list of conditions and the following disclaimer.
-//
-//     Redistributions in binary form must reproduce the above copyright notice,
-//     this list of conditions and the following disclaimer in the documentation
-//     and/or other materials provided with the distribution.
-//
-//     Neither the name of the author nor the names of contributors may be used
-//     to endorse or promote products derived from this software without
-//     specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-// POSSIBILITY OF SUCH DAMAGE.
