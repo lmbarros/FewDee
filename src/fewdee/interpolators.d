@@ -73,67 +73,67 @@ Interpolator_t
 interpolator(string type)(double from, double to, double duration = 1.0)
 {
    static if (type == "t" || type == "linear")
-      return MakeLinearInterpolator(from, to, duration);
+      return makeLinearInterpolator(from, to, duration);
    else static if (type == "[t^2" || type == "[quadratic")
-      return MakeQuadraticInInterpolator(from, to, duration);
+      return makeQuadraticInInterpolator(from, to, duration);
    else static if (type == "t^2]" || type == "quadratic]")
-      return MakeQuadraticOutInterpolator(from, to, duration);
+      return makeQuadraticOutInterpolator(from, to, duration);
    else static if (type == "[t^2]" || type == "[quadratic]")
-      return MakeQuadraticInOutInterpolator(from, to, duration);
+      return makeQuadraticInOutInterpolator(from, to, duration);
    else static if (type == "[t^3" || type == "[cubic")
-      return MakeCubicInInterpolator(from, to, duration);
+      return makeCubicInInterpolator(from, to, duration);
    else static if (type == "t^3]" || type == "cubic]")
-      return MakeCubicOutInterpolator(from, to, duration);
+      return makeCubicOutInterpolator(from, to, duration);
    else static if (type == "[t^3]" || type == "[cubic]")
-      return MakeCubicInOutInterpolator(from, to, duration);
+      return makeCubicInOutInterpolator(from, to, duration);
    else static if (type == "[t^4" || type == "[quartic")
-      return MakeQuarticInInterpolator(from, to, duration);
+      return makeQuarticInInterpolator(from, to, duration);
    else static if (type == "t^4]" || type == "quartic]")
-      return MakeQuarticOutInterpolator(from, to, duration);
+      return makeQuarticOutInterpolator(from, to, duration);
    else static if (type == "[t^4]" || type == "[quartic]")
-      return MakeQuarticInOutInterpolator(from, to, duration);
+      return makeQuarticInOutInterpolator(from, to, duration);
    else static if (type == "[t^5" || type == "[quintic")
-      return MakeQuinticInInterpolator(from, to, duration);
+      return makeQuinticInInterpolator(from, to, duration);
    else static if (type == "t^5]" || type == "quintic]")
-      return MakeQuinticOutInterpolator(from, to, duration);
+      return makeQuinticOutInterpolator(from, to, duration);
    else static if (type == "[t^5]" || type == "[quintic]")
-      return MakeQuinticInOutInterpolator(from, to, duration);
+      return makeQuinticInOutInterpolator(from, to, duration);
    else static if (type == "[sin" || type == "[sine")
-      return MakeSineInInterpolator(from, to, duration);
+      return makeSineInInterpolator(from, to, duration);
    else static if (type == "sin]" || type == "sine]")
-      return MakeSineOutInterpolator(from, to, duration);
+      return makeSineOutInterpolator(from, to, duration);
    else static if (type == "[sin]" || type == "[sine]")
-      return MakeSineInOutInterpolator(from, to, duration);
+      return makeSineInOutInterpolator(from, to, duration);
    else static if (type == "[circle")
-      return MakeCircleInInterpolator(from, to, duration);
+      return makeCircleInInterpolator(from, to, duration);
    else static if (type == "circle]")
-      return MakeCircleOutInterpolator(from, to, duration);
+      return makeCircleOutInterpolator(from, to, duration);
    else static if (type == "[circle]")
-      return MakeCircleInOutInterpolator(from, to, duration);
+      return makeCircleInOutInterpolator(from, to, duration);
    else static if (type == "[exp")
-      return MakeExponentialInInterpolator(from, to, duration);
+      return makeExponentialInInterpolator(from, to, duration);
    else static if (type == "exp]")
-      return MakeExponentialOutInterpolator(from, to, duration);
+      return makeExponentialOutInterpolator(from, to, duration);
    else static if (type == "[exp]")
-      return MakeExponentialInOutInterpolator(from, to, duration);
+      return makeExponentialInOutInterpolator(from, to, duration);
    else static if (type == "[back")
-      return MakeBackInInterpolator(from, to, duration);
+      return makeBackInInterpolator(from, to, duration);
    else static if (type == "back]")
-      return MakeBackOutInterpolator(from, to, duration);
+      return makeBackOutInterpolator(from, to, duration);
    else static if (type == "[back]")
-      return MakeBackInOutInterpolator(from, to, duration);
+      return makeBackInOutInterpolator(from, to, duration);
    else static if (type == "[bounce")
-      return MakeBounceInInterpolator(from, to, duration);
+      return makeBounceInInterpolator(from, to, duration);
    else static if (type == "bounce]")
-      return MakeBounceOutInterpolator(from, to, duration);
+      return makeBounceOutInterpolator(from, to, duration);
    else static if (type == "[bounce]")
-      return MakeBounceInOutInterpolator(from, to, duration);
+      return makeBounceInOutInterpolator(from, to, duration);
    else static if (type == "[elastic")
-      return MakeElasticInInterpolator(from, to, duration);
+      return makeElasticInInterpolator(from, to, duration);
    else static if (type == "elastic]")
-      return MakeElasticOutInterpolator(from, to, duration);
+      return makeElasticOutInterpolator(from, to, duration);
    else static if (type == "[elastic]")
-      return MakeElasticInOutInterpolator(from, to, duration);
+      return makeElasticInOutInterpolator(from, to, duration);
    else
       static assert(false, "Invalid interpolator type string: " ~ type);
 }
@@ -156,71 +156,78 @@ GenericInterpolatorMakerDelegate_t interpolatorMaker(string type)()
    import std.functional;
 
    static if (type == "t" || type == "linear")
-      return toDelegate(&MakeLinearInterpolator);
+      return toDelegate(&makeLinearInterpolator);
    else static if (type == "[t^2" || type == "[quadratic")
-      return toDelegate(&MakeQuadraticInInterpolator);
+      return toDelegate(&makeQuadraticInInterpolator);
    else static if (type == "t^2]" || type == "quadratic]")
-      return toDelegate(&MakeQuadraticOutInterpolator);
+      return toDelegate(&makeQuadraticOutInterpolator);
    else static if (type == "[t^2]" || type == "[quadratic]")
-      return toDelegate(&MakeQuadraticInOutInterpolator);
+      return toDelegate(&makeQuadraticInOutInterpolator);
    else static if (type == "[t^3" || type == "[cubic")
-      return toDelegate(&MakeCubicInInterpolator);
+      return toDelegate(&makeCubicInInterpolator);
    else static if (type == "t^3]" || type == "cubic]")
-      return toDelegate(&MakeCubicOutInterpolator);
+      return toDelegate(&makeCubicOutInterpolator);
    else static if (type == "[t^3]" || type == "[cubic]")
-      return toDelegate(&MakeCubicInOutInterpolator);
+      return toDelegate(&makeCubicInOutInterpolator);
    else static if (type == "[t^4" || type == "[quartic")
-      return toDelegate(&MakeQuarticInInterpolator);
+      return toDelegate(&makeQuarticInInterpolator);
    else static if (type == "t^4]" || type == "quartic]")
-      return toDelegate(&MakeQuarticOutInterpolator);
+      return toDelegate(&makeQuarticOutInterpolator);
    else static if (type == "[t^4]" || type == "[quartic]")
-      return toDelegate(&MakeQuarticInOutInterpolator);
+      return toDelegate(&makeQuarticInOutInterpolator);
    else static if (type == "[t^5" || type == "[quintic")
-      return toDelegate(&MakeQuinticInInterpolator);
+      return toDelegate(&makeQuinticInInterpolator);
    else static if (type == "t^5]" || type == "quintic]")
-      return toDelegate(&MakeQuinticOutInterpolator);
+      return toDelegate(&makeQuinticOutInterpolator);
    else static if (type == "[t^5]" || type == "[quintic]")
-      return toDelegate(&MakeQuinticInOutInterpolator);
+      return toDelegate(&makeQuinticInOutInterpolator);
    else static if (type == "[sin" || type == "[sine")
-      return toDelegate(&MakeSineInInterpolator);
+      return toDelegate(&makeSineInInterpolator);
    else static if (type == "sin]" || type == "sine]")
-      return toDelegate(&MakeSineOutInterpolator);
+      return toDelegate(&makeSineOutInterpolator);
    else static if (type == "[sin]" || type == "[sine]")
-      return toDelegate(&MakeSineInOutInterpolator);
+      return toDelegate(&makeSineInOutInterpolator);
    else static if (type == "[circle")
-      return toDelegate(&MakeCircleInInterpolator);
+      return toDelegate(&makeCircleInInterpolator);
    else static if (type == "circle]")
-      return toDelegate(&MakeCircleOutInterpolator);
+      return toDelegate(&makeCircleOutInterpolator);
    else static if (type == "[circle]")
-      return toDelegate(&MakeCircleInOutInterpolator);
+      return toDelegate(&makeCircleInOutInterpolator);
    else static if (type == "[exp")
-      return toDelegate(&MakeExponentialInInterpolator);
+      return toDelegate(&makeExponentialInInterpolator);
    else static if (type == "exp]")
-      return toDelegate(&MakeExponentialOutInterpolator);
+      return toDelegate(&makeExponentialOutInterpolator);
    else static if (type == "[exp]")
-      return toDelegate(&MakeExponentialInOutInterpolator);
+      return toDelegate(&makeExponentialInOutInterpolator);
    else static if (type == "[back")
-      return MakeGenericBackInInterpolatorMaker();
+      return makeGenericBackInInterpolatorMaker();
    else static if (type == "back]")
-      return MakeGenericBackOutInterpolatorMaker();
+      return makeGenericBackOutInterpolatorMaker();
    else static if (type == "[back]")
-      return MakeGenericBackInOutInterpolatorMaker();
+      return makeGenericBackInOutInterpolatorMaker();
    else static if (type == "[bounce")
-      return toDelegate(&MakeBounceInInterpolator);
+      return toDelegate(&makeBounceInInterpolator);
    else static if (type == "bounce]")
-      return toDelegate(&MakeBounceOutInterpolator);
+      return toDelegate(&makeBounceOutInterpolator);
    else static if (type == "[bounce]")
-      return toDelegate(&MakeBounceInOutInterpolator);
+      return toDelegate(&makeBounceInOutInterpolator);
    else static if (type == "[elastic")
-      return MakeGenericElasticInInterpolatorMaker();
+      return makeGenericElasticInInterpolatorMaker();
    else static if (type == "elastic]")
-      return MakeGenericElasticOutInterpolatorMaker();
+      return makeGenericElasticOutInterpolatorMaker();
    else static if (type == "[elastic]")
-      return MakeGenericElasticInOutInterpolatorMaker();
+      return makeGenericElasticInOutInterpolatorMaker();
    else
       static assert(false, "Invalid interpolator type string: " ~ type);
 }
 
+
+//
+// From now on, what we have is a slightly more powerful interface (can set
+// those parameters that exist only for "back" and "elastic" interpolators), but
+// which is also much less uniform and a bit more verbose. Most users will
+// probably be happier simply using interpolator() and interpolatorMaker().
+//
 
 
 /**
@@ -232,7 +239,7 @@ GenericInterpolatorMakerDelegate_t interpolatorMaker(string type)()
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeLinearInterpolator(double from, double to, double duration = 1.0)
+makeLinearInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -252,7 +259,7 @@ MakeLinearInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeQuadraticInInterpolator(double from, double to, double duration = 1.0)
+makeQuadraticInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -272,7 +279,7 @@ MakeQuadraticInInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeQuadraticOutInterpolator(double from, double to, double duration = 1.0)
+makeQuadraticOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -292,7 +299,7 @@ MakeQuadraticOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeQuadraticInOutInterpolator(double from, double to, double duration = 1.0)
+makeQuadraticInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -314,7 +321,7 @@ MakeQuadraticInOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeCubicInInterpolator(double from, double to, double duration = 1.0)
+makeCubicInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -334,7 +341,7 @@ MakeCubicInInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeCubicOutInterpolator(double from, double to, double duration = 1.0)
+makeCubicOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -354,7 +361,7 @@ MakeCubicOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeCubicInOutInterpolator(double from, double to, double duration = 1.0)
+makeCubicInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -376,7 +383,7 @@ MakeCubicInOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeQuarticInInterpolator(double from, double to, double duration = 1.0)
+makeQuarticInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -396,7 +403,7 @@ MakeQuarticInInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeQuarticOutInterpolator(double from, double to, double duration = 1.0)
+makeQuarticOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -416,7 +423,7 @@ MakeQuarticOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeQuarticInOutInterpolator(double from, double to, double duration = 1.0)
+makeQuarticInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -438,7 +445,7 @@ MakeQuarticInOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeQuinticInInterpolator(double from, double to, double duration = 1.0)
+makeQuinticInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -458,7 +465,7 @@ MakeQuinticInInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeQuinticOutInterpolator(double from, double to, double duration = 1.0)
+makeQuinticOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -478,7 +485,7 @@ MakeQuinticOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeQuinticInOutInterpolator(double from, double to, double duration = 1.0)
+makeQuinticInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -501,7 +508,7 @@ MakeQuinticInOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeSineInInterpolator(double from, double to, double duration = 1.0)
+makeSineInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -521,7 +528,7 @@ MakeSineInInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeSineOutInterpolator(double from, double to, double duration = 1.0)
+makeSineOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -541,7 +548,7 @@ MakeSineOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeSineInOutInterpolator(double from, double to, double duration = 1.0)
+makeSineInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -561,7 +568,7 @@ MakeSineInOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeCircleInInterpolator(double from, double to, double duration = 1.0)
+makeCircleInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -587,7 +594,7 @@ MakeCircleInInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeCircleOutInterpolator(double from, double to, double duration = 1.0)
+makeCircleOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -613,7 +620,7 @@ MakeCircleOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeCircleInOutInterpolator(double from, double to, double duration = 1.0)
+makeCircleInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -642,7 +649,7 @@ MakeCircleInOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeExponentialInInterpolator(double from, double to, double duration = 1.0)
+makeExponentialInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -664,7 +671,7 @@ MakeExponentialInInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeExponentialOutInterpolator(double from, double to, double duration = 1.0)
+makeExponentialOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -686,7 +693,7 @@ MakeExponentialOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeExponentialInOutInterpolator(double from, double to, double duration = 1.0)
+makeExponentialInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -717,7 +724,7 @@ MakeExponentialInOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeBackInInterpolator(double from, double to, double amplitude = 1.70158,
+makeBackInInterpolator(double from, double to, double amplitude = 1.70158,
                        double duration = 1.0)
 {
    immutable c = to - from;
@@ -740,7 +747,7 @@ MakeBackInInterpolator(double from, double to, double amplitude = 1.70158,
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeBackOutInterpolator(double from, double to, double amplitude = 1.70158,
+makeBackOutInterpolator(double from, double to, double amplitude = 1.70158,
                         double duration = 1.0)
 {
    immutable c = to - from;
@@ -765,7 +772,7 @@ MakeBackOutInterpolator(double from, double to, double amplitude = 1.70158,
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeBackInOutInterpolator(double from, double to, double amplitude = 1.70158,
+makeBackInOutInterpolator(double from, double to, double amplitude = 1.70158,
                           double duration = 1.0)
 {
    immutable c = to - from;
@@ -783,33 +790,33 @@ MakeBackInOutInterpolator(double from, double to, double amplitude = 1.70158,
 
 /// Helper to create a generic interpolator from a "back in interpolator".
 GenericInterpolatorMakerDelegate_t
-MakeGenericBackInInterpolatorMaker(double amplitude = 1.70158)
+makeGenericBackInInterpolatorMaker(double amplitude = 1.70158)
 {
    return delegate(from, to, duration)
    {
-      return MakeBackInInterpolator(from, to, amplitude, duration);
+      return makeBackInInterpolator(from, to, amplitude, duration);
    };
 }
 
 
 /// Helper to create a generic interpolator from a "back out interpolator".
 GenericInterpolatorMakerDelegate_t
-MakeGenericBackOutInterpolatorMaker(double amplitude = 1.70158)
+makeGenericBackOutInterpolatorMaker(double amplitude = 1.70158)
 {
    return delegate(from, to, duration)
    {
-      return MakeBackOutInterpolator(from, to, amplitude, duration);
+      return makeBackOutInterpolator(from, to, amplitude, duration);
    };
 }
 
 
 /// Helper to create a generic interpolator from a "back in/out interpolator".
 GenericInterpolatorMakerDelegate_t
-MakeGenericBackInOutInterpolatorMaker(double amplitude = 1.70158)
+makeGenericBackInOutInterpolatorMaker(double amplitude = 1.70158)
 {
    return delegate(from, to, duration)
    {
-      return MakeBackInOutInterpolator(from, to, amplitude, duration);
+      return makeBackInOutInterpolator(from, to, amplitude, duration);
    };
 }
 
@@ -838,7 +845,7 @@ bounceInterpolatorHelper(double t, double from, double c, double duration)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeBounceInInterpolator(double from, double to, double duration = 1.0)
+makeBounceInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -858,7 +865,7 @@ MakeBounceInInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeBounceOutInterpolator(double from, double to, double duration = 1.0)
+makeBounceOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -878,7 +885,7 @@ MakeBounceOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeBounceInOutInterpolator(double from, double to, double duration = 1.0)
+makeBounceInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
 
@@ -913,7 +920,7 @@ MakeBounceInOutInterpolator(double from, double to, double duration = 1.0)
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeElasticInInterpolator(double from, double to, double amplitude = double.nan,
+makeElasticInInterpolator(double from, double to, double amplitude = double.nan,
                           double period = double.nan, double duration = 1.0)
 {
    immutable c = to - from;
@@ -963,7 +970,7 @@ MakeElasticInInterpolator(double from, double to, double amplitude = double.nan,
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeElasticOutInterpolator(double from, double to,
+makeElasticOutInterpolator(double from, double to,
                            double amplitude = double.nan,
                            double period = double.nan, double duration = 1.0)
 {
@@ -1014,7 +1021,7 @@ MakeElasticOutInterpolator(double from, double to,
  *    duration = The duration of the interpolation.
  */
 public Interpolator_t
-MakeElasticInOutInterpolator(double from, double to,
+makeElasticInOutInterpolator(double from, double to,
                              double amplitude = double.nan,
                              double period = double.nan, double duration = 1.0)
 {
@@ -1062,24 +1069,24 @@ MakeElasticInOutInterpolator(double from, double to,
 
 /// Helper to create a generic interpolator from an "elastic in interpolator".
 GenericInterpolatorMakerDelegate_t
-MakeGenericElasticInInterpolatorMaker(double amplitude = double.nan,
+makeGenericElasticInInterpolatorMaker(double amplitude = double.nan,
                                       double period = double.nan)
 {
    return delegate(from, to, duration)
    {
-      return MakeElasticOutInterpolator(from, to, amplitude, period, duration);
+      return makeElasticOutInterpolator(from, to, amplitude, period, duration);
    };
 }
 
 
 /// Helper to create a generic interpolator from an "elastic out interpolator".
 GenericInterpolatorMakerDelegate_t
-MakeGenericElasticOutInterpolatorMaker(double amplitude = double.nan,
+makeGenericElasticOutInterpolatorMaker(double amplitude = double.nan,
                                        double period = double.nan)
 {
    return delegate(from, to, duration)
    {
-      return MakeElasticOutInterpolator(from, to, amplitude, period, duration);
+      return makeElasticOutInterpolator(from, to, amplitude, period, duration);
    };
 }
 
@@ -1089,11 +1096,11 @@ MakeGenericElasticOutInterpolatorMaker(double amplitude = double.nan,
  * interpolator".
  */
 GenericInterpolatorMakerDelegate_t
-MakeGenericElasticInOutInterpolatorMaker(double amplitude = double.nan,
+makeGenericElasticInOutInterpolatorMaker(double amplitude = double.nan,
                                          double period = double.nan)
 {
    return delegate(from, to, duration)
    {
-      return MakeElasticInOutInterpolator(from, to, amplitude, period, duration);
+      return makeElasticInOutInterpolator(from, to, amplitude, period, duration);
    };
 }

@@ -135,17 +135,17 @@ void RemakeInterpolator()
 
       case Interpolator.BackIn:
          TheInterpolator =
-            MakeBackInInterpolator(From, To, Amplitude, Duration);
+            makeBackInInterpolator(From, To, Amplitude, Duration);
          break;
 
       case Interpolator.BackOut:
          TheInterpolator =
-            MakeBackOutInterpolator(From, To, Amplitude, Duration);
+            makeBackOutInterpolator(From, To, Amplitude, Duration);
          break;
 
       case Interpolator.BackInOut:
          TheInterpolator =
-            MakeBackInOutInterpolator(From, To, Amplitude, Duration);
+            makeBackInOutInterpolator(From, To, Amplitude, Duration);
          break;
 
       case Interpolator.BounceIn:
@@ -162,17 +162,17 @@ void RemakeInterpolator()
 
       case Interpolator.ElasticIn:
          TheInterpolator =
-            MakeElasticInInterpolator(From, To, Amplitude, Period, Duration);
+            makeElasticInInterpolator(From, To, Amplitude, Period, Duration);
          break;
 
       case Interpolator.ElasticOut:
          TheInterpolator =
-            MakeElasticOutInterpolator(From, To, Amplitude, Period, Duration);
+            makeElasticOutInterpolator(From, To, Amplitude, Period, Duration);
          break;
 
       case Interpolator.ElasticInOut:
          TheInterpolator =
-            MakeElasticInOutInterpolator(From, To, Amplitude, Period, Duration);
+            makeElasticInOutInterpolator(From, To, Amplitude, Period, Duration);
          break;
 
       case Interpolator.Count:
