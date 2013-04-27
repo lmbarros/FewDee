@@ -1063,7 +1063,7 @@ MakeElasticInOutInterpolator(double from, double to,
 /// Helper to create a generic interpolator from an "elastic in interpolator".
 GenericInterpolatorMakerDelegate_t
 MakeGenericElasticInInterpolatorMaker(double amplitude = double.nan,
-                                         double period = double.nan)
+                                      double period = double.nan)
 {
    return delegate(from, to, duration)
    {
@@ -1075,7 +1075,7 @@ MakeGenericElasticInInterpolatorMaker(double amplitude = double.nan,
 /// Helper to create a generic interpolator from an "elastic out interpolator".
 GenericInterpolatorMakerDelegate_t
 MakeGenericElasticOutInterpolatorMaker(double amplitude = double.nan,
-                                         double period = double.nan)
+                                       double period = double.nan)
 {
    return delegate(from, to, duration)
    {
