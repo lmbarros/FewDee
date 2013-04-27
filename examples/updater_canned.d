@@ -48,7 +48,7 @@ class TheState: GameState
                              {
                                 updater_.addPositionUpdater(
                                    sprite_, 30.0, 30.0, 3.5,
-                                   &MakeLinearInterpolator);
+                                   interpolatorMaker!"t");
                                 break;
                              }
 
@@ -56,7 +56,7 @@ class TheState: GameState
                              {
                                 updater_.addPositionUpdater(
                                    sprite_, 600, 40, 3.5,
-                                   &MakeQuadraticInOutInterpolator);
+                                   interpolatorMaker!"[t^2]");
                                 break;
                              }
 
@@ -64,7 +64,7 @@ class TheState: GameState
                              {
                                 updater_.addPositionUpdater(
                                    sprite_, 530, 410, 6.0,
-                                   MakeGenericElasticOutInterpolatorMaker());
+                                   interpolatorMaker!"elastic]");
                                 break;
                              }
 
@@ -72,7 +72,7 @@ class TheState: GameState
                              {
                                 updater_.addPositionUpdater(
                                    sprite_, 55, 430, 2.0,
-                                   &MakeBounceInInterpolator);
+                                   interpolatorMaker!"[bounce");
                                 break;
                              }
 
@@ -81,7 +81,7 @@ class TheState: GameState
                              {
                                 updater_.addAlphaUpdater(
                                    sprite_, 1.0, 2.0,
-                                   &MakeQuadraticOutInterpolator);
+                                   interpolatorMaker!"t^2]");
                                 break;
                              }
 
@@ -89,7 +89,7 @@ class TheState: GameState
                              {
                                 updater_.addAlphaUpdater(
                                    sprite_, 0.66, 2.0,
-                                   &MakeCircleInInterpolator);
+                                   interpolatorMaker!"[circle");
                                 break;
                              }
 
@@ -97,7 +97,7 @@ class TheState: GameState
                              {
                                 updater_.addAlphaUpdater(
                                    sprite_, 0.33, 2.0,
-                                   &MakeQuinticOutInterpolator);
+                                   interpolatorMaker!"t^5]");
                                 break;
                              }
 
@@ -105,7 +105,7 @@ class TheState: GameState
                              {
                                 updater_.addAlphaUpdater(
                                    sprite_, 0.0, 2.0,
-                                   &MakeExponentialInOutInterpolator);
+                                   interpolatorMaker!"[exp]");
                                 break;
                              }
 
@@ -117,7 +117,7 @@ class TheState: GameState
 
                                 updater_.addColorUpdater(
                                    sprite_, color, 2.0,
-                                   &MakeCubicInInterpolator);
+                                   interpolatorMaker!"[t^3");
                                 break;
                              }
 
@@ -128,7 +128,7 @@ class TheState: GameState
 
                                 updater_.addColorUpdater(
                                    sprite_, color, 2.0,
-                                   &MakeSineOutInterpolator);
+                                   interpolatorMaker!"sin]");
                                 break;
                              }
 
@@ -139,7 +139,7 @@ class TheState: GameState
 
                                 updater_.addColorUpdater(
                                    sprite_, color, 2.0,
-                                   &MakeQuarticInOutInterpolator);
+                                   interpolatorMaker!"[t^4]");
                                 break;
                              }
 
@@ -150,7 +150,7 @@ class TheState: GameState
 
                                 updater_.addColorUpdater(
                                    sprite_, color, 2.0,
-                                   &MakeExponentialInInterpolator);
+                                   interpolatorMaker!"[exp");
                                 break;
                              }
 
@@ -159,7 +159,7 @@ class TheState: GameState
                              {
                                 updater_.addScaleUpdater(
                                    sprite_, 1.0, 1.0, 2.0,
-                                   &MakeBounceOutInterpolator);
+                                   interpolatorMaker!"bounce]");
                                 break;
                              }
 
@@ -167,7 +167,7 @@ class TheState: GameState
                              {
                                 updater_.addScaleUpdater(
                                    sprite_, 0.5, 0.5, 2.0,
-                                   &MakeCubicInOutInterpolator);
+                                   interpolatorMaker!"[t^3]");
                                 break;
                              }
 
@@ -175,7 +175,7 @@ class TheState: GameState
                              {
                                 updater_.addScaleUpdater(
                                    sprite_, 1.7, -0.8, 2.0,
-                                   &MakeQuarticInInterpolator);
+                                   interpolatorMaker!"[t^4");
                                 break;
                              }
 
@@ -183,7 +183,7 @@ class TheState: GameState
                              {
                                 updater_.addScaleUpdater(
                                    sprite_, 1.8, 1.8, 2.0,
-                                   MakeGenericBackInInterpolatorMaker());
+                                   interpolatorMaker!"[back");
                                 break;
                              }
 
@@ -192,7 +192,7 @@ class TheState: GameState
                              {
                                 updater_.addRotationUpdater(
                                    sprite_, 0.0, 2.0,
-                                   MakeGenericBackInOutInterpolatorMaker());
+                                   interpolatorMaker!"[back]");
                                 break;
                              }
 
@@ -200,7 +200,7 @@ class TheState: GameState
                              {
                                 updater_.addRotationUpdater(
                                    sprite_, PI, 2.0,
-                                   MakeGenericElasticInOutInterpolatorMaker());
+                                   interpolatorMaker!"[elastic]");
                                 break;
                              }
 
@@ -208,7 +208,7 @@ class TheState: GameState
                              {
                                 updater_.addRotationUpdater(
                                    sprite_, -PI, 2.0,
-                                   &MakeCircleInOutInterpolator);
+                                   interpolatorMaker!"[circle]");
                                 break;
                              }
 
@@ -216,7 +216,7 @@ class TheState: GameState
                              {
                                 updater_.addRotationUpdater(
                                    sprite_, 5*PI, 2.0,
-                                   &MakeSineOutInterpolator);
+                                   interpolatorMaker!"sin]");
                                 break;
                              }
 

@@ -36,14 +36,11 @@ import fewdee.updater;
  *    duration = The time, in seconds, it will take to go from the current to
  *       the target position.
  *    maker = A function that will be used to create the necessary
- *       interpolators. Must have the same signature as
- *       twodee.interpolators.GenericInterpolatorMakerDelegate_t (though it
- *       doesn't have to be of this type).
+ *       interpolators.
  */
-public void addPositionUpdater(T)(Updater updater, Positionable target,
-                                  float destX, float destY, double duration,
-                                  T maker)
-   if (__traits(isFloating, maker(0.0, 0.0, 1.0)(0.0)))
+public void addPositionUpdater(Updater updater, Positionable target,
+                               float destX, float destY, double duration,
+                               GenericInterpolatorMakerDelegate_t maker)
 {
    double t = 0.0;
 
@@ -77,13 +74,11 @@ public void addPositionUpdater(T)(Updater updater, Positionable target,
  *    duration = The time, in seconds, it will take to go from the current to
  *       the target alpha.
  *    maker = A function that will be used to create the necessary
- *       interpolators. Must have the same signature as
- *       twodee.interpolators.GenericInterpolatorMakerDelegate_t (though it
- *       doesn't have to be of this type).
+ *       interpolators.
  */
-public void addAlphaUpdater(T)(Updater updater, Colorable target,
-                               float destAlpha, double duration, T maker)
-   if (__traits(isFloating, maker(0.0, 0.0, 1.0)(0.0)))
+public void addAlphaUpdater(Updater updater, Colorable target,
+                            float destAlpha, double duration,
+                            GenericInterpolatorMakerDelegate_t maker)
 {
    double t = 0.0;
 
@@ -124,16 +119,13 @@ public void addAlphaUpdater(T)(Updater updater, Colorable target,
  *    duration = The time, in seconds, it will take to go from the current to
  *       the target color.
  *    maker = A function that will be used to create the necessary
- *       interpolators. Must have the same signature as
- *       twodee.interpolators.GenericInterpolatorMakerDelegate_t (though it
- *       doesn't have to be of this type).
+ *       interpolators.
  *
  * See_Also: addAlphaUpdater
  */
-public void addColorUpdater(T)(Updater updater, Colorable target,
-                               in ref ALLEGRO_COLOR destColor, double duration,
-                               T maker)
-   if (__traits(isFloating, maker(0.0, 0.0, 1.0)(0.0)))
+public void addColorUpdater(Updater updater, Colorable target,
+                            in ref ALLEGRO_COLOR destColor, double duration,
+                            GenericInterpolatorMakerDelegate_t maker)
 {
    double t = 0.0;
 
@@ -178,14 +170,11 @@ public void addColorUpdater(T)(Updater updater, Colorable target,
  *    duration = The time, in seconds, it will take to go from the current to
  *       the target scale.
  *    maker = A function that will be used to create the necessary
- *       interpolators. Must have the same signature as
- *       twodee.interpolators.GenericInterpolatorMakerDelegate_t (though it
- *       doesn't have to be of this type).
+ *       interpolators.
  */
-public void addScaleUpdater(T)(Updater updater, Scalable target,
-                               float destScaleX, float destScaleY,
-                               double duration, T maker)
-   if (__traits(isFloating, maker(0.0, 0.0, 1.0)(0.0)))
+public void addScaleUpdater(Updater updater, Scalable target,
+                            float destScaleX, float destScaleY, double duration,
+                            GenericInterpolatorMakerDelegate_t maker)
 {
    double t = 0.0;
 
@@ -214,14 +203,11 @@ public void addScaleUpdater(T)(Updater updater, Scalable target,
  *    duration = The time, in seconds, it will take to go from the current to
  *       the target scale.
  *    maker = A function that will be used to create the necessary
- *       interpolators. Must have the same signature as
- *       twodee.interpolators.GenericInterpolatorMakerDelegate_t (though it
- *       doesn't have to be of this type).
+ *       interpolators.
  */
-public void addRotationUpdater(T)(Updater updater, Rotatable target,
-                                  float destRotation, double duration,
-                                  T maker)
-   if (__traits(isFloating, maker(0.0, 0.0, 1.0)(0.0)))
+public void addRotationUpdater(Updater updater, Rotatable target,
+                               float destRotation, double duration,
+                               GenericInterpolatorMakerDelegate_t maker)
 {
    double t = 0.0;
 

@@ -46,91 +46,91 @@ void RemakeInterpolator()
    final switch(CurrentInterpolator)
    {
       case Interpolator.Linear:
-         TheInterpolator = MakeLinearInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"t"(From, To, Duration);
          break;
 
       case Interpolator.QuadraticIn:
-         TheInterpolator = MakeQuadraticInInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[t^2"(From, To, Duration);
          break;
 
       case Interpolator.QuadraticOut:
-         TheInterpolator = MakeQuadraticOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"t^2]"(From, To, Duration);
          break;
 
       case Interpolator.QuadraticInOut:
-         TheInterpolator = MakeQuadraticInOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[t^2]"(From, To, Duration);
          break;
 
       case Interpolator.CubicIn:
-         TheInterpolator = MakeCubicInInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[t^3"(From, To, Duration);
          break;
 
       case Interpolator.CubicOut:
-         TheInterpolator = MakeCubicOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"t^3]"(From, To, Duration);
          break;
 
       case Interpolator.CubicInOut:
-         TheInterpolator = MakeCubicInOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[t^3]"(From, To, Duration);
          break;
 
       case Interpolator.QuarticIn:
-         TheInterpolator = MakeQuarticInInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[t^4"(From, To, Duration);
          break;
 
       case Interpolator.QuarticOut:
-         TheInterpolator = MakeQuarticOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"t^4]"(From, To, Duration);
          break;
 
       case Interpolator.QuarticInOut:
-         TheInterpolator = MakeQuarticInOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[t^4]"(From, To, Duration);
          break;
 
       case Interpolator.QuinticIn:
-         TheInterpolator = MakeQuinticInInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[t^5"(From, To, Duration);
          break;
 
       case Interpolator.QuinticOut:
-         TheInterpolator = MakeQuinticOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"t^5]"(From, To, Duration);
          break;
 
       case Interpolator.QuinticInOut:
-         TheInterpolator = MakeQuinticInOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[t^5]"(From, To, Duration);
          break;
 
       case Interpolator.SineIn:
-         TheInterpolator = MakeSineInInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[sin"(From, To, Duration);
          break;
 
       case Interpolator.SineOut:
-         TheInterpolator = MakeSineOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"sin]"(From, To, Duration);
          break;
 
       case Interpolator.SineInOut:
-         TheInterpolator = MakeSineInOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[sin]"(From, To, Duration);
          break;
 
       case Interpolator.CircleIn:
-         TheInterpolator = MakeCircleInInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[circle"(From, To, Duration);
          break;
 
       case Interpolator.CircleOut:
-         TheInterpolator = MakeCircleOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"circle]"(From, To, Duration);
          break;
 
       case Interpolator.CircleInOut:
-         TheInterpolator = MakeCircleInOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[circle]"(From, To, Duration);
          break;
 
       case Interpolator.ExponentialIn:
-         TheInterpolator = MakeExponentialInInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[exp"(From, To, Duration);
          break;
 
       case Interpolator.ExponentialOut:
-         TheInterpolator = MakeExponentialOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"exp]"(From, To, Duration);
          break;
 
       case Interpolator.ExponentialInOut:
-         TheInterpolator = MakeExponentialInOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[exp]"(From, To, Duration);
          break;
 
       case Interpolator.BackIn:
@@ -149,15 +149,15 @@ void RemakeInterpolator()
          break;
 
       case Interpolator.BounceIn:
-         TheInterpolator = MakeBounceInInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[bounce"(From, To, Duration);
          break;
 
       case Interpolator.BounceOut:
-         TheInterpolator = MakeBounceOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"bounce]"(From, To, Duration);
          break;
 
       case Interpolator.BounceInOut:
-         TheInterpolator = MakeBounceInOutInterpolator(From, To, Duration);
+         TheInterpolator = interpolator!"[bounce]"(From, To, Duration);
          break;
 
       case Interpolator.ElasticIn:

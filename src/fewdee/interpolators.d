@@ -46,6 +46,183 @@ public alias Interpolator_t delegate(double from, double to, double duration)
    GenericInterpolatorMakerDelegate_t;
 
 
+
+/**
+ * Creates and returns an interpolator. This is the easiest way to create one of
+ * the provided interpolators, and should probably be the best choice for most
+ * uses. This interface has just one shortcoming: it doesn't provide a way to
+ * specify the special parameters accepted by the "back" and "elastic"
+ * interpolators (the default value for these parameters will be used).
+ *
+ * Parameters:
+ *    type = This specifies what type of interpolator is desired. The general
+ *       string format should be "[#" (easing in), "#]" (easing out) or "[#]"
+ *       (both easing in and out). The exception is the linear interpolator,
+ *       which doesn't accept brackets. "#" must be replaced by the desired
+ *       interpolator type, which can be "t", "linear", "t^2", "quadratic",
+ *       "t^3", "cubic", "t^4", "quartic", "t^5", "quintic", "sin", "sine",
+ *       "circle", "exp", "back", "bounce" or "elastic". (Notice that many of
+ *       these are synonyms, like "t" and "linear", or "sin" and "sine".)
+ *    from = The starting interpolation value.
+ *    to = The ending interpolation value.
+ *    duration = The interpolation duration. In other words, the returned
+ *       interpolator will interpolate from "from" to "to", as its independent
+ *       parameter varies from 0.0 to "duration".
+ */
+Interpolator_t
+interpolator(string type)(double from, double to, double duration = 1.0)
+{
+   static if (type == "t" || type == "linear")
+      return MakeLinearInterpolator(from, to, duration);
+   else static if (type == "[t^2" || type == "[quadratic")
+      return MakeQuadraticInInterpolator(from, to, duration);
+   else static if (type == "t^2]" || type == "quadratic]")
+      return MakeQuadraticOutInterpolator(from, to, duration);
+   else static if (type == "[t^2]" || type == "[quadratic]")
+      return MakeQuadraticInOutInterpolator(from, to, duration);
+   else static if (type == "[t^3" || type == "[cubic")
+      return MakeCubicInInterpolator(from, to, duration);
+   else static if (type == "t^3]" || type == "cubic]")
+      return MakeCubicOutInterpolator(from, to, duration);
+   else static if (type == "[t^3]" || type == "[cubic]")
+      return MakeCubicInOutInterpolator(from, to, duration);
+   else static if (type == "[t^4" || type == "[quartic")
+      return MakeQuarticInInterpolator(from, to, duration);
+   else static if (type == "t^4]" || type == "quartic]")
+      return MakeQuarticOutInterpolator(from, to, duration);
+   else static if (type == "[t^4]" || type == "[quartic]")
+      return MakeQuarticInOutInterpolator(from, to, duration);
+   else static if (type == "[t^5" || type == "[quintic")
+      return MakeQuinticInInterpolator(from, to, duration);
+   else static if (type == "t^5]" || type == "quintic]")
+      return MakeQuinticOutInterpolator(from, to, duration);
+   else static if (type == "[t^5]" || type == "[quintic]")
+      return MakeQuinticInOutInterpolator(from, to, duration);
+   else static if (type == "[sin" || type == "[sine")
+      return MakeSineInInterpolator(from, to, duration);
+   else static if (type == "sin]" || type == "sine]")
+      return MakeSineOutInterpolator(from, to, duration);
+   else static if (type == "[sin]" || type == "[sine]")
+      return MakeSineInOutInterpolator(from, to, duration);
+   else static if (type == "[circle")
+      return MakeCircleInInterpolator(from, to, duration);
+   else static if (type == "circle]")
+      return MakeCircleOutInterpolator(from, to, duration);
+   else static if (type == "[circle]")
+      return MakeCircleInOutInterpolator(from, to, duration);
+   else static if (type == "[exp")
+      return MakeExponentialInInterpolator(from, to, duration);
+   else static if (type == "exp]")
+      return MakeExponentialOutInterpolator(from, to, duration);
+   else static if (type == "[exp]")
+      return MakeExponentialInOutInterpolator(from, to, duration);
+   else static if (type == "[back")
+      return MakeBackInInterpolator(from, to, duration);
+   else static if (type == "back]")
+      return MakeBackOutInterpolator(from, to, duration);
+   else static if (type == "[back]")
+      return MakeBackInOutInterpolator(from, to, duration);
+   else static if (type == "[bounce")
+      return MakeBounceInInterpolator(from, to, duration);
+   else static if (type == "bounce]")
+      return MakeBounceOutInterpolator(from, to, duration);
+   else static if (type == "[bounce]")
+      return MakeBounceInOutInterpolator(from, to, duration);
+   else static if (type == "[elastic")
+      return MakeElasticInInterpolator(from, to, duration);
+   else static if (type == "elastic]")
+      return MakeElasticOutInterpolator(from, to, duration);
+   else static if (type == "[elastic]")
+      return MakeElasticInOutInterpolator(from, to, duration);
+   else
+      static assert(false, "Invalid interpolator type string: " ~ type);
+}
+
+
+/**
+ * Creates and returns an interpolator maker (that is, a function that can be
+ * used to create interpolators). This is the easiest way to create a maker of
+ * one of the provided interpolators, and should probably be the best choice for
+ * most uses. This interface has just one shortcoming: it doesn't provide a way
+ * to specify the special parameters accepted by the "back" and "elastic"
+ * interpolators (the default value for these parameters will be used).
+ *
+ * Parameters:
+ *    type = This specifies what type of interpolator is desired. The possible
+ *       values are the same as in the interpolator() function.
+ */
+GenericInterpolatorMakerDelegate_t interpolatorMaker(string type)()
+{
+   import std.functional;
+
+   static if (type == "t" || type == "linear")
+      return toDelegate(&MakeLinearInterpolator);
+   else static if (type == "[t^2" || type == "[quadratic")
+      return toDelegate(&MakeQuadraticInInterpolator);
+   else static if (type == "t^2]" || type == "quadratic]")
+      return toDelegate(&MakeQuadraticOutInterpolator);
+   else static if (type == "[t^2]" || type == "[quadratic]")
+      return toDelegate(&MakeQuadraticInOutInterpolator);
+   else static if (type == "[t^3" || type == "[cubic")
+      return toDelegate(&MakeCubicInInterpolator);
+   else static if (type == "t^3]" || type == "cubic]")
+      return toDelegate(&MakeCubicOutInterpolator);
+   else static if (type == "[t^3]" || type == "[cubic]")
+      return toDelegate(&MakeCubicInOutInterpolator);
+   else static if (type == "[t^4" || type == "[quartic")
+      return toDelegate(&MakeQuarticInInterpolator);
+   else static if (type == "t^4]" || type == "quartic]")
+      return toDelegate(&MakeQuarticOutInterpolator);
+   else static if (type == "[t^4]" || type == "[quartic]")
+      return toDelegate(&MakeQuarticInOutInterpolator);
+   else static if (type == "[t^5" || type == "[quintic")
+      return toDelegate(&MakeQuinticInInterpolator);
+   else static if (type == "t^5]" || type == "quintic]")
+      return toDelegate(&MakeQuinticOutInterpolator);
+   else static if (type == "[t^5]" || type == "[quintic]")
+      return toDelegate(&MakeQuinticInOutInterpolator);
+   else static if (type == "[sin" || type == "[sine")
+      return toDelegate(&MakeSineInInterpolator);
+   else static if (type == "sin]" || type == "sine]")
+      return toDelegate(&MakeSineOutInterpolator);
+   else static if (type == "[sin]" || type == "[sine]")
+      return toDelegate(&MakeSineInOutInterpolator);
+   else static if (type == "[circle")
+      return toDelegate(&MakeCircleInInterpolator);
+   else static if (type == "circle]")
+      return toDelegate(&MakeCircleOutInterpolator);
+   else static if (type == "[circle]")
+      return toDelegate(&MakeCircleInOutInterpolator);
+   else static if (type == "[exp")
+      return toDelegate(&MakeExponentialInInterpolator);
+   else static if (type == "exp]")
+      return toDelegate(&MakeExponentialOutInterpolator);
+   else static if (type == "[exp]")
+      return toDelegate(&MakeExponentialInOutInterpolator);
+   else static if (type == "[back")
+      return MakeGenericBackInInterpolatorMaker();
+   else static if (type == "back]")
+      return MakeGenericBackOutInterpolatorMaker();
+   else static if (type == "[back]")
+      return MakeGenericBackInOutInterpolatorMaker();
+   else static if (type == "[bounce")
+      return toDelegate(&MakeBounceInInterpolator);
+   else static if (type == "bounce]")
+      return toDelegate(&MakeBounceOutInterpolator);
+   else static if (type == "[bounce]")
+      return toDelegate(&MakeBounceInOutInterpolator);
+   else static if (type == "[elastic")
+      return MakeGenericElasticInInterpolatorMaker();
+   else static if (type == "elastic]")
+      return MakeGenericElasticOutInterpolatorMaker();
+   else static if (type == "[elastic]")
+      return MakeGenericElasticInOutInterpolatorMaker();
+   else
+      static assert(false, "Invalid interpolator type string: " ~ type);
+}
+
+
+
 /**
  * Returns a Linear interpolator.
  *
