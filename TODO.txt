@@ -1,3 +1,64 @@
+ Architecture
+--------------
+
+Notes about the redesign (or, in fact, the first real design) of the
+architecture.
+
+Engine (core)
+   - knows who is inited...
+   - ...so that it can stop them afterward
+   - initializes the Allegro core and perhaps some other module
+     (native dialogs?)
+
+EventManager
+   - loads addons: mouse, keyboard, joystick.
+   - allows to register and de-register event listeners
+   - translates Allegro events to FewDee events (performance?! use tricks like
+     free lists?)
+   - TODO: needs to be called by the main loop, so that it can call
+     al_get_next_event() andthe like.
+   - TODO: how to identify events? OK, subsystem/event pair, but what are
+     "subsystem" and "event"? Must be easily extensible and not too
+     slow. Benchmark uints versus strings.
+
+DisplayManager
+   - loads lots of addons: image, font, ttf. Perhaps primitives.
+   - provide information about available monitors and their capabilities
+   - create, destroy, manage displays.
+   - get the default display.
+   - display identified by string IDs.
+   - TODO: what is the default display? One named "default"? The first created?
+     One explicitly flagged as such?
+
+AudioManager
+   - loads addons: audio, audio codecs.
+   - play samples and streams (play, pause, loop, volume, etc)
+   - stops everything upon destruction
+   - TODO: how to chose the parameter to al_reserve_samples()?
+
+ResourceManager
+   - seems that must be destroyed after all other managers (just the core is
+     destroyed afterward), because they may still reference stuff from here
+     (like, streams playing -- if this is destroyed before AudioManager,
+     AudioManager may try to read from a deleted audio stream).
+   - Resources are identified by strings.
+   - Clean resources by regexp: "please, clean resources named "level_01-*".
+   - TODO: how to specify which resources are loaded from which files? May want
+     to read from a hardcoded string or from a file.
+   - TODO: and what about resource archives? Not an issue for now, but... maybe
+     a resource manager can use some kind of helper class to actually read data
+     from disk... by default, uses a FileSystemReader, but could be replaced by
+     an ArchiveReader or whatever.
+   - TODO: one resource manager to rule them all or one resource manager per
+     type of resource? Do I want to allow "user-defined" resources (like, say,
+     "scripts")?
+   - TODO: how to deal with the "one image file contains many 'logical
+     bitmaps', which may be combined in various ways in a single sprite?"
+
+
+ Assorted TODOs
+----------------
+
 Check how exactly font sizes are specified in Allegro. Ensure that
 AllegroFont works as documented.
 
