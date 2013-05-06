@@ -49,6 +49,23 @@ ResourceManager
      a resource manager can use some kind of helper class to actually read data
      from disk... by default, uses a FileSystemReader, but could be replaced by
      an ArchiveReader or whatever.
+        - How Allegro deals with this: there a struct,
+          ALLEGRO_FILE_INTERFACE, with pointers to all file
+          system-related functions (open, close, read, write, flush,
+          tell, seek, etc). Then, there are functions like
+          al_set_new_file_interface() and
+          al_set_standard_file_interface() that allow to change the
+          current set of funcions used for all I/O operations in the
+          current thread.
+        - So, a Reader would have to somehow provide pointers to these
+          functions.
+        - And how to set the current Reader? An IOManager? Or add this
+          to the core engine? In any case, reading from the file
+          system will be the default, so I don't have to worry about
+          this now. Er, I may want to add a mean to set the data root
+          directory (CWD by default)... but then, I would have to
+          provide the interfaces, and a FileSystemReader with a
+          setRoot() method.
    - TODO: one resource manager to rule them all or one resource manager per
      type of resource? Do I want to allow "user-defined" resources (like, say,
      "scripts")?
