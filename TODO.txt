@@ -72,7 +72,6 @@ ResourceManager
    - TODO: how to deal with the "one image file contains many 'logical
      bitmaps', which may be combined in various ways in a single sprite?"
 
-
  Assorted TODOs
 ----------------
 

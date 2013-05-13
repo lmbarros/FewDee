@@ -145,6 +145,7 @@ class MyState: GameState
 
 void main()
 {
-   scope crank = new fewdee.engine.Crank();
-   fewdee.engine.run(new MyState());
+   DisplayManager.createDisplay("default");
+
+   Core.run(new MyState());
 }

@@ -8,10 +8,10 @@ DMDFLAGS=-unittest $(DMDCOMMONFLAGS)
 # DMDFLAGS=-debug -gc $(DMDCOMMONFLAGS)
 
 DMDLINKFLAGS=fewdee.a -L-lallegro -L-lallegro_image -L-lallegro_font \
-   -L-lallegro_ttf -L-lallegro_primitives
+   -L-lallegro_ttf -L-lallegro_primitives -L-lallegro_dialog -L-lallegro_audio -L-lallegro_acodec
 
 FEWDEE_SOURCES=src/allegro5/*.d src/allegro5/internal/*.d \
-   src/fewdee/*.d src/fewdee/sg/*.d
+   src/fewdee/*.d src/fewdee/aux/*.d src/fewdee/sg/*.d
 
 # Implicit rule to build an example
 %.example: examples/%.d
@@ -19,10 +19,10 @@ FEWDEE_SOURCES=src/allegro5/*.d src/allegro5/internal/*.d \
 
 
 # All
-all: fewdee.a fewdeedemo.example states_simple.example updater_simple.example \
-     updater_canned.example sg_solar_system.example \
-     sg_parallax_scrolling.example interpolators_graphs.example \
-     abstracted_input_simple.example
+all: fewdee.a fewdeedemo.example #states_simple.example updater_simple.example \
+#     updater_canned.example sg_solar_system.example \
+#     sg_parallax_scrolling.example interpolators_graphs.example \
+#     abstracted_input_simple.example
 
 
 # The library
