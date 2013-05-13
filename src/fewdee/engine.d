@@ -18,6 +18,7 @@ import allegro5.allegro_image;
 import allegro5.allegro_primitives;
 import fewdee.aux.singleton;
 import fewdee.event;
+import fewdee.event_manager;
 import fewdee.game_state;
 import fewdee.ref_counted_wrappers;
 import fewdee.state_manager;
@@ -82,20 +83,6 @@ private class CoreImpl
       mixin (makeInitCode("al_install_joystick()", "al_uninstall_joystick()",
                           "Error initializing joystick"));
 
-      al_init_user_event_source(&TheCustomEventSource);
-      scope (failure)
-         al_destroy_user_event_source(&TheCustomEventSource);
-
-      TheEventQueue = al_create_event_queue();
-      mixin (makeInitCode("(TheEventQueue !is null)",
-                          "al_destroy_event_queue(TheEventQueue)",
-                          "Error creating event queue."));
-
-      al_register_event_source(TheEventQueue, al_get_mouse_event_source());
-      al_register_event_source(TheEventQueue, al_get_keyboard_event_source());
-      al_register_event_source(TheEventQueue, al_get_joystick_event_source());
-      al_register_event_source(TheEventQueue, &TheCustomEventSource);
-
       // Don't use pre-multiplied alpha by default
       al_set_blender(ALLEGRO_BLEND_OPERATIONS.ALLEGRO_ADD,
                      ALLEGRO_BLEND_MODE.ALLEGRO_ALPHA,
@@ -119,9 +106,7 @@ private class CoreImpl
     */
    private void stop()
    {
-      al_destroy_event_queue(TheEventQueue);
-
-      al_destroy_user_event_source(&TheCustomEventSource);
+      EventManager.finalize(); // TODO: must check if inited; and think about ordering
 
       al_uninstall_joystick();
 
@@ -162,11 +147,11 @@ private class CoreImpl
          ALLEGRO_EVENT tickEvent;
          tickEvent.user.type = FEWDEE_EVENT_TICK;
          tickEvent.user.deltaTime(deltaTime);
-         al_emit_user_event(&TheCustomEventSource, &tickEvent, null);
+         al_emit_user_event(EventManager.customEventSource, &tickEvent, null);
 
          // Handle pending events
          ALLEGRO_EVENT event;
-         while (al_get_next_event(TheEventQueue, &event))
+         while (al_get_next_event(EventManager.eventQueue, &event))
             TheStateManager.onEvent(event);
 
          // Draw!
@@ -178,12 +163,6 @@ private class CoreImpl
 
    // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    public ALLEGRO_DISPLAY* TheDisplay;
-
-   /// The source of custom events.
-   private ALLEGRO_EVENT_SOURCE TheCustomEventSource;
-
-   /// The one and only event queue.
-   package ALLEGRO_EVENT_QUEUE* TheEventQueue;
 
    /// The object managing the game states.
    private StateManager TheStateManager;
