@@ -17,9 +17,15 @@ EventManager
      free lists?)
    - TODO: needs to be called by the main loop, so that it can call
      al_get_next_event() andthe like.
+        - TODO: Perhaps it should somehow provide run()
    - TODO: how to identify events? OK, subsystem/event pair, but what are
      "subsystem" and "event"? Must be easily extensible and not too
      slow. Benchmark uints versus strings.
+   - In addition to "please call this callback when this specific
+     event happens", we need a low-level event handler, to implement
+     things like AbstractedInput. This should probably be usable by
+     end users... they should be able to provide their own
+     abstracted input mechanisms, if desired.
 
 DisplayManager
    - loads lots of addons: image, font, ttf. Perhaps primitives.
