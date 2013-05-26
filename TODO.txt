@@ -80,6 +80,9 @@ ResourceManager
    - TODO: one resource manager to rule them all or one resource manager per
      type of resource? Do I want to allow "user-defined" resources (like, say,
      "scripts")?
+        - Best idea so far: add a pool of "generic resources"
+          (LowLevelResources). The user can put whatever he wants
+          there. Not elegant, but let's KISS.
    - TODO: how to deal with the "one image file contains many 'logical
      bitmaps', which may be combined in various ways in a single sprite?"
 
