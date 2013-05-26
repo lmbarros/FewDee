@@ -72,6 +72,11 @@ ResourceManager
           directory (CWD by default)... but then, I would have to
           provide the interfaces, and a FileSystemReader with a
           setRoot() method.
+        - Also note that there are funcions like al_load_bitmap_f()
+          that take a pointer to an ALLEGRO_FILE -- these functions
+          are probably a better alternative to use (if possible),
+          since they don't rely on a global state set by
+          al_set_standard_file_interface() and friends.
    - TODO: one resource manager to rule them all or one resource manager per
      type of resource? Do I want to allow "user-defined" resources (like, say,
      "scripts")?
