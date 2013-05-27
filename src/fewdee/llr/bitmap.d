@@ -50,20 +50,6 @@ class Bitmap: LowLevelResource
       enforce(_bitmap !is null);
    }
 
-   /**
-    * Creates a Bitmap from an $(D ALLEGRO_BITMAP*). Use this only if you really
-    * want to use the Allegro API to create your own Bitmap.
-    *
-    * Parameters:
-    *    bitmap = The Allegro bitmap that will henceforth be wrapped by this
-    *       Bitmap.
-    */
-   this(ALLEGRO_BITMAP* bitmap)
-   {
-      _bitmap = bitmap;
-      enforce(_bitmap !is null);
-   }
-
    /// Frees all resources used by the Bitmap.
    public void free()
    {
