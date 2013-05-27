@@ -12,6 +12,7 @@ import allegro5.allegro;
 import fewdee.engine;
 import fewdee.aux.singleton;
 import fewdee.llr.bitmap;
+import fewdee.llr.font;
 
 
 /**
@@ -145,10 +146,14 @@ private class ResourceManagerImpl
    public void removeEverythingMatching(Regex!char regex)
    {
       bitmaps.removeMatching(regex);
+      fonts.removeMatching(regex);
    }
 
    /// The Bitmap resources.
    public Resources!Bitmap bitmaps;
+
+   /// The Font resources.
+   public Resources!Font fonts;
 }
 
 

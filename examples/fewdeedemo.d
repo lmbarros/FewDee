@@ -31,8 +31,9 @@ class MyState: GameState
 
       sprite_.color = al_map_rgba_f(1.0, 1.0, 1.0, 0.2);
 
-      font_ = AllegroFont("data/bluehigl.ttf", 50);
-      text_ = new Text(font_, "Hi! Âçënts, tóô!");
+      ResourceManager.fonts.add("font", new Font("data/bluehigl.ttf", 50));
+
+      text_ = new Text(ResourceManager.fonts["font"], "Hi! Âçënts, tóô!");
       text_.alignment = Text.Alignment.RIGHT;
       text_.x = 400;
       text_.y = 25;
@@ -131,8 +132,6 @@ class MyState: GameState
    private Updater updater_;
 
    private Sprite sprite_;
-
-   private AllegroFont font_;
 
    private Text text_;
 
