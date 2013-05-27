@@ -21,9 +21,12 @@ public import fewdee.event_handler;
 public import fewdee.game_state;
 public import fewdee.interpolators;
 public import fewdee.positionable;
-public import fewdee.ref_counted_wrappers;
+public import fewdee.ref_counted_wrappers; // TODO: remove this
+public import fewdee.resource_manager;
 public import fewdee.state_manager;
 public import fewdee.updater;
+public import fewdee.llr.bitmap;
+public import fewdee.llr.low_level_resource;
 public import fewdee.sg.drawable;
 public import fewdee.sg.drawing_visitor;
 public import fewdee.sg.group;

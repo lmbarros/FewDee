@@ -13,15 +13,15 @@ class MyState: GameState
       addEventHandler(guish_);
       addEventHandler(updater_);
 
-      bitmap1_ = AllegroBitmap("data/flag_1.png");
-      bitmap2_ = AllegroBitmap("data/flag_2.png");
-      bitmap3_ = AllegroBitmap("data/flag_3.png");
+      ResourceManager.bitmaps.add("bmp1", new Bitmap("data/flag_1.png"));
+      ResourceManager.bitmaps.add("bmp2", new Bitmap("data/flag_2.png"));
+      ResourceManager.bitmaps.add("bmp3", new Bitmap("data/flag_3.png"));
 
       sprite_ = new Sprite(64, 64, 6, 61);
-      sprite_.addBitmap(bitmap1_);
-      sprite_.addBitmap(bitmap2_);
-      sprite_.addBitmap(bitmap1_);
-      sprite_.addBitmap(bitmap3_);
+      sprite_.addBitmap(ResourceManager.bitmaps["bmp1"]);
+      sprite_.addBitmap(ResourceManager.bitmaps["bmp2"]);
+      sprite_.addBitmap(ResourceManager.bitmaps["bmp1"]);
+      sprite_.addBitmap(ResourceManager.bitmaps["bmp3"]);
 
       sprite_.x = 200;
       sprite_.y = 200;
@@ -133,9 +133,6 @@ class MyState: GameState
    private Sprite sprite_;
 
    private AllegroFont font_;
-   private AllegroBitmap bitmap1_;
-   private AllegroBitmap bitmap2_;
-   private AllegroBitmap bitmap3_;
 
    private Text text_;
 

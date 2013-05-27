@@ -23,6 +23,7 @@ import fewdee.game_state;
 import fewdee.ref_counted_wrappers;
 import fewdee.state_manager;
 import fewdee.display_manager;
+import fewdee.resource_manager;
 
 
 shared static this()
@@ -116,6 +117,9 @@ private class CoreImpl
 
       DisplayManager.finalize(); // TODO: must check if initialized
 
+      if (isResourceManagerInited)
+         ResourceManager.finalize();
+
       al_shutdown_primitives_addon();
 
       al_shutdown_ttf_addon();
@@ -178,6 +182,12 @@ private class CoreImpl
     * this to $(D true).
     */
    package bool isEventManagerInited = false;
+
+   /**
+    * Is the Resource Manager initialized? Only the Resource Manager itself
+    * should set this to $(D true).
+    */
+   package bool isResourceManagerInited = false;
 }
 
 
