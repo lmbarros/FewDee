@@ -41,8 +41,7 @@ class Bitmap: LowLevelResource
     * Creates a Bitmap, reading its contents from a given file.
     *
     * Parameters:
-    *    width = The bitmap width, in pixels.
-    *    height = The bitmap height, in pixels.
+    *    path = The path to the bitmap image file.
     */
    this(in string path)
    {
