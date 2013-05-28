@@ -1,4 +1,7 @@
- Architecture
+Rename the 'aux' directory to something like 'internal', or 'impl'. It should
+be *the* directory with stuff not intended for end-users.
+
+Architecture
 --------------
 
 Notes about the redesign (or, in fact, the first real design) of the
