@@ -19,7 +19,7 @@ import fewdee.llr.font;
  * Stores a collection of resources of the same type $(D T), indexed by string
  * keys. Has methods allowing to add, query and remove resources.
  */
-private struct Resources(T)
+private struct ResourceCollection(T)
    if (is(T: fewdee.llr.low_level_resource.LowLevelResource))
 {
    /**
@@ -150,10 +150,10 @@ private class ResourceManagerImpl
    }
 
    /// The Bitmap resources.
-   public Resources!Bitmap bitmaps;
+   public ResourceCollection!Bitmap bitmaps;
 
    /// The Font resources.
-   public Resources!Font fonts;
+   public ResourceCollection!Font fonts;
 }
 
 
