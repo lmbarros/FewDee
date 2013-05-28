@@ -10,6 +10,8 @@ import std.regex;
 import allegro5.allegro;
 import fewdee.engine;
 import fewdee.aux.singleton;
+import fewdee.llr.audio_sample;
+import fewdee.llr.audio_stream;
 import fewdee.llr.bitmap;
 import fewdee.llr.font;
 
@@ -154,6 +156,12 @@ private class ResourceManagerImpl
 
    /// The Font resources.
    public ResourceCollection!Font fonts;
+
+   /// The Audio Sample resources.
+   public ResourceCollection!AudioSample audioSamples;
+
+   /// The Audio Stream resources.
+   public ResourceCollection!AudioStream audioStreams;
 }
 
 
