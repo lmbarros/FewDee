@@ -6,7 +6,6 @@
 
 module fewdee.resource_manager;
 
-// import std.exception; // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 import std.regex;
 import allegro5.allegro;
 import fewdee.engine;
@@ -101,6 +100,9 @@ private struct ResourceCollection(T)
 }
 
 
+/// A regex matching everything.
+private enum regexMatchingEverything = "";
+
 
 /**
  * The real implementation of the Resource Manager. Users shall use this through
@@ -124,9 +126,7 @@ private class ResourceManagerImpl
    /// Removes (and destroys) all resources of all types.
    public void removeEverything()
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      // TODO: does this remove a resource with an empty string key?
-      removeEverythingMatching("");
+      removeEverythingMatching(regexMatchingEverything);
    }
 
    /**
@@ -165,4 +165,212 @@ private class ResourceManagerImpl
 public class ResourceManager
 {
    mixin LowLockSingleton!ResourceManagerImpl;
+}
+
+
+
+//
+// Unit tests
+//
+
+version (unittest)
+{
+   private immutable fakeResourceBoilerplate = `
+      import fewdee.llr.low_level_resource;
+      bool[string] destroyed;
+
+      class FakeResource: LowLevelResource
+      {
+         this(string data) { _data = data; }
+         public void free() { destroyed[_data] = true; }
+         private string _data;
+      }`;
+} // version(unittest)
+
+
+// ResourceCollection.add()
+unittest
+{
+   mixin(fakeResourceBoilerplate);
+
+   ResourceCollection!FakeResource rc;
+   assert(rc._resources.length == 0);
+
+   rc.add("a", new FakeResource("a"));
+   assert(rc._resources.length == 1);
+
+   rc.add("b", new FakeResource("b"));
+   rc.add("c", new FakeResource("c"));
+   assert(rc._resources.length == 3);
+}
+
+// ResourceCollection.remove()
+unittest
+{
+   mixin(fakeResourceBoilerplate);
+
+   ResourceCollection!FakeResource rc;
+
+   rc.add("a", new FakeResource("a"));
+   rc.add("b", new FakeResource("b"));
+   rc.add("c", new FakeResource("c"));
+   rc.add("d", new FakeResource("d"));
+   rc.add("e", new FakeResource("e"));
+
+   assert(rc._resources.length == 5);
+   assert(destroyed.length == 0);
+
+   rc.remove("b");
+   assert(rc._resources.length == 4);
+   assert(destroyed.length == 1);
+   assert("b" in destroyed);
+
+   rc.remove("c");
+   rc.remove("c"); // remove twice; must work
+   assert(rc._resources.length == 3);
+   assert(destroyed.length == 2);
+   assert("c" in destroyed);
+
+   rc.remove("z"); // remove nonexistent resource; must be no-op
+   assert(rc._resources.length == 3);
+   assert(destroyed.length == 2);
+
+   rc.remove("e");
+   assert(rc._resources.length == 2);
+   assert(destroyed.length == 3);
+   assert("e" in destroyed);
+}
+
+
+// ResourceCollection.opIndex()
+unittest
+{
+   mixin(fakeResourceBoilerplate);
+
+   ResourceCollection!FakeResource rc;
+   auto a = new FakeResource("a");
+   auto b = new FakeResource("b");
+   auto c = new FakeResource("c");
+
+   rc.add("a", a);
+   rc.add("b", b);
+   rc.add("c", c);
+
+   assert(rc["a"] == a);
+   assert(rc["b"] == b);
+   assert(rc["c"] == c);
+}
+
+// ResourceCollection.removeMatching(string)
+unittest
+{
+   mixin(fakeResourceBoilerplate);
+
+   ResourceCollection!FakeResource rc;
+   rc.add("a-1", new FakeResource("a-1"));
+   rc.add("a-2", new FakeResource("a-2"));
+   rc.add("a-3", new FakeResource("a-3"));
+   rc.add("b-1", new FakeResource("b-1"));
+   rc.add("b-2", new FakeResource("b-2"));
+   rc.add("b-3", new FakeResource("b-3"));
+   rc.add("c-1", new FakeResource("c-1"));
+   rc.add("c-2", new FakeResource("c-2"));
+   rc.add("c-3", new FakeResource("c-3"));
+
+   assert(rc._resources.length == 9);
+   assert(destroyed.length == 0);
+
+   rc.removeMatching("z"); // shall not match anything
+   assert(rc._resources.length == 9);
+   assert(destroyed.length == 0);
+
+   rc.removeMatching("[abc]-2");
+   assert(rc._resources.length == 6);
+   assert(destroyed.length == 3);
+   assert("a-2" in destroyed);
+   assert("b-2" in destroyed);
+   assert("c-2" in destroyed);
+
+   rc.removeMatching("a-");
+   assert(rc._resources.length == 4);
+   assert(destroyed.length == 5);
+   assert("a-1" in destroyed);
+   assert("a-2" in destroyed); // was there already, but anyway
+   assert("a-3" in destroyed);
+}
+
+
+// ResourceCollection.removeMatching(Regex!char)
+unittest
+{
+   mixin(fakeResourceBoilerplate);
+
+   ResourceCollection!FakeResource rc;
+   rc.add("a-1", new FakeResource("a-1"));
+   rc.add("a-2", new FakeResource("a-2"));
+   rc.add("a-3", new FakeResource("a-3"));
+   rc.add("b-1", new FakeResource("b-1"));
+   rc.add("b-2", new FakeResource("b-2"));
+   rc.add("b-3", new FakeResource("b-3"));
+   rc.add("c-1", new FakeResource("c-1"));
+   rc.add("c-2", new FakeResource("c-2"));
+   rc.add("c-3", new FakeResource("c-3"));
+
+   assert(rc._resources.length == 9);
+   assert(destroyed.length == 0);
+
+   rc.removeMatching(std.regex.regex("z")); // shall not match anything
+   assert(rc._resources.length == 9);
+   assert(destroyed.length == 0);
+
+   rc.removeMatching(std.regex.regex("[abc]-2"));
+   assert(rc._resources.length == 6);
+   assert(destroyed.length == 3);
+   assert("a-2" in destroyed);
+   assert("b-2" in destroyed);
+   assert("c-2" in destroyed);
+
+   rc.removeMatching(std.regex.regex("a-"));
+   assert(rc._resources.length == 4);
+   assert(destroyed.length == 5);
+   assert("a-1" in destroyed);
+   assert("a-2" in destroyed); // was there already, but anyway
+   assert("a-3" in destroyed);
+}
+
+
+// ResourceCollection.removeMatching(regexMatchingEverything)
+unittest
+{
+   mixin(fakeResourceBoilerplate);
+
+   ResourceCollection!FakeResource rc;
+   rc.add("a-1", new FakeResource("a-1"));
+   rc.add("a-2", new FakeResource("a-2"));
+   rc.add("a-3", new FakeResource("a-3"));
+   rc.add("b-1", new FakeResource("b-1"));
+   rc.add("b-2", new FakeResource("b-2"));
+   rc.add("b-3", new FakeResource("b-3"));
+   rc.add("c-1", new FakeResource("c-1"));
+   rc.add("c-2", new FakeResource("c-2"));
+   rc.add("c-3", new FakeResource("c-3"));
+   rc.add("", new FakeResource("")); // empty string as key
+
+   assert(rc._resources.length == 10);
+   assert(destroyed.length == 0);
+
+   rc.removeMatching(regexMatchingEverything);
+   assert(rc._resources.length == 0);
+   assert(destroyed.length == 10);
+
+   assert("a-1" in destroyed);
+   assert("b-1" in destroyed);
+   assert("c-1" in destroyed);
+   assert("a-2" in destroyed);
+   assert("b-2" in destroyed);
+   assert("c-2" in destroyed);
+   assert("a-3" in destroyed);
+   assert("b-3" in destroyed);
+   assert("c-3" in destroyed);
+   assert("" in destroyed);
 }
