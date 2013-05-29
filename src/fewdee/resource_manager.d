@@ -149,8 +149,8 @@ private class ResourceManagerImpl
    {
       bitmaps.removeMatching(regex);
       fonts.removeMatching(regex);
-      audioSamples.removeMatching(regex);
-      audioStreams.removeMatching(regex);
+      samples.removeMatching(regex);
+      streams.removeMatching(regex);
    }
 
    /// The Bitmap resources.
@@ -160,10 +160,10 @@ private class ResourceManagerImpl
    public ResourceCollection!Font fonts;
 
    /// The Audio Sample resources.
-   public ResourceCollection!AudioSample audioSamples;
+   public ResourceCollection!AudioSample samples;
 
    /// The Audio Stream resources.
-   public ResourceCollection!AudioStream audioStreams;
+   public ResourceCollection!AudioStream streams;
 }
 
 
@@ -454,8 +454,8 @@ unittest
    auto rm = new ResourceManagerImpl();
    assert(rm.bitmaps._resources.length == 0);
    assert(rm.fonts._resources.length == 0);
-   assert(rm.audioSamples._resources.length == 0);
-   assert(rm.audioStreams._resources.length == 0);
+   assert(rm.samples._resources.length == 0);
+   assert(rm.streams._resources.length == 0);
 
    rm.bitmaps.add("a", new Bitmap("data/logo.png"));
    rm.bitmaps.add("b", new Bitmap("data/logo.png"));
@@ -468,16 +468,16 @@ unittest
    rm.fonts.add("c", new FakeFont);
    assert(rm.fonts._resources.length == 3);
 
-   rm.audioSamples.add("a", new FakeAudioSample);
-   rm.audioSamples.add("b", new FakeAudioSample);
-   rm.audioSamples.add("c", new FakeAudioSample);
-   rm.audioSamples.add("d", new FakeAudioSample);
-   rm.audioSamples.add("e", new FakeAudioSample);
-   assert(rm.audioSamples._resources.length == 5);
+   rm.samples.add("a", new FakeAudioSample);
+   rm.samples.add("b", new FakeAudioSample);
+   rm.samples.add("c", new FakeAudioSample);
+   rm.samples.add("d", new FakeAudioSample);
+   rm.samples.add("e", new FakeAudioSample);
+   assert(rm.samples._resources.length == 5);
 
-   rm.audioStreams.add("a", new FakeAudioStream);
-   rm.audioStreams.add("b", new FakeAudioStream);
-   assert(rm.audioStreams._resources.length == 2);
+   rm.streams.add("a", new FakeAudioStream);
+   rm.streams.add("b", new FakeAudioStream);
+   assert(rm.streams._resources.length == 2);
 
    rm.removeEverything();
 
@@ -486,8 +486,8 @@ unittest
    // magic in the implementation of removeEverything()).
    assert(rm.bitmaps._resources.length == 0);
    assert(rm.fonts._resources.length == 0);
-   assert(rm.audioSamples._resources.length == 0);
-   assert(rm.audioStreams._resources.length == 0);
+   assert(rm.samples._resources.length == 0);
+   assert(rm.streams._resources.length == 0);
 }
 
 
@@ -511,44 +511,44 @@ unittest
    rm.fonts.add("2-b", new FakeFont);
    assert(rm.fonts._resources.length == 3);
 
-   rm.audioSamples.add("1-a", new FakeAudioSample);
-   rm.audioSamples.add("2-a", new FakeAudioSample);
-   rm.audioSamples.add("2-b", new FakeAudioSample);
-   rm.audioSamples.add("2-c", new FakeAudioSample);
-   rm.audioSamples.add("3-a", new FakeAudioSample);
-   assert(rm.audioSamples._resources.length == 5);
+   rm.samples.add("1-a", new FakeAudioSample);
+   rm.samples.add("2-a", new FakeAudioSample);
+   rm.samples.add("2-b", new FakeAudioSample);
+   rm.samples.add("2-c", new FakeAudioSample);
+   rm.samples.add("3-a", new FakeAudioSample);
+   assert(rm.samples._resources.length == 5);
 
-   rm.audioStreams.add("1-a", new FakeAudioStream);
-   rm.audioStreams.add("2-a", new FakeAudioStream);
-   assert(rm.audioStreams._resources.length == 2);
+   rm.streams.add("1-a", new FakeAudioStream);
+   rm.streams.add("2-a", new FakeAudioStream);
+   assert(rm.streams._resources.length == 2);
 
    // First batch of removals
    rm.removeEverythingMatching("3-");
    assert(rm.bitmaps._resources.length == 3);
    assert(rm.fonts._resources.length == 3);
-   assert(rm.audioSamples._resources.length == 4);
-   assert(rm.audioStreams._resources.length == 2);
+   assert(rm.samples._resources.length == 4);
+   assert(rm.streams._resources.length == 2);
 
    // Second batch of removals
    rm.removeEverythingMatching("-b");
    assert(rm.bitmaps._resources.length == 2);
    assert(rm.fonts._resources.length == 2);
-   assert(rm.audioSamples._resources.length == 3);
-   assert(rm.audioStreams._resources.length == 2);
+   assert(rm.samples._resources.length == 3);
+   assert(rm.streams._resources.length == 2);
 
    // Third batch of removals: remove nothing
    rm.removeEverythingMatching("xxx");
    assert(rm.bitmaps._resources.length == 2);
    assert(rm.fonts._resources.length == 2);
-   assert(rm.audioSamples._resources.length == 3);
-   assert(rm.audioStreams._resources.length == 2);
+   assert(rm.samples._resources.length == 3);
+   assert(rm.streams._resources.length == 2);
 
    // Fourth and last batch of removals
    rm.removeEverythingMatching("-c");
    assert(rm.bitmaps._resources.length == 2);
    assert(rm.fonts._resources.length == 2);
-   assert(rm.audioSamples._resources.length == 2);
-   assert(rm.audioStreams._resources.length == 2);
+   assert(rm.samples._resources.length == 2);
+   assert(rm.streams._resources.length == 2);
 }
 
 // ResourceManagerImpl.removeEverythingMatching(Regex!char)
@@ -571,42 +571,42 @@ unittest
    rm.fonts.add("2-b", new FakeFont);
    assert(rm.fonts._resources.length == 3);
 
-   rm.audioSamples.add("1-a", new FakeAudioSample);
-   rm.audioSamples.add("2-a", new FakeAudioSample);
-   rm.audioSamples.add("2-b", new FakeAudioSample);
-   rm.audioSamples.add("2-c", new FakeAudioSample);
-   rm.audioSamples.add("3-a", new FakeAudioSample);
-   assert(rm.audioSamples._resources.length == 5);
+   rm.samples.add("1-a", new FakeAudioSample);
+   rm.samples.add("2-a", new FakeAudioSample);
+   rm.samples.add("2-b", new FakeAudioSample);
+   rm.samples.add("2-c", new FakeAudioSample);
+   rm.samples.add("3-a", new FakeAudioSample);
+   assert(rm.samples._resources.length == 5);
 
-   rm.audioStreams.add("1-a", new FakeAudioStream);
-   rm.audioStreams.add("2-a", new FakeAudioStream);
-   assert(rm.audioStreams._resources.length == 2);
+   rm.streams.add("1-a", new FakeAudioStream);
+   rm.streams.add("2-a", new FakeAudioStream);
+   assert(rm.streams._resources.length == 2);
 
    // First batch of removals
    rm.removeEverythingMatching(std.regex.regex("3-"));
    assert(rm.bitmaps._resources.length == 3);
    assert(rm.fonts._resources.length == 3);
-   assert(rm.audioSamples._resources.length == 4);
-   assert(rm.audioStreams._resources.length == 2);
+   assert(rm.samples._resources.length == 4);
+   assert(rm.streams._resources.length == 2);
 
    // Second batch of removals
    rm.removeEverythingMatching(std.regex.regex("-b"));
    assert(rm.bitmaps._resources.length == 2);
    assert(rm.fonts._resources.length == 2);
-   assert(rm.audioSamples._resources.length == 3);
-   assert(rm.audioStreams._resources.length == 2);
+   assert(rm.samples._resources.length == 3);
+   assert(rm.streams._resources.length == 2);
 
    // Third batch of removals: remove nothing
    rm.removeEverythingMatching(std.regex.regex("xxx"));
    assert(rm.bitmaps._resources.length == 2);
    assert(rm.fonts._resources.length == 2);
-   assert(rm.audioSamples._resources.length == 3);
-   assert(rm.audioStreams._resources.length == 2);
+   assert(rm.samples._resources.length == 3);
+   assert(rm.streams._resources.length == 2);
 
    // Fourth and last batch of removals
    rm.removeEverythingMatching(std.regex.regex("-c"));
    assert(rm.bitmaps._resources.length == 2);
    assert(rm.fonts._resources.length == 2);
-   assert(rm.audioSamples._resources.length == 2);
-   assert(rm.audioStreams._resources.length == 2);
+   assert(rm.samples._resources.length == 2);
+   assert(rm.streams._resources.length == 2);
 }
