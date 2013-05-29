@@ -114,12 +114,15 @@ private enum regexMatchingEverything = "";
  */
 private class ResourceManagerImpl
 {
+   /// Constructs the Resource Manager.
    private this()
    {
       Core.isResourceManagerInited = true;
    }
 
-
+   /**
+    * Finalize the Resource Manager, destroying all resources it currently owns.
+    */
    package void finalize()
    {
       removeEverything();
