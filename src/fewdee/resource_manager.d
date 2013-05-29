@@ -149,6 +149,8 @@ private class ResourceManagerImpl
    {
       bitmaps.removeMatching(regex);
       fonts.removeMatching(regex);
+      audioSamples.removeMatching(regex);
+      audioStreams.removeMatching(regex);
    }
 
    /// The Bitmap resources.
