@@ -14,7 +14,7 @@ import std.exception;
 import allegro5.allegro;
 import fewdee.engine;
 import fewdee.event_manager;
-import fewdee.aux.singleton;
+import fewdee.internal.singleton;
 
 
 /**

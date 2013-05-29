@@ -16,7 +16,7 @@ import allegro5.allegro_font;
 import allegro5.allegro_ttf;
 import allegro5.allegro_image;
 import allegro5.allegro_primitives;
-import fewdee.aux.singleton;
+import fewdee.internal.singleton;
 import fewdee.event;
 import fewdee.event_manager;
 import fewdee.game_state;

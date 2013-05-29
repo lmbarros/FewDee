@@ -5,7 +5,7 @@
  * Authors: Leandro Motta Barros
  */
 
-module fewdee.aux.singleton;
+module fewdee.internal.singleton;
 
 
 /**

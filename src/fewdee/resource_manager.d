@@ -9,7 +9,7 @@ module fewdee.resource_manager;
 import std.regex;
 import allegro5.allegro;
 import fewdee.engine;
-import fewdee.aux.singleton;
+import fewdee.internal.singleton;
 import fewdee.llr.audio_sample;
 import fewdee.llr.audio_stream;
 import fewdee.llr.bitmap;
