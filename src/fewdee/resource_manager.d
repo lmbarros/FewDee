@@ -384,3 +384,229 @@ unittest
    assert("c-3" in destroyed);
    assert("" in destroyed);
 }
+
+version (unittest)
+{
+   // During unit test execution, the Allegro modules necessary to load real
+   // data are not loaded, so we use these dummies. (Yes, I tried to load the
+   // Allegro modules, but for some reason this didn't work.) Notice that the
+   // call to the super() will fail (no real data being loaded), so we simply
+   // catch and pretend that everything went fine.
+   private immutable fakeLowLevelResourcesBoilerplate = `
+      class FakeFont: Font
+      {
+         this()
+         {
+            try
+            {
+               super("foo.ttf", 10);
+            }
+            catch(Throwable)
+            {
+               // Nothing here
+            }
+         }
+         public override void free() { }
+      }
+
+      class FakeAudioSample: AudioSample
+      {
+         this()
+         {
+            try
+            {
+               super("foo.ogg");
+            }
+            catch(Throwable)
+            {
+               // Nothing here
+            }
+         }
+         public override void free() { }
+      }
+
+      class FakeAudioStream: AudioStream
+      {
+         this()
+         {
+            try
+            {
+               super("foo.ogg");
+            }
+            catch(Throwable)
+            {
+               // Nothing here
+            }
+         }
+         public override void free() { }
+      }
+   `;
+} // version(unittest)
+
+
+// ResourceManagerImpl.removeEverything()
+unittest
+{
+   mixin(fakeLowLevelResourcesBoilerplate);
+
+   // Being able to instantiate what should be a singleton in a unit test is
+   // weird, but useful nevertheless
+   auto rm = new ResourceManagerImpl();
+   assert(rm.bitmaps._resources.length == 0);
+   assert(rm.fonts._resources.length == 0);
+   assert(rm.audioSamples._resources.length == 0);
+   assert(rm.audioStreams._resources.length == 0);
+
+   rm.bitmaps.add("a", new Bitmap("data/logo.png"));
+   rm.bitmaps.add("b", new Bitmap("data/logo.png"));
+   rm.bitmaps.add("c", new Bitmap("data/logo.png"));
+   rm.bitmaps.add("", new Bitmap("data/logo.png")); // empty string as key
+   assert(rm.bitmaps._resources.length == 4);
+
+   rm.fonts.add("a", new FakeFont);
+   rm.fonts.add("b", new FakeFont);
+   rm.fonts.add("c", new FakeFont);
+   assert(rm.fonts._resources.length == 3);
+
+   rm.audioSamples.add("a", new FakeAudioSample);
+   rm.audioSamples.add("b", new FakeAudioSample);
+   rm.audioSamples.add("c", new FakeAudioSample);
+   rm.audioSamples.add("d", new FakeAudioSample);
+   rm.audioSamples.add("e", new FakeAudioSample);
+   assert(rm.audioSamples._resources.length == 5);
+
+   rm.audioStreams.add("a", new FakeAudioStream);
+   rm.audioStreams.add("b", new FakeAudioStream);
+   assert(rm.audioStreams._resources.length == 2);
+
+   rm.removeEverything();
+
+   // TODO: Can't I make some compile-time magic to ensure that all
+   // ResourceCollection!T members are tested? (But then, I could use the same
+   // magic in the implementation of removeEverything()).
+   assert(rm.bitmaps._resources.length == 0);
+   assert(rm.fonts._resources.length == 0);
+   assert(rm.audioSamples._resources.length == 0);
+   assert(rm.audioStreams._resources.length == 0);
+}
+
+
+// ResourceManagerImpl.removeEverythingMatching(string)
+unittest
+{
+   mixin(fakeLowLevelResourcesBoilerplate);
+
+   // Being able to instantiate what should be a singleton in a unit test is
+   // weird, but useful nevertheless
+   auto rm = new ResourceManagerImpl();
+
+   rm.bitmaps.add("1-a", new Bitmap("data/logo.png"));
+   rm.bitmaps.add("1-b", new Bitmap("data/logo.png"));
+   rm.bitmaps.add("2-a", new Bitmap("data/logo.png"));
+   rm.bitmaps.add("3-a", new Bitmap("data/logo.png"));
+   assert(rm.bitmaps._resources.length == 4);
+
+   rm.fonts.add("1-a", new FakeFont);
+   rm.fonts.add("2-a", new FakeFont);
+   rm.fonts.add("2-b", new FakeFont);
+   assert(rm.fonts._resources.length == 3);
+
+   rm.audioSamples.add("1-a", new FakeAudioSample);
+   rm.audioSamples.add("2-a", new FakeAudioSample);
+   rm.audioSamples.add("2-b", new FakeAudioSample);
+   rm.audioSamples.add("2-c", new FakeAudioSample);
+   rm.audioSamples.add("3-a", new FakeAudioSample);
+   assert(rm.audioSamples._resources.length == 5);
+
+   rm.audioStreams.add("1-a", new FakeAudioStream);
+   rm.audioStreams.add("2-a", new FakeAudioStream);
+   assert(rm.audioStreams._resources.length == 2);
+
+   // First batch of removals
+   rm.removeEverythingMatching("3-");
+   assert(rm.bitmaps._resources.length == 3);
+   assert(rm.fonts._resources.length == 3);
+   assert(rm.audioSamples._resources.length == 4);
+   assert(rm.audioStreams._resources.length == 2);
+
+   // Second batch of removals
+   rm.removeEverythingMatching("-b");
+   assert(rm.bitmaps._resources.length == 2);
+   assert(rm.fonts._resources.length == 2);
+   assert(rm.audioSamples._resources.length == 3);
+   assert(rm.audioStreams._resources.length == 2);
+
+   // Third batch of removals: remove nothing
+   rm.removeEverythingMatching("xxx");
+   assert(rm.bitmaps._resources.length == 2);
+   assert(rm.fonts._resources.length == 2);
+   assert(rm.audioSamples._resources.length == 3);
+   assert(rm.audioStreams._resources.length == 2);
+
+   // Fourth and last batch of removals
+   rm.removeEverythingMatching("-c");
+   assert(rm.bitmaps._resources.length == 2);
+   assert(rm.fonts._resources.length == 2);
+   assert(rm.audioSamples._resources.length == 2);
+   assert(rm.audioStreams._resources.length == 2);
+}
+
+// ResourceManagerImpl.removeEverythingMatching(Regex!char)
+unittest
+{
+   mixin(fakeLowLevelResourcesBoilerplate);
+
+   // Being able to instantiate what should be a singleton in a unit test is
+   // weird, but useful nevertheless
+   auto rm = new ResourceManagerImpl();
+
+   rm.bitmaps.add("1-a", new Bitmap("data/logo.png"));
+   rm.bitmaps.add("1-b", new Bitmap("data/logo.png"));
+   rm.bitmaps.add("2-a", new Bitmap("data/logo.png"));
+   rm.bitmaps.add("3-a", new Bitmap("data/logo.png"));
+   assert(rm.bitmaps._resources.length == 4);
+
+   rm.fonts.add("1-a", new FakeFont);
+   rm.fonts.add("2-a", new FakeFont);
+   rm.fonts.add("2-b", new FakeFont);
+   assert(rm.fonts._resources.length == 3);
+
+   rm.audioSamples.add("1-a", new FakeAudioSample);
+   rm.audioSamples.add("2-a", new FakeAudioSample);
+   rm.audioSamples.add("2-b", new FakeAudioSample);
+   rm.audioSamples.add("2-c", new FakeAudioSample);
+   rm.audioSamples.add("3-a", new FakeAudioSample);
+   assert(rm.audioSamples._resources.length == 5);
+
+   rm.audioStreams.add("1-a", new FakeAudioStream);
+   rm.audioStreams.add("2-a", new FakeAudioStream);
+   assert(rm.audioStreams._resources.length == 2);
+
+   // First batch of removals
+   rm.removeEverythingMatching(std.regex.regex("3-"));
+   assert(rm.bitmaps._resources.length == 3);
+   assert(rm.fonts._resources.length == 3);
+   assert(rm.audioSamples._resources.length == 4);
+   assert(rm.audioStreams._resources.length == 2);
+
+   // Second batch of removals
+   rm.removeEverythingMatching(std.regex.regex("-b"));
+   assert(rm.bitmaps._resources.length == 2);
+   assert(rm.fonts._resources.length == 2);
+   assert(rm.audioSamples._resources.length == 3);
+   assert(rm.audioStreams._resources.length == 2);
+
+   // Third batch of removals: remove nothing
+   rm.removeEverythingMatching(std.regex.regex("xxx"));
+   assert(rm.bitmaps._resources.length == 2);
+   assert(rm.fonts._resources.length == 2);
+   assert(rm.audioSamples._resources.length == 3);
+   assert(rm.audioStreams._resources.length == 2);
+
+   // Fourth and last batch of removals
+   rm.removeEverythingMatching(std.regex.regex("-c"));
+   assert(rm.bitmaps._resources.length == 2);
+   assert(rm.fonts._resources.length == 2);
+   assert(rm.audioSamples._resources.length == 2);
+   assert(rm.audioStreams._resources.length == 2);
+}
