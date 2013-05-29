@@ -118,7 +118,7 @@ CommandTrigger_t joyButtonPress(int button)
  * high-level commands and, if they do, call the handlers of these high-level
  * commands.
  */
-class AbstractedInput(HighLevelCommandsEnum) : EventHandler
+class AbstractedInput(HighLevelCommandsEnum): EventHandler
    if (is(HighLevelCommandsEnum == enum))
 {
    /**
