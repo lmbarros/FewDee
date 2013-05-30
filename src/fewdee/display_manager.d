@@ -126,6 +126,8 @@ class Display
    /// Destroys the Display.
    ~this()
    {
+      al_unregister_event_source(EventManager.eventQueue,
+                                 al_get_display_event_source(_display));
       al_destroy_display(_display);
    }
 
