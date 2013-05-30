@@ -12,7 +12,7 @@ module fewdee.display_manager;
 
 import std.exception;
 import allegro5.allegro;
-import fewdee.engine;
+import fewdee.core;
 import fewdee.event_manager;
 import fewdee.internal.singleton;
 

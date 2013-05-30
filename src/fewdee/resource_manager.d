@@ -8,7 +8,7 @@ module fewdee.resource_manager;
 
 import std.regex;
 import allegro5.allegro;
-import fewdee.engine;
+import fewdee.core;
 import fewdee.internal.singleton;
 import fewdee.llr.audio_sample;
 import fewdee.llr.audio_stream;

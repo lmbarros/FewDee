@@ -8,7 +8,7 @@ module fewdee.event_manager;
 
 // import std.exception; // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 import allegro5.allegro;
-import fewdee.engine;
+import fewdee.core;
 import fewdee.internal.singleton;
 
 

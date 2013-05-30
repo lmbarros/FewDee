@@ -1,15 +1,11 @@
 /**
- * The game engine. The engine is implemented as a module, with a bunch of free
- * functions. This is similar to a singleton, just without lying to myself and
- * pretending that I am not using globals. All functions are thread safe (if
- * they are not, that's a bug).
- *
- * TODO: rename this to "core"?
+ * The engine core. Provides some very fundamental services, plus some
+ * utilities.
  *
  * Authors: Leandro Motta Barros
  */
 
-module fewdee.engine;
+module fewdee.core;
 
 import allegro5.allegro;
 import allegro5.allegro_font;
