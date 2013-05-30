@@ -6,7 +6,7 @@
 
 module fewdee.event_manager;
 
-// import std.exception; // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+import std.exception;
 import allegro5.allegro;
 import fewdee.core;
 import fewdee.internal.singleton;
@@ -18,6 +18,7 @@ import fewdee.internal.singleton;
  */
 private class EventManagerImpl
 {
+   /// Constructs the Event Manager.
    private this()
    {
       al_init_user_event_source(&_customEventSource);
@@ -25,11 +26,9 @@ private class EventManagerImpl
          al_destroy_user_event_source(&_customEventSource);
 
       _eventQueue = al_create_event_queue();
-
-      // TODO: Error checking! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      // mixin (makeInitCode("(TheEventQueue !is null)",
-      //                     "al_destroy_event_queue(TheEventQueue)",
-      //                     "Error creating event queue."));
+      enforce(_eventQueue);
+      scope (failure)
+         al_destroy_event_queue(_eventQueue);
 
       al_register_event_source(_eventQueue, al_get_mouse_event_source());
       al_register_event_source(_eventQueue, al_get_keyboard_event_source());
@@ -39,7 +38,12 @@ private class EventManagerImpl
       Core.isEventManagerInited = true;
    }
 
-
+   /**
+    * Returns the one and only event queue we use. This is accessible by other
+    * FewDee modules, because they need to register themselves as event sources
+    * (displays, for example, must register and unregister themselves as event
+    * sources as they are created and destroyed).
+    */
    package @property inout(ALLEGRO_EVENT_QUEUE*) eventQueue() inout
    {
       return _eventQueue;
@@ -53,6 +57,7 @@ private class EventManagerImpl
       return &_customEventSource;
    }
 
+   /// Finalizes the Event Manager.
    package void finalize()
    {
       al_destroy_event_queue(_eventQueue);
