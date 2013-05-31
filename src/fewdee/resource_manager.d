@@ -454,7 +454,7 @@ unittest
 
    // Being able to instantiate what should be a singleton in a unit test is
    // weird, but useful nevertheless
-   auto rm = new ResourceManagerImpl();
+   scope rm = new ResourceManagerImpl();
    assert(rm.bitmaps._resources.length == 0);
    assert(rm.fonts._resources.length == 0);
    assert(rm.samples._resources.length == 0);
@@ -501,7 +501,7 @@ unittest
 
    // Being able to instantiate what should be a singleton in a unit test is
    // weird, but useful nevertheless
-   auto rm = new ResourceManagerImpl();
+   scope rm = new ResourceManagerImpl();
 
    rm.bitmaps.add("1-a", new Bitmap("data/logo.png"));
    rm.bitmaps.add("1-b", new Bitmap("data/logo.png"));
@@ -561,7 +561,7 @@ unittest
 
    // Being able to instantiate what should be a singleton in a unit test is
    // weird, but useful nevertheless
-   auto rm = new ResourceManagerImpl();
+   scope rm = new ResourceManagerImpl();
 
    rm.bitmaps.add("1-a", new Bitmap("data/logo.png"));
    rm.bitmaps.add("1-b", new Bitmap("data/logo.png"));
