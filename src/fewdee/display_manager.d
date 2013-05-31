@@ -169,11 +169,12 @@ private class DisplayManagerImpl
       return d;
    }
 
-
+   /// The collection of Displays, indexed by their string keys.
    private Display[string] _displays;
 
    private Display _currentDisplay;
 
+   /// Finalizes the DisplayManager. Destroys all Displays.
    package void finalize()
    {
       foreach(d; _displays)
@@ -181,6 +182,7 @@ private class DisplayManagerImpl
       _displays = typeof(_displays).init;
    }
 
+   /// Constructs the Display Manager.
    private this()
    {
       Core.isDisplayManagerInited = true;
