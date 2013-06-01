@@ -9,7 +9,22 @@ module fewdee.event_manager;
 import std.exception;
 import allegro5.allegro;
 import fewdee.core;
+import fewdee.event;
 import fewdee.internal.singleton;
+
+
+/**
+ * The type of functions (er, delegates) used to handle events. The functions
+ * receives a single parameter: the event structure describing it in detail.
+ */
+public alias void delegate(in ref ALLEGRO_EVENT event) EventHandler;
+
+
+/**
+ * An opaque identifier identifying an $(D EventHandler) added to the Event
+ * Manager. It can be used to remove the handler from the list of handler.
+ */
+public alias size_t EventHandlerID;
 
 
 /**
@@ -39,6 +54,132 @@ private class EventManagerImpl
    }
 
    /**
+    * Adds an event handler. From this point on, whenever an event of the
+    * requested type is triggered, the handler will be called.
+    *
+    * Parameters:
+    *    eventType = The type of event to handle.
+    *    handler = The handler function.
+    *
+    * Return:
+    *    An ID that can be passed to $(D removeHandler()) if one desires to
+    *    remove the event handler later.
+    */
+   EventHandlerID addHandler(
+      ALLEGRO_EVENT_TYPE eventType, EventHandler handler)
+   {
+      if (eventType !in _eventHandlers)
+         _eventHandlers[eventType] = typeof(_eventHandlers[eventType]).init;
+
+      assert(_nextEventHandlerID !in _eventHandlers[eventType]);
+
+      _eventHandlers[eventType][_nextEventHandlerID] = handler;
+
+      return _nextEventHandlerID++;
+   }
+
+   /**
+    * Removes an event handler. If the requested handler wasn't previously added
+    * to the Event Manager, nothing happens.
+    *
+    * Parameters:
+    *    id = The ID of the event handler to remove.
+    *
+    * Return:
+    *    $(D true) if the event handler was removed; $(D false) otherwise.
+    */
+   bool removeHandler(EventHandlerID id)
+   {
+      foreach (eventType, list; _eventHandlers)
+      {
+         if (id in _eventHandlers[eventType])
+         {
+            _eventHandlers[eventType].remove(id);
+            return true;
+         }
+      }
+
+      return false; // ID not found
+   }
+
+   /**
+    * The collection of all registered event handlers.
+    *
+    * This is an associative array indexed by the event type. Each value in this
+    * associative array is itself another associative array, which maps the
+    * event handler handle to
+    */
+   private EventHandler[EventHandlerID][ALLEGRO_EVENT_TYPE] _eventHandlers;
+
+   /**
+    * The next event handler ID to use. The same sequence of IDs is used for all
+    * event types.
+    */
+   private size_t _nextEventHandlerID = 0;
+
+   /**
+    * Causes a tick event to be generated. This must be called from the main
+    * game loop.
+    *
+    * Ticks are the game logic heartbeats. Tick handler are the usual place
+    * where the game state is updated.
+    *
+    * Parameters:
+    *    deltaT = The wall time, in seconds, elapsed since the last time this
+    *       function was called.
+    */
+   public void triggerTickEvent(double deltaT)
+   {
+      // Emit a tick event
+      _tickTime += deltaT;
+      ALLEGRO_EVENT tickEvent;
+      tickEvent.user.type = FEWDEE_EVENT_TICK;
+      tickEvent.user.deltaTime = deltaT;
+      tickEvent.user.totalTime = _tickTime;
+      al_emit_user_event(&_customEventSource, &tickEvent, null);
+
+      // Call handler for all pending events (and this includes the tick event
+      // we just emitted)
+      ALLEGRO_EVENT event;
+      while (al_get_next_event(_eventQueue, &event))
+      {
+         if (event.type in _eventHandlers)
+         {
+            foreach (handler; _eventHandlers[event.type])
+               handler(event);
+         }
+      }
+   }
+
+   /**
+    * Causes a draw event to be generated. This must be called from the main
+    * game loop. All drawing should be made in response to draw events.
+    *
+    * Parameters:
+    *    deltaT = The wall time, in seconds, elapsed since the last time this
+    *       function was called.
+    */
+   public void triggerDrawEvent(double deltaT)
+   {
+      // Construct the event structure
+      _drawingTime += deltaT;
+      ALLEGRO_EVENT drawEvent;
+      drawEvent.user.type = FEWDEE_EVENT_DRAW;
+      drawEvent.user.deltaTime(deltaT);
+      drawEvent.user.totalTime(_drawingTime);
+
+      // Call the handlers
+      if (FEWDEE_EVENT_DRAW in _eventHandlers)
+      {
+         foreach (handler; _eventHandlers[FEWDEE_EVENT_DRAW])
+            handler(drawEvent);
+      }
+
+      // And flip the buffers
+      al_flip_display();
+   }
+
+   /**
     * Returns the one and only event queue we use. This is accessible by other
     * FewDee modules, because they need to register themselves as event sources
     * (displays, for example, must register and unregister themselves as event
@@ -49,14 +190,6 @@ private class EventManagerImpl
       return _eventQueue;
    }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   // TODO: shouldn't be necessary. Now, used in Core.run(), because they
-   // generate the custom FEWDEE_EVENT_TICK events.
-   package @property inout(ALLEGRO_EVENT_SOURCE*) customEventSource() inout
-   {
-      return &_customEventSource;
-   }
-
    /// Finalizes the Event Manager.
    package void finalize()
    {
@@ -64,10 +197,28 @@ private class EventManagerImpl
       al_destroy_user_event_source(&_customEventSource);
    }
 
+   /**
+    * The drawing time. This is the number of seconds elapsed since an
+    * arbitrary instant (the "epoch"), which gets updated whenever
+    * $(triggerDrawEvent()) is called.
+    */
+   private double _drawingTime = 0;
+
+   /**
+    * The tick time. This is the number of seconds elapsed since an
+    * arbitrary instant (the "epoch"), which gets updated whenever
+    * $(triggerTickEvent()) is called.
+    */
+   private double _tickTime;
+
    /// The source of custom events.
    private ALLEGRO_EVENT_SOURCE _customEventSource;
 
-   /// The one and only event queue.
+   /**
+    * The one and only event queue. Notice that draw events ($D
+    * FEWDEE_EVENT_DRAW) are never added here (nor in any other event queue);
+    * they are handled separately, in $(D triggerDrawEvent()).
+    */
    private ALLEGRO_EVENT_QUEUE* _eventQueue;
 }
 
@@ -80,4 +231,112 @@ private class EventManagerImpl
 public class EventManager
 {
    mixin LowLockSingleton!EventManagerImpl;
+}
+
+
+
+//
+// Unit tests
+//
+
+version (unittest)
+{
+   // A dummy event handler
+   void aHandler(in ref ALLEGRO_EVENT e) { }
+} // version (unittest)
+
+// EventManagerImpl.addHandler()
+unittest
+{
+   import std.functional;
+
+   // Being able to instantiate what should be a singleton in a unit test is
+   // weird, but useful nevertheless
+   scope em = new EventManagerImpl;
+   assert(em._eventHandlers.length == 0);
+
+   immutable id1 = em.addHandler(ALLEGRO_EVENT_KEY_DOWN, toDelegate(&aHandler));
+   immutable id2 = em.addHandler(ALLEGRO_EVENT_TIMER, toDelegate(&aHandler));
+   immutable id3 = em.addHandler(ALLEGRO_EVENT_KEY_DOWN, toDelegate(&aHandler));
+   immutable id4 = em.addHandler(ALLEGRO_EVENT_KEY_UP, toDelegate(&aHandler));
+   immutable id5 = em.addHandler(FEWDEE_EVENT_DRAW, toDelegate(&aHandler));
+
+   // Returned IDs must be unique
+   assert(id1 != id2);
+   assert(id1 != id3);
+   assert(id1 != id4);
+   assert(id1 != id5);
+   assert(id2 != id3);
+   assert(id2 != id4);
+   assert(id2 != id5);
+   assert(id3 != id4);
+   assert(id3 != id5);
+   assert(id4 != id5);
+
+   // The interface of the EventManagerImpl class alone doesn't provide many
+   // ways to check if addHandler() is working. From this point on, we check if
+   // certain implementation details are behaving as expected. Not really nice,
+   // but that's the best I can do without doing changes I am unwilling to do.
+   assert(ALLEGRO_EVENT_KEY_DOWN in em._eventHandlers);
+   assert(ALLEGRO_EVENT_TIMER in em._eventHandlers);
+   assert(ALLEGRO_EVENT_KEY_UP in em._eventHandlers);
+   assert(FEWDEE_EVENT_DRAW in em._eventHandlers);
+   assert(em._eventHandlers.length == 4);
+
+   assert(em._eventHandlers[ALLEGRO_EVENT_KEY_DOWN].length == 2);
+   assert(em._eventHandlers[ALLEGRO_EVENT_TIMER].length == 1);
+   assert(em._eventHandlers[ALLEGRO_EVENT_KEY_UP].length == 1);
+   assert(em._eventHandlers[FEWDEE_EVENT_DRAW].length == 1);
+}
+
+// EventManagerImpl.removeHandler()
+unittest
+{
+   import std.functional;
+
+   // Being able to instantiate what should be a singleton in a unit test is
+   // weird, but useful nevertheless
+   scope em = new EventManagerImpl;
+
+   immutable id1 = em.addHandler(ALLEGRO_EVENT_KEY_DOWN, toDelegate(&aHandler));
+   immutable id2 = em.addHandler(ALLEGRO_EVENT_TIMER, toDelegate(&aHandler));
+   immutable id3 = em.addHandler(ALLEGRO_EVENT_KEY_DOWN, toDelegate(&aHandler));
+   immutable id4 = em.addHandler(ALLEGRO_EVENT_KEY_UP, toDelegate(&aHandler));
+   immutable id5 = em.addHandler(FEWDEE_EVENT_DRAW, toDelegate(&aHandler));
+
+   // Again, let's test by checking the internal state
+   assert(em._eventHandlers[ALLEGRO_EVENT_KEY_DOWN].length == 2);
+   assert(em._eventHandlers[ALLEGRO_EVENT_TIMER].length == 1);
+   assert(em._eventHandlers[ALLEGRO_EVENT_KEY_UP].length == 1);
+   assert(em._eventHandlers[FEWDEE_EVENT_DRAW].length == 1);
+
+   em.removeHandler(id1);
+   assert(em._eventHandlers[ALLEGRO_EVENT_KEY_DOWN].length == 1);
+   assert(em._eventHandlers[ALLEGRO_EVENT_TIMER].length == 1);
+   assert(em._eventHandlers[ALLEGRO_EVENT_KEY_UP].length == 1);
+   assert(em._eventHandlers[FEWDEE_EVENT_DRAW].length == 1);
+
+   em.removeHandler(id5);
+   assert(em._eventHandlers[ALLEGRO_EVENT_KEY_DOWN].length == 1);
+   assert(em._eventHandlers[ALLEGRO_EVENT_TIMER].length == 1);
+   assert(em._eventHandlers[ALLEGRO_EVENT_KEY_UP].length == 1);
+   assert(em._eventHandlers[FEWDEE_EVENT_DRAW].length == 0);
+
+   em.removeHandler(id3);
+   assert(em._eventHandlers[ALLEGRO_EVENT_KEY_DOWN].length == 0);
+   assert(em._eventHandlers[ALLEGRO_EVENT_TIMER].length == 1);
+   assert(em._eventHandlers[ALLEGRO_EVENT_KEY_UP].length == 1);
+   assert(em._eventHandlers[FEWDEE_EVENT_DRAW].length == 0);
+
+   em.removeHandler(id2);
+   assert(em._eventHandlers[ALLEGRO_EVENT_KEY_DOWN].length == 0);
+   assert(em._eventHandlers[ALLEGRO_EVENT_TIMER].length == 0);
+   assert(em._eventHandlers[ALLEGRO_EVENT_KEY_UP].length == 1);
+   assert(em._eventHandlers[FEWDEE_EVENT_DRAW].length == 0);
+
+   em.removeHandler(id4);
+   assert(em._eventHandlers[ALLEGRO_EVENT_KEY_DOWN].length == 0);
+   assert(em._eventHandlers[ALLEGRO_EVENT_TIMER].length == 0);
+   assert(em._eventHandlers[ALLEGRO_EVENT_KEY_UP].length == 0);
+   assert(em._eventHandlers[FEWDEE_EVENT_DRAW].length == 0);
 }

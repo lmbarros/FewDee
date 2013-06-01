@@ -139,25 +139,15 @@ private class CoreImpl
       while (!TheStateManager.empty)
       {
          // What time is it?
-         double now = al_get_time();
-         auto deltaTime = now - prevTime;
+         immutable now = al_get_time();
+         immutable deltaT = now - prevTime;
          prevTime = now;
 
          // Generate tick event
-         ALLEGRO_EVENT tickEvent;
-         tickEvent.user.type = FEWDEE_EVENT_TICK;
-         tickEvent.user.deltaTime(deltaTime);
-         al_emit_user_event(EventManager.customEventSource, &tickEvent, null);
-
-         // Handle pending events
-         ALLEGRO_EVENT event;
-         while (al_get_next_event(EventManager.eventQueue, &event))
-            TheStateManager.onEvent(event);
+         EventManager.triggerTickEvent(deltaT);
 
          // Draw!
-         al_set_target_backbuffer(TheDisplay);
-         TheStateManager.onDraw();
-         al_flip_display();
+         EventManager.triggerDrawEvent(deltaT);
       }
    }
 
