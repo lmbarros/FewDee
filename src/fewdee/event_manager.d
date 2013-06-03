@@ -49,8 +49,17 @@ private class EventManagerImpl
       al_register_event_source(_eventQueue, al_get_keyboard_event_source());
       al_register_event_source(_eventQueue, al_get_joystick_event_source());
       al_register_event_source(_eventQueue, &_customEventSource);
+   }
 
-      Core.isEventManagerInited = true;
+   /// Destroys the Event Manager.
+   package ~this()
+   {
+      al_unregister_event_source(_eventQueue, al_get_mouse_event_source());
+      al_unregister_event_source(_eventQueue, al_get_keyboard_event_source());
+      al_unregister_event_source(_eventQueue, al_get_joystick_event_source());
+      al_unregister_event_source(_eventQueue, &_customEventSource);
+      al_destroy_event_queue(_eventQueue);
+      al_destroy_user_event_source(&_customEventSource);
    }
 
    /**
@@ -190,13 +199,6 @@ private class EventManagerImpl
       return _eventQueue;
    }
 
-   /// Finalizes the Event Manager.
-   package void finalize()
-   {
-      al_destroy_event_queue(_eventQueue);
-      al_destroy_user_event_source(&_customEventSource);
-   }
-
    /**
     * The drawing time. This is the number of seconds elapsed since an
     * arbitrary instant (the "epoch"), which gets updated whenever
@@ -250,9 +252,9 @@ unittest
 {
    import std.functional;
 
-   // Being able to instantiate what should be a singleton in a unit test is
-   // weird, but useful nevertheless
-   scope em = new EventManagerImpl;
+   scope crank = new Crank();
+   auto em = EventManager.instance; // spare some typing
+
    assert(em._eventHandlers.length == 0);
 
    immutable id1 = em.addHandler(ALLEGRO_EVENT_KEY_DOWN, toDelegate(&aHandler));
@@ -294,9 +296,8 @@ unittest
 {
    import std.functional;
 
-   // Being able to instantiate what should be a singleton in a unit test is
-   // weird, but useful nevertheless
-   scope em = new EventManagerImpl;
+   scope crank = new Crank();
+   auto em = EventManager.instance; // spare some typing
 
    immutable id1 = em.addHandler(ALLEGRO_EVENT_KEY_DOWN, toDelegate(&aHandler));
    immutable id2 = em.addHandler(ALLEGRO_EVENT_TIMER, toDelegate(&aHandler));

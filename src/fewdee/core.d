@@ -8,6 +8,8 @@
 module fewdee.core;
 
 import allegro5.allegro;
+import allegro5.allegro_audio;  // TODO: remove from core?
+import allegro5.allegro_acodec; // TODO: remove form core?
 import allegro5.allegro_font;
 import allegro5.allegro_ttf;
 import allegro5.allegro_image;
@@ -22,14 +24,36 @@ import fewdee.display_manager;
 import fewdee.resource_manager;
 
 
-shared static this()
+/**
+ * A handy way to start the engine. Crank, handy, start an engine... witty
+ * naming, uh? (Incidentally, FewDee's Crank also stops the engine.)
+ *
+ * Notice that this is a $(D scope class), so it must be instantiated with the
+ * $(D scope) keyword.
+ *
+ * See_also: https://en.wikipedia.org/wiki/Crank_%28mechanism%29#20th_Century
+ */
+public scope class Crank
 {
-   Core.start();
-}
+      import std.stdio;
 
-shared static ~this()
-{
-   Core.stop();
+   /**
+    * Creates the $D(Crank), which causes the engine to be started ($(D
+    * fewdee.core.Core.start()) is called).
+    */
+   public this()
+   {
+      Core.start();
+   }
+
+   /**
+    * Destroys the $D(Crank), which causes the engine to be stopped
+    * ($D(fewdee.core.Core.stop()) is called).
+    */
+   public ~this()
+   {
+      Core.stop();
+   }
 }
 
 
@@ -80,6 +104,15 @@ private class CoreImpl
       mixin (makeInitCode("al_install_joystick()", "al_uninstall_joystick()",
                           "Error initializing joystick"));
 
+      // TODO: These probably shouldn't be in the core. But how to ensure that
+      //       the audio subsystem is initialized in the moment we create, say,
+      //       an AudioSample object?
+      mixin (makeInitCode("al_install_audio()", "al_uninstall_audio()",
+                          "Error initializing audio"));
+
+      if (!al_init_acodec_addon())
+         throw new Exception("Error initializing audio codecs");
+
       // Don't use pre-multiplied alpha by default
       al_set_blender(ALLEGRO_BLEND_OPERATIONS.ALLEGRO_ADD,
                      ALLEGRO_BLEND_MODE.ALLEGRO_ALPHA,
@@ -90,20 +123,21 @@ private class CoreImpl
                               | ALLEGRO_MAG_LINEAR);
    }
 
-
    /**
     * Stops the engine. This sets shuts everything down so that your program
     * shuts down gracefully. You cannot call any other $(D fewdee.engine) after
     * calling this function.
     *
-    * BTW, you should use a $(D Crank) to start and stop the engine, instead of
-    * calling this manually.
+    * BTW, you should use a $(D Crank) to start and stop the engine -- this is
+    * $(D private), you cannot even call this manually.
     *
     * See_also: Crank
     */
    private void stop()
    {
-      EventManager.finalize(); // TODO: must check if inited; and think about ordering
+      // TODO: calling destroyInstance() in an uninstantiated singleton is OK;
+      //       but must think well about the ordering of destruction.
+      EventManager.destroyInstance();
 
       al_uninstall_joystick();
 
@@ -111,10 +145,10 @@ private class CoreImpl
 
       al_uninstall_mouse();
 
-      DisplayManager.finalize(); // TODO: must check if initialized
+      DisplayManager.destroyInstance();
+      ResourceManager.destroyInstance();
 
-      if (isResourceManagerInited)
-         ResourceManager.finalize();
+      al_uninstall_audio(); // TODO: This one probably shouldn't be in the core.
 
       al_shutdown_primitives_addon();
 
@@ -126,8 +160,6 @@ private class CoreImpl
 
       al_uninstall_system();
    }
-
-
 
    /// Runs the engine main loop, with a given starting state.
    void run(GameState startingState)
@@ -156,25 +188,8 @@ private class CoreImpl
 
    /// The object managing the game states.
    private StateManager TheStateManager;
-
-   /**
-    * Is the Display Manager initialized? Only the Display Manager itself should
-    * set this to $(D true).
-    */
-   package bool isDisplayManagerInited = false;
-
-   /**
-    * Is the Event Manager initialized? Only the Event Manager itself should set
-    * this to $(D true).
-    */
-   package bool isEventManagerInited = false;
-
-   /**
-    * Is the Resource Manager initialized? Only the Resource Manager itself
-    * should set this to $(D true).
-    */
-   package bool isResourceManagerInited = false;
 }
+
 
 
 /**

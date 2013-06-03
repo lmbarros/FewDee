@@ -117,13 +117,14 @@ private class ResourceManagerImpl
    /// Constructs the Resource Manager.
    private this()
    {
-      Core.isResourceManagerInited = true;
+      // Nothing here...
    }
 
    /**
-    * Finalize the Resource Manager, destroying all resources it currently owns.
+    * Destroys the Resource Manager, which in turn destroys all resources it
+    * currently owns.
     */
-   package void finalize()
+   package ~this()
    {
       removeEverything();
    }
@@ -388,73 +389,13 @@ unittest
    assert("" in destroyed);
 }
 
-version (unittest)
-{
-   // During unit test execution, the Allegro modules necessary to load real
-   // data are not loaded, so we use these dummies. (Yes, I tried to load the
-   // Allegro modules, but for some reason this didn't work.) Notice that the
-   // call to the super() will fail (no real data being loaded), so we simply
-   // catch and pretend that everything went fine.
-   private immutable fakeLowLevelResourcesBoilerplate = `
-      class FakeFont: Font
-      {
-         this()
-         {
-            try
-            {
-               super("foo.ttf", 10);
-            }
-            catch(Throwable)
-            {
-               // Nothing here
-            }
-         }
-         public override void free() { }
-      }
 
-      class FakeAudioSample: AudioSample
-      {
-         this()
-         {
-            try
-            {
-               super("foo.ogg");
-            }
-            catch(Throwable)
-            {
-               // Nothing here
-            }
-         }
-         public override void free() { }
-      }
-
-      class FakeAudioStream: AudioStream
-      {
-         this()
-         {
-            try
-            {
-               super("foo.ogg");
-            }
-            catch(Throwable)
-            {
-               // Nothing here
-            }
-         }
-         public override void free() { }
-      }
-   `;
-} // version(unittest)
-
-
-// ResourceManagerImpl.removeEverything()
+// ResourceManager.removeEverything()
 unittest
 {
-   mixin(fakeLowLevelResourcesBoilerplate);
+   scope crank = new Crank();
+   auto rm = ResourceManager.instance; // spare some typing
 
-   // Being able to instantiate what should be a singleton in a unit test is
-   // weird, but useful nevertheless
-   scope rm = new ResourceManagerImpl();
    assert(rm.bitmaps._resources.length == 0);
    assert(rm.fonts._resources.length == 0);
    assert(rm.samples._resources.length == 0);
@@ -466,20 +407,20 @@ unittest
    rm.bitmaps.add("", new Bitmap("data/logo.png")); // empty string as key
    assert(rm.bitmaps._resources.length == 4);
 
-   rm.fonts.add("a", new FakeFont);
-   rm.fonts.add("b", new FakeFont);
-   rm.fonts.add("c", new FakeFont);
+   rm.fonts.add("a", new Font("data/bluehigl.ttf", 10));
+   rm.fonts.add("b", new Font("data/bluehigl.ttf", 15));
+   rm.fonts.add("c", new Font("data/bluehigl.ttf", 20));
    assert(rm.fonts._resources.length == 3);
 
-   rm.samples.add("a", new FakeAudioSample);
-   rm.samples.add("b", new FakeAudioSample);
-   rm.samples.add("c", new FakeAudioSample);
-   rm.samples.add("d", new FakeAudioSample);
-   rm.samples.add("e", new FakeAudioSample);
+   rm.samples.add("a", new AudioSample("data/yes.ogg"));
+   rm.samples.add("b", new AudioSample("data/yes.ogg"));
+   rm.samples.add("c", new AudioSample("data/yes.ogg"));
+   rm.samples.add("d", new AudioSample("data/yes.ogg"));
+   rm.samples.add("e", new AudioSample("data/yes.ogg"));
    assert(rm.samples._resources.length == 5);
 
-   rm.streams.add("a", new FakeAudioStream);
-   rm.streams.add("b", new FakeAudioStream);
+   rm.streams.add("a", new AudioStream("data/yes.ogg"));
+   rm.streams.add("b", new AudioStream("data/yes.ogg"));
    assert(rm.streams._resources.length == 2);
 
    rm.removeEverything();
@@ -494,14 +435,11 @@ unittest
 }
 
 
-// ResourceManagerImpl.removeEverythingMatching(string)
+// ResourceManager.removeEverythingMatching(string)
 unittest
 {
-   mixin(fakeLowLevelResourcesBoilerplate);
-
-   // Being able to instantiate what should be a singleton in a unit test is
-   // weird, but useful nevertheless
-   scope rm = new ResourceManagerImpl();
+   scope crank = new Crank();
+   auto rm = ResourceManager.instance; // spare some typing
 
    rm.bitmaps.add("1-a", new Bitmap("data/logo.png"));
    rm.bitmaps.add("1-b", new Bitmap("data/logo.png"));
@@ -509,20 +447,20 @@ unittest
    rm.bitmaps.add("3-a", new Bitmap("data/logo.png"));
    assert(rm.bitmaps._resources.length == 4);
 
-   rm.fonts.add("1-a", new FakeFont);
-   rm.fonts.add("2-a", new FakeFont);
-   rm.fonts.add("2-b", new FakeFont);
+   rm.fonts.add("1-a", new Font("data/bluehigl.ttf", 12));
+   rm.fonts.add("2-a", new Font("data/bluehigl.ttf", 18));
+   rm.fonts.add("2-b", new Font("data/bluehigl.ttf", 24));
    assert(rm.fonts._resources.length == 3);
 
-   rm.samples.add("1-a", new FakeAudioSample);
-   rm.samples.add("2-a", new FakeAudioSample);
-   rm.samples.add("2-b", new FakeAudioSample);
-   rm.samples.add("2-c", new FakeAudioSample);
-   rm.samples.add("3-a", new FakeAudioSample);
+   rm.samples.add("1-a", new AudioSample("data/yes.ogg"));
+   rm.samples.add("2-a", new AudioSample("data/yes.ogg"));
+   rm.samples.add("2-b", new AudioSample("data/yes.ogg"));
+   rm.samples.add("2-c", new AudioSample("data/yes.ogg"));
+   rm.samples.add("3-a", new AudioSample("data/yes.ogg"));
    assert(rm.samples._resources.length == 5);
 
-   rm.streams.add("1-a", new FakeAudioStream);
-   rm.streams.add("2-a", new FakeAudioStream);
+   rm.streams.add("1-a", new AudioStream("data/yes.ogg"));
+   rm.streams.add("2-a", new AudioStream("data/yes.ogg"));
    assert(rm.streams._resources.length == 2);
 
    // First batch of removals
@@ -554,14 +492,11 @@ unittest
    assert(rm.streams._resources.length == 2);
 }
 
-// ResourceManagerImpl.removeEverythingMatching(Regex!char)
+// ResourceManager.removeEverythingMatching(Regex!char)
 unittest
 {
-   mixin(fakeLowLevelResourcesBoilerplate);
-
-   // Being able to instantiate what should be a singleton in a unit test is
-   // weird, but useful nevertheless
-   scope rm = new ResourceManagerImpl();
+   scope crank = new Crank();
+   auto rm = ResourceManager.instance; // spare some typing
 
    rm.bitmaps.add("1-a", new Bitmap("data/logo.png"));
    rm.bitmaps.add("1-b", new Bitmap("data/logo.png"));
@@ -569,20 +504,20 @@ unittest
    rm.bitmaps.add("3-a", new Bitmap("data/logo.png"));
    assert(rm.bitmaps._resources.length == 4);
 
-   rm.fonts.add("1-a", new FakeFont);
-   rm.fonts.add("2-a", new FakeFont);
-   rm.fonts.add("2-b", new FakeFont);
+   rm.fonts.add("1-a", new Font("data/bluehigl.ttf", 8));
+   rm.fonts.add("2-a", new Font("data/bluehigl.ttf", 10));
+   rm.fonts.add("2-b", new Font("data/bluehigl.ttf", 12));
    assert(rm.fonts._resources.length == 3);
 
-   rm.samples.add("1-a", new FakeAudioSample);
-   rm.samples.add("2-a", new FakeAudioSample);
-   rm.samples.add("2-b", new FakeAudioSample);
-   rm.samples.add("2-c", new FakeAudioSample);
-   rm.samples.add("3-a", new FakeAudioSample);
+   rm.samples.add("1-a", new AudioSample("data/yes.ogg"));
+   rm.samples.add("2-a", new AudioSample("data/yes.ogg"));
+   rm.samples.add("2-b", new AudioSample("data/yes.ogg"));
+   rm.samples.add("2-c", new AudioSample("data/yes.ogg"));
+   rm.samples.add("3-a", new AudioSample("data/yes.ogg"));
    assert(rm.samples._resources.length == 5);
 
-   rm.streams.add("1-a", new FakeAudioStream);
-   rm.streams.add("2-a", new FakeAudioStream);
+   rm.streams.add("1-a", new AudioStream("data/yes.ogg"));
+   rm.streams.add("2-a", new AudioStream("data/yes.ogg"));
    assert(rm.streams._resources.length == 2);
 
    // First batch of removals

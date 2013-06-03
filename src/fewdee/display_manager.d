@@ -143,6 +143,20 @@ class Display
  */
 private class DisplayManagerImpl
 {
+   /// Constructs the Display Manager.
+   private this()
+   {
+      // Nothing here...
+   }
+
+   /// Destroys the DisplayManager, which, in turn, destroys all Displays.
+   package ~this()
+   {
+      foreach(d; _displays)
+         destroy(d);
+      _displays = typeof(_displays).init;
+   }
+
    // TODO: implement this xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    public @property MonitorInfo[] monitors()
    {
@@ -173,20 +187,6 @@ private class DisplayManagerImpl
    private Display[string] _displays;
 
    private Display _currentDisplay;
-
-   /// Finalizes the DisplayManager. Destroys all Displays.
-   package void finalize()
-   {
-      foreach(d; _displays)
-         destroy(d);
-      _displays = typeof(_displays).init;
-   }
-
-   /// Constructs the Display Manager.
-   private this()
-   {
-      Core.isDisplayManagerInited = true;
-   }
 }
 
 

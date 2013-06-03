@@ -60,6 +60,42 @@ mixin template LowLockSingleton(WrappedClass)
       return _instance;
    }
 
+   /**
+    * Destroys the singleton instance. Does nothing if it is not instantiated.
+    *
+    * It may seem strange to explicitly destroy a singleton instance, but it
+    * comes handy when doing unit tests.
+    */
+   package static void destroyInstance()
+   {
+      synchronized
+      {
+         if (_instance !is null)
+         {
+            destroy(_instance);
+            _instance = null;
+            _isInstantiated = false;
+         }
+      }
+   }
+
+   /**
+    * Checks if this singleton's instance is instantiated or not. This used by
+    * the FewDee's core, to check if a singleton must be destroyed during engine
+    * shutdown.
+    */
+   package @property bool isInstantiated()
+   {
+      bool isIt;
+
+      synchronized
+      {
+         isIt = _instance !is null;
+      }
+
+      return isIt;
+   }
+
    /// This saves us from typing $(D .instance) whenever we use the singleton.
    alias instance this;
 
