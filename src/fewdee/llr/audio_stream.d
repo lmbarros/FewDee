@@ -29,7 +29,8 @@ class AudioStream: LowLevelResource
    this(in string path, uint bufferCount = 4, uint numSamples = 2048)
    {
       _stream = al_load_audio_stream(path.toStringz, bufferCount, numSamples);
-      enforce(_stream !is null);
+      enforce(_stream !is null,
+              "Couldn't load audio stream from '" ~ path ~ "'");
    }
 
    /// Frees all resources used by the AudioStream.

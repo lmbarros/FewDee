@@ -34,7 +34,7 @@ class Bitmap: LowLevelResource
    this(uint width, uint height)
    {
       _bitmap = al_create_bitmap(width, height);
-      enforce(_bitmap !is null);
+      enforce(_bitmap !is null, "Couldn't create bitmap");
    }
 
    /**
@@ -46,7 +46,7 @@ class Bitmap: LowLevelResource
    this(in string path)
    {
       _bitmap = al_load_bitmap(path.toStringz);
-      enforce(_bitmap !is null);
+      enforce(_bitmap !is null, "Couldn't load bitmap from '" ~ path ~ "'");
    }
 
    /// Frees all resources used by the Bitmap.

@@ -26,7 +26,8 @@ class AudioSample: LowLevelResource
    this(in string path)
    {
       _sample = al_load_sample(path.toStringz);
-      enforce(_sample !is null);
+      enforce(_sample !is null,
+              "Couldn't load audio sample  from '" ~ path ~ "'");
    }
 
    /// Frees all resources used by the AudioSample.

@@ -37,7 +37,7 @@ class Font: LowLevelResource
    this(in string path, int size, int flags = 0)
    {
       _font = al_load_font(path.toStringz, size, flags);
-      enforce(_font !is null);
+      enforce(_font !is null, "Couldn't load font from '" ~ path ~  "'");
    }
 
    /// Frees all resources used by the Font.
