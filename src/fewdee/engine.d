@@ -91,7 +91,7 @@ private class EngineImpl
     * Parameters:
     *    features = The desired engine features.
     */
-   private void start(Features features)
+   private final void start(Features features)
    {
       // Initialize what we need
       AllegroManager.initSystem();
@@ -119,7 +119,7 @@ private class EngineImpl
     *
     * See_also: Crank
     */
-   private void stop()
+   private final void stop()
    {
       // TODO: calling destroyInstance() in an uninstantiated singleton is OK;
       //       but must think well about the ordering of destruction.
@@ -134,7 +134,7 @@ private class EngineImpl
     * TODO: Implement different main loop strategies, with or without the State
     *       Manager.
     */
-   void run(GameState startingState)
+   public final void run(GameState startingState)
    {
       TheStateManager.pushState(startingState);
 
