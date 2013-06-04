@@ -31,7 +31,7 @@ public struct MonitorInfo
     * constructor is for internal usage only.
     *
     * Parameters:
-    *    mi = The Allegro structure describing 
+    *    mi = The Allegro structure constaining the monitor information.
     */
    private this(ALLEGRO_MONITOR_INFO mi)
    {
