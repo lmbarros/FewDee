@@ -48,14 +48,17 @@ public scope class Crank
 }
 
 
-// TODO: review docs! Er, and everything else!
+/**
+ * The real implementation of the Engine. Users shall use this through the $(D
+ * Engine) class.
+ */
 private class EngineImpl
 {
    /**
-    * Starts the core. This sets everything up so that the engine can be used,
-    * and must be called before any other $(D fewdee.engine) function.
+    * Starts the engine. This sets everything up so that the engine can be used,
+    * and must be called before any other Engine method.
     *
-    * That said, you should use a tool to start the engine: $(D Crank) (crude,
+    * That said, you should use a tool to start the engine: a $(D Crank) (crude,
     * but effective).
     */
    private void start()
@@ -84,8 +87,8 @@ private class EngineImpl
 
    /**
     * Stops the engine. This sets shuts everything down so that your program
-    * shuts down gracefully. You cannot call any other $(D fewdee.engine) after
-    * calling this function.
+    * shuts down gracefully. You cannot call any other Engine after calling this
+    * function.
     *
     * BTW, you should use a $(D Crank) to start and stop the engine -- this is
     * $(D private), you cannot even call this manually.
@@ -102,7 +105,11 @@ private class EngineImpl
       AllegroManager.destroyInstance();
    }
 
-   /// Runs the engine main loop, with a given starting state.
+   /**
+    * Runs the engine main loop, with a given starting state.
+    * TODO: Implement different main loop strategies, with or without the State
+    *       Manager.
+    */
    void run(GameState startingState)
    {
       TheStateManager.pushState(startingState);
@@ -124,10 +131,16 @@ private class EngineImpl
       }
    }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   /**
+    * The one and only display.
+    * TODO: This is temporary; we should use the Display Manager.
+    */
    public ALLEGRO_DISPLAY* TheDisplay;
 
-   /// The object managing the game states.
+   /**
+    * The object managing the game states.
+    * TODO: This is temporary; we should use the State Manager singleton.
+    */
    private StateManager TheStateManager;
 }
 

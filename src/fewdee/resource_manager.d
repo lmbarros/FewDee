@@ -101,7 +101,12 @@ private struct ResourceCollection(T)
 }
 
 
-/// A regex matching everything.
+/**
+ * A regex matching everything.
+ * TODO: Perhaps all this "matching" methods should "match" only if the passed
+ *       regex matches whole resource key. This should become ".*", for
+ *       instance.
+ */
 private enum regexMatchingEverything = "";
 
 
@@ -113,12 +118,6 @@ private enum regexMatchingEverything = "";
  */
 private class ResourceManagerImpl
 {
-   /// Constructs the Resource Manager.
-   private this()
-   {
-      // Nothing here...
-   }
-
    /**
     * Destroys the Resource Manager, which in turn destroys all resources it
     * currently owns.

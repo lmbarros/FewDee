@@ -143,12 +143,6 @@ class Display
  */
 private class DisplayManagerImpl
 {
-   /// Constructs the Display Manager.
-   private this()
-   {
-      // Nothing here...
-   }
-
    /// Destroys the DisplayManager, which, in turn, destroys all Displays.
    package ~this()
    {
@@ -157,23 +151,43 @@ private class DisplayManagerImpl
       _displays = typeof(_displays).init;
    }
 
-   // TODO: implement this xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   /**
+    * Returns an array with information about all the detected monitors.
+    * TODO: Implement this!
+    */
    public @property MonitorInfo[] monitors()
    {
       return [];
       // ...
    }
 
+   /**
+    * Creates a new Display and puts it under the control of this Display
+    * Manager. The first display created will be set as the current one.
+    *
+    * Parameters:
+    *    name = The name of the display being created. If a display with this
+    *       name already exists, the old display is destroyed and replaced with
+    *       the new one.
+    *    params = The parameters describing the desired display features.
+    */
    public Display createDisplay(
       in string name, in DisplayParams params = DisplayParams())
    {
       auto d = new Display(params);
-      enforce(d !is null);
+      enforce(d !is null, "Error creating Display");
 
       Engine.TheDisplay = d._display; // TODO: hack!
       al_register_event_source(
          EventManager.eventQueue,
          al_get_display_event_source(Engine.TheDisplay)); // TODO: hack!
+
+      if (name in _displays)
+      {
+         if (_displays[name] == _currentDisplay)
+            _currentDisplay = d;
+         destroy(_displays[name]);
+      }
 
       _displays[name] = d;
 
@@ -186,6 +200,12 @@ private class DisplayManagerImpl
    /// The collection of Displays, indexed by their string keys.
    private Display[string] _displays;
 
+   /**
+    * The current Display.
+    *
+    * TODO: The definition of what exactly it means to be the current Display is
+    *       still open.
+    */
    private Display _currentDisplay;
 }
 

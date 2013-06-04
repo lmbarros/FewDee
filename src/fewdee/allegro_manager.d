@@ -41,12 +41,6 @@ import fewdee.internal.singleton;
  */
 private class AllegroManagerImpl
 {
-   /// Constructs the Allegro Manager.
-   private this()
-   {
-      // Nothing here...
-   }
-
    /**
     * Destroys the Allegro Manager, which, in turn, unloads all loaded Allegro
     * subsystems.
