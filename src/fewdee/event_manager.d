@@ -73,7 +73,7 @@ private class EventManagerImpl
     *    An ID that can be passed to $(D removeHandler()) if one desires to
     *    remove the event handler later.
     */
-   EventHandlerID addHandler(
+   public final EventHandlerID addHandler(
       ALLEGRO_EVENT_TYPE eventType, EventHandler handler)
    {
       if (eventType !in _eventHandlers)
@@ -96,7 +96,7 @@ private class EventManagerImpl
     * Return:
     *    $(D true) if the event handler was removed; $(D false) otherwise.
     */
-   bool removeHandler(EventHandlerID id)
+   public final bool removeHandler(EventHandlerID id)
    {
       foreach (eventType, list; _eventHandlers)
       {
@@ -136,7 +136,7 @@ private class EventManagerImpl
     *    deltaT = The wall time, in seconds, elapsed since the last time this
     *       function was called.
     */
-   public void triggerTickEvent(double deltaT)
+   public final void triggerTickEvent(double deltaT)
    {
       // Emit a tick event
       _tickTime += deltaT;
@@ -167,7 +167,7 @@ private class EventManagerImpl
     *    deltaT = The wall time, in seconds, elapsed since the last time this
     *       function was called.
     */
-   public void triggerDrawEvent(double deltaT)
+   public final void triggerDrawEvent(double deltaT)
    {
       // Construct the event structure
       _drawingTime += deltaT;
@@ -193,7 +193,7 @@ private class EventManagerImpl
     * (displays, for example, must register and unregister themselves as event
     * sources as they are created and destroyed).
     */
-   package @property inout(ALLEGRO_EVENT_QUEUE*) eventQueue() inout
+   package final @property inout(ALLEGRO_EVENT_QUEUE*) eventQueue() inout
    {
       return _eventQueue;
    }

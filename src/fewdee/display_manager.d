@@ -77,7 +77,7 @@ public struct MonitorInfo
  * Parameters describing a Display; used when creating a new one. The defaults
  * should be reasonable for casual FewDee usage.
  */
-struct DisplayParams
+public struct DisplayParams
 {
    /// Shall the Display be a full screen? (Otherwise, it is a window.)
    bool fullScreen = true;
@@ -109,7 +109,7 @@ struct DisplayParams
 
 
 /// A Display, which is either a window or "a full screen".
-class Display
+public class Display
 {
    /**
     * Constructs the Display.
@@ -155,7 +155,7 @@ private class DisplayManagerImpl
     * Returns an array with information about all the detected monitors.
     * TODO: Implement this!
     */
-   public @property MonitorInfo[] monitors()
+   public final @property MonitorInfo[] monitors()
    {
       return [];
       // ...
@@ -171,7 +171,7 @@ private class DisplayManagerImpl
     *       the new one.
     *    params = The parameters describing the desired display features.
     */
-   public Display createDisplay(
+   public final Display createDisplay(
       in string name, in DisplayParams params = DisplayParams())
    {
       auto d = new Display(params);

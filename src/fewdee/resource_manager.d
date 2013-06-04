@@ -128,7 +128,7 @@ private class ResourceManagerImpl
    }
 
    /// Removes (and destroys) all resources of all types.
-   public void removeEverything()
+   public final void removeEverything()
    {
       removeEverythingMatching(regexMatchingEverything);
    }
@@ -137,7 +137,7 @@ private class ResourceManagerImpl
     * Removes (and destroys) all resources (of all types) with keys matching a
     * given regular expression.
     */
-   public void removeEverythingMatching(in string regex)
+   public final void removeEverythingMatching(in string regex)
    {
       auto re = std.regex.regex(regex);
       removeEverythingMatching(re);
@@ -147,7 +147,7 @@ private class ResourceManagerImpl
     * Removes (and destroys) all resources (of all types) with keys matching a
     * given regular expression.
     */
-   public void removeEverythingMatching(Regex!char regex)
+   public final void removeEverythingMatching(Regex!char regex)
    {
       bitmaps.removeMatching(regex);
       fonts.removeMatching(regex);
@@ -216,6 +216,7 @@ unittest
    assert(rc._resources.length == 3);
 }
 
+
 // ResourceCollection.remove()
 unittest
 {
@@ -272,6 +273,7 @@ unittest
    assert(rc["b"] == b);
    assert(rc["c"] == c);
 }
+
 
 // ResourceCollection.removeMatching(string)
 unittest
