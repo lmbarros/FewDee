@@ -8,7 +8,8 @@ DMDCOMMONFLAGS=-Isrc -w -wi
 DMDFLAGS=-debug -gc -unittest $(DMDCOMMONFLAGS)
 
 DMDLINKFLAGS=fewdee.a -L-lallegro -L-lallegro_image -L-lallegro_font \
-   -L-lallegro_ttf -L-lallegro_primitives -L-lallegro_dialog -L-lallegro_audio -L-lallegro_acodec
+   -L-lallegro_ttf -L-lallegro_primitives -L-lallegro_dialog \
+   -L-lallegro_audio -L-lallegro_acodec
 
 FEWDEE_SOURCES=src/allegro5/*.d src/allegro5/internal/*.d \
    src/fewdee/*.d src/fewdee/internal/*.d src/fewdee/llr/*.d src/fewdee/sg/*.d
