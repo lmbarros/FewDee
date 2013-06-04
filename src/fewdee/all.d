@@ -12,6 +12,7 @@ public import allegro5.allegro_ttf;
 public import allegro5.allegro_primitives;
 
 public import fewdee.aabb;
+// public import fewdee.allegro_manager; // shouldn't be "too public", I guess
 public import fewdee.abstracted_input;
 public import fewdee.canned_updaters;
 public import fewdee.core;
