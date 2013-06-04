@@ -1,6 +1,9 @@
-syntax: glob
+syntax: regexp
 
-*.o
-*.a
-*.example
-utils/test_joysticks
+\.o$
+\.obj$
+\.a$
+\.lib$
+\.example$
+^utils/test_joysticks$
+^fewdee_unit_tests
