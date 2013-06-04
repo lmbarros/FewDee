@@ -3,9 +3,9 @@
 #
 
 DMDCOMMONFLAGS=-Isrc -w -wi
-DMDFLAGS=-unittest $(DMDCOMMONFLAGS)
+# DMDFLAGS=-unittest $(DMDCOMMONFLAGS)
 # DMDFLAGS=-O -inline $(DMDCOMMONFLAGS)
-# DMDFLAGS=-debug -gc $(DMDCOMMONFLAGS)
+DMDFLAGS=-debug -gc -unittest $(DMDCOMMONFLAGS)
 
 DMDLINKFLAGS=fewdee.a -L-lallegro -L-lallegro_image -L-lallegro_font \
    -L-lallegro_ttf -L-lallegro_primitives -L-lallegro_dialog -L-lallegro_audio -L-lallegro_acodec
