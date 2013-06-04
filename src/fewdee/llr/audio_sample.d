@@ -9,6 +9,7 @@ module fewdee.llr.audio_sample;
 import std.exception;
 import std.string;
 import allegro5.allegro_audio;
+import fewdee.allegro_manager;
 import fewdee.llr.low_level_resource;
 
 
@@ -25,6 +26,7 @@ class AudioSample: LowLevelResource
     */
    this(in string path)
    {
+      AllegroManager.initAudioCodecs();
       _sample = al_load_sample(path.toStringz);
       enforce(_sample !is null,
               "Couldn't load audio sample  from '" ~ path ~ "'");

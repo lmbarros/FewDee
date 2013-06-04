@@ -9,6 +9,7 @@ module fewdee.llr.bitmap;
 import std.exception;
 import std.string;
 import allegro5.allegro;
+import fewdee.allegro_manager;
 import fewdee.llr.low_level_resource;
 
 
@@ -45,6 +46,7 @@ class Bitmap: LowLevelResource
     */
    this(in string path)
    {
+      AllegroManager.initImageIO();
       _bitmap = al_load_bitmap(path.toStringz);
       enforce(_bitmap !is null, "Couldn't load bitmap from '" ~ path ~ "'");
    }

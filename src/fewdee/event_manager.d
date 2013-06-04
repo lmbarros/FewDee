@@ -8,6 +8,8 @@ module fewdee.event_manager;
 
 import std.exception;
 import allegro5.allegro;
+import fewdee.allegro_manager;
+import fewdee.engine;
 import fewdee.event;
 import fewdee.internal.singleton;
 
@@ -35,6 +37,18 @@ private class EventManagerImpl
    /// Constructs the Event Manager.
    private this()
    {
+      // Initialize input subsystems. We'll probably want to add Touch Input
+      // support with Allegro 5.1.
+      if (Engine.requestedFeatures & Features.MOUSE)
+         AllegroManager.initMouse();
+
+      if (Engine.requestedFeatures & Features.KEYBOARD)
+         AllegroManager.initKeyboard();
+
+      if (Engine.requestedFeatures & Features.JOYSTICK)
+         AllegroManager.initJoystick();
+
+      // Initialize the event handling data structures
       al_init_user_event_source(&_customEventSource);
       scope (failure)
          al_destroy_user_event_source(&_customEventSource);
@@ -44,19 +58,32 @@ private class EventManagerImpl
       scope (failure)
          al_destroy_event_queue(_eventQueue);
 
-      al_register_event_source(_eventQueue, al_get_mouse_event_source());
-      al_register_event_source(_eventQueue, al_get_keyboard_event_source());
-      al_register_event_source(_eventQueue, al_get_joystick_event_source());
+      if (Engine.requestedFeatures & Features.MOUSE)
+         al_register_event_source(_eventQueue, al_get_mouse_event_source());
+
+      if (Engine.requestedFeatures & Features.KEYBOARD)
+         al_register_event_source(_eventQueue, al_get_keyboard_event_source());
+
+      if (Engine.requestedFeatures & Features.JOYSTICK)
+         al_register_event_source(_eventQueue, al_get_joystick_event_source());
+
       al_register_event_source(_eventQueue, &_customEventSource);
    }
 
    /// Destroys the Event Manager.
    package ~this()
    {
-      al_unregister_event_source(_eventQueue, al_get_mouse_event_source());
-      al_unregister_event_source(_eventQueue, al_get_keyboard_event_source());
-      al_unregister_event_source(_eventQueue, al_get_joystick_event_source());
+      if (Engine.requestedFeatures & Features.MOUSE)
+         al_unregister_event_source(_eventQueue, al_get_mouse_event_source());
+
+      if (Engine.requestedFeatures & Features.KEYBOARD)
+         al_unregister_event_source(_eventQueue, al_get_keyboard_event_source());
+
+      if (Engine.requestedFeatures & Features.JOYSTICK)
+         al_unregister_event_source(_eventQueue, al_get_joystick_event_source());
+
       al_unregister_event_source(_eventQueue, &_customEventSource);
+
       al_destroy_event_queue(_eventQueue);
       al_destroy_user_event_source(&_customEventSource);
    }

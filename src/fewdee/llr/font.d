@@ -9,6 +9,7 @@ module fewdee.llr.font;
 import std.exception;
 import std.string;
 import allegro5.allegro_font;
+import fewdee.allegro_manager;
 import fewdee.llr.low_level_resource;
 
 
@@ -36,6 +37,8 @@ class Font: LowLevelResource
     */
    this(in string path, int size, int flags = 0)
    {
+      AllegroManager.initImageIO();
+      AllegroManager.initTTF();
       _font = al_load_font(path.toStringz, size, flags);
       enforce(_font !is null, "Couldn't load font from '" ~ path ~  "'");
    }

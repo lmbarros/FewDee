@@ -17,6 +17,26 @@ import fewdee.display_manager;
 import fewdee.resource_manager;
 
 
+/// A list of features that can be enabled when initializing the engine.
+enum Features
+{
+   /// Enable generation of mouse events.
+   MOUSE = 0x00000001,
+
+   /// Enable generation of keyboard events.
+   KEYBOARD = 0x00000002,
+
+   /// Enable generation of joystick events.
+   JOYSTICK = 0x00000004,
+
+   /// Disable all supported features.
+   NONE = 0,
+
+   /// Enable all supported features.
+   I_WANT_IT_ALL = MOUSE | KEYBOARD | JOYSTICK
+}
+
+
 /**
  * A handy way to start the engine. "Crank", "handy", "start an engine"... witty
  * naming, uh? (Incidentally, FewDee's Crank also stops the engine.)
@@ -31,10 +51,17 @@ public scope class Crank
    /**
     * Creates the $D(Crank), which causes the engine to be started ($(D
     * fewdee.core.Core.start()) is called).
+    *
+    * Parameters:
+    *    features = The desired engine features. By default, all features are
+    *       enabled. If you know that, say keyboard events will not be used in
+    *       your program, you can pass $(Features.D I_WANT_IT_ALL &
+    *       ~Features.KEYBOARD) here and hope to spare a few microsseconds per
+    *       frame.
     */
-   public this()
+   public this(Features features = Features.I_WANT_IT_ALL)
    {
-      Engine.start();
+      Engine.start(features);
    }
 
    /**
@@ -60,20 +87,17 @@ private class EngineImpl
     *
     * That said, you should use a tool to start the engine: a $(D Crank) (crude,
     * but effective).
+    *
+    * Parameters:
+    *    features = The desired engine features.
     */
-   private void start()
+   private void start(Features features)
    {
-      // TODO: Shouldn't all be done here.
+      // Initialize what we need
       AllegroManager.initSystem();
-      AllegroManager.initImageIO();
-      AllegroManager.initFont();
-      AllegroManager.initTTF();
-      AllegroManager.initPrimitives();
-      AllegroManager.initMouse();
-      AllegroManager.initKeyboard();
-      AllegroManager.initJoystick();
-      AllegroManager.initAudio();
-      AllegroManager.initAudioCodecs();
+
+      // Store the requested features.
+      _requestedFeatures = features;
 
       // Don't use pre-multiplied alpha by default
       al_set_blender(ALLEGRO_BLEND_OPERATIONS.ALLEGRO_ADD,
@@ -132,6 +156,15 @@ private class EngineImpl
    }
 
    /**
+    * Returns the engine features requested by the user when initializing the
+    * Engine.
+    */
+   package final @property Features requestedFeatures() const
+   {
+      return _requestedFeatures;
+   }
+
+   /**
     * The one and only display.
     * TODO: This is temporary; we should use the Display Manager.
     */
@@ -142,6 +175,9 @@ private class EngineImpl
     * TODO: This is temporary; we should use the State Manager singleton.
     */
    private StateManager TheStateManager;
+
+   /// The requested engine features.
+   private Features _requestedFeatures;
 }
 
 
@@ -153,4 +189,50 @@ private class EngineImpl
 public class Engine
 {
    mixin LowLockSingleton!EngineImpl;
+}
+
+
+//
+// Unit tests
+//
+
+// All engine features disabled
+unittest
+{
+   import std.functional;
+   import fewdee.event_manager;
+
+   // Start the Engine requesting no features
+   scope crank = new Crank(Features.NONE);
+
+   // Initialize the Event Manager, which in turn will initialize all requested
+   // input devices (none, in this case).
+   auto em = EventManager.instance;
+
+   // Use the Allegro API to ensure that the input subsystems were not
+   // initialized.
+   assert(!al_is_keyboard_installed());
+   assert(!al_is_mouse_installed());
+   assert(!al_is_joystick_installed());
+}
+
+
+// All engine features enabled (the default)
+unittest
+{
+   import std.functional;
+   import fewdee.event_manager;
+
+   // Start the Engine requesting all features (the default)
+   scope crank = new Crank();
+
+   // Initialize the Event Manager, which in turn will initialize all requested
+   // input devices (in this case, all of them).
+   auto em = EventManager.instance;
+
+   // Use the Allegro API to ensure that the input subsystems were not
+   // initialized.
+   assert(al_is_keyboard_installed());
+   assert(al_is_mouse_installed());
+   assert(al_is_joystick_installed());
 }

@@ -9,6 +9,7 @@ module fewdee.llr.audio_stream;
 import std.exception;
 import std.string;
 import allegro5.allegro_audio;
+import fewdee.allegro_manager;
 import fewdee.llr.low_level_resource;
 
 
@@ -28,6 +29,7 @@ class AudioStream: LowLevelResource
     */
    this(in string path, uint bufferCount = 4, uint numSamples = 2048)
    {
+      AllegroManager.initAudioCodecs();
       _stream = al_load_audio_stream(path.toStringz, bufferCount, numSamples);
       enforce(_stream !is null,
               "Couldn't load audio stream from '" ~ path ~ "'");
