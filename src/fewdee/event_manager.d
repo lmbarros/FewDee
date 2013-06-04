@@ -8,7 +8,6 @@ module fewdee.event_manager;
 
 import std.exception;
 import allegro5.allegro;
-import fewdee.core;
 import fewdee.event;
 import fewdee.internal.singleton;
 
@@ -251,6 +250,7 @@ version (unittest)
 unittest
 {
    import std.functional;
+   import fewdee.engine;
 
    scope crank = new Crank();
    auto em = EventManager.instance; // spare some typing
@@ -295,6 +295,7 @@ unittest
 unittest
 {
    import std.functional;
+   import fewdee.engine;
 
    scope crank = new Crank();
    auto em = EventManager.instance; // spare some typing

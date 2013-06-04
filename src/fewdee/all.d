@@ -15,8 +15,8 @@ public import fewdee.aabb;
 // public import fewdee.allegro_manager; // shouldn't be "too public", I guess
 public import fewdee.abstracted_input;
 public import fewdee.canned_updaters;
-public import fewdee.core;
 public import fewdee.display_manager;
+public import fewdee.engine;
 public import fewdee.event;
 public import fewdee.event_handler;
 public import fewdee.game_state;

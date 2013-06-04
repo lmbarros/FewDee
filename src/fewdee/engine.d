@@ -5,28 +5,20 @@
  * Authors: Leandro Motta Barros
  */
 
-module fewdee.core;
+module fewdee.engine;
 
 import allegro5.allegro;
-import allegro5.allegro_audio;  // TODO: remove from core?
-import allegro5.allegro_acodec; // TODO: remove form core?
-import allegro5.allegro_font;
-import allegro5.allegro_ttf;
-import allegro5.allegro_image;
-import allegro5.allegro_primitives;
 import fewdee.internal.singleton;
 import fewdee.allegro_manager;
-import fewdee.event;
 import fewdee.event_manager;
 import fewdee.game_state;
-import fewdee.ref_counted_wrappers;
 import fewdee.state_manager;
 import fewdee.display_manager;
 import fewdee.resource_manager;
 
 
 /**
- * A handy way to start the engine. Crank, handy, start an engine... witty
+ * A handy way to start the engine. "Crank", "handy", "start an engine"... witty
  * naming, uh? (Incidentally, FewDee's Crank also stops the engine.)
  *
  * Notice that this is a $(D scope class), so it must be instantiated with the
@@ -36,15 +28,13 @@ import fewdee.resource_manager;
  */
 public scope class Crank
 {
-      import std.stdio;
-
    /**
     * Creates the $D(Crank), which causes the engine to be started ($(D
     * fewdee.core.Core.start()) is called).
     */
    public this()
    {
-      Core.start();
+      Engine.start();
    }
 
    /**
@@ -53,13 +43,13 @@ public scope class Crank
     */
    public ~this()
    {
-      Core.stop();
+      Engine.stop();
    }
 }
 
 
 // TODO: review docs! Er, and everything else!
-private class CoreImpl
+private class EngineImpl
 {
    /**
     * Starts the core. This sets everything up so that the engine can be used,
@@ -144,10 +134,10 @@ private class CoreImpl
 
 
 /**
- * The Core singleton. Provides access to the one and only $(D
- * CoreImpl) instance.
+ * The Engine singleton. Provides access to the one and only $(D EngineImpl)
+ * instance.
  */
-public class Core
+public class Engine
 {
-   mixin LowLockSingleton!CoreImpl;
+   mixin LowLockSingleton!EngineImpl;
 }

@@ -144,5 +144,5 @@ void main()
    scope crank = new Crank();
    DisplayManager.createDisplay("default");
 
-   Core.run(new MyState());
+   Engine.run(new MyState());
 }

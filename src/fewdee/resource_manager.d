@@ -8,7 +8,6 @@ module fewdee.resource_manager;
 
 import std.regex;
 import allegro5.allegro;
-import fewdee.core;
 import fewdee.internal.singleton;
 import fewdee.llr.audio_sample;
 import fewdee.llr.audio_stream;
@@ -393,6 +392,7 @@ unittest
 // ResourceManager.removeEverything()
 unittest
 {
+   import fewdee.engine;
    scope crank = new Crank();
    auto rm = ResourceManager.instance; // spare some typing
 
@@ -438,6 +438,7 @@ unittest
 // ResourceManager.removeEverythingMatching(string)
 unittest
 {
+   import fewdee.engine;
    scope crank = new Crank();
    auto rm = ResourceManager.instance; // spare some typing
 
@@ -495,6 +496,7 @@ unittest
 // ResourceManager.removeEverythingMatching(Regex!char)
 unittest
 {
+   import fewdee.engine;
    scope crank = new Crank();
    auto rm = ResourceManager.instance; // spare some typing
 

@@ -12,7 +12,7 @@ module fewdee.display_manager;
 
 import std.exception;
 import allegro5.allegro;
-import fewdee.core;
+import fewdee.engine;
 import fewdee.event_manager;
 import fewdee.internal.singleton;
 
@@ -170,10 +170,10 @@ private class DisplayManagerImpl
       auto d = new Display(params);
       enforce(d !is null);
 
-      Core.TheDisplay = d._display; // TODO: hack!
+      Engine.TheDisplay = d._display; // TODO: hack!
       al_register_event_source(
          EventManager.eventQueue,
-         al_get_display_event_source(Core.TheDisplay)); // TODO: hack!
+         al_get_display_event_source(Engine.TheDisplay)); // TODO: hack!
 
       _displays[name] = d;
 
