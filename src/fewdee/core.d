@@ -15,6 +15,7 @@ import allegro5.allegro_ttf;
 import allegro5.allegro_image;
 import allegro5.allegro_primitives;
 import fewdee.internal.singleton;
+import fewdee.allegro_manager;
 import fewdee.event;
 import fewdee.event_manager;
 import fewdee.game_state;
@@ -69,49 +70,17 @@ private class CoreImpl
     */
    private void start()
    {
-      // A "macro" for initializing something with the proper error checking,
-      // recovery and reporting.
-      string makeInitCode(string initCode, string cleanupCode, string errMsg)
-      {
-         return "if (!" ~ initCode ~ ")
-                    throw new Exception(\"" ~ errMsg ~ "\");
-                 scope (failure) " ~ cleanupCode ~ ";";
-      }
-
-      mixin (makeInitCode("al_init()", "al_uninstall_system()",
-                          "Initialization failed miserably"));
-
-      mixin (makeInitCode("al_init_image_addon()", "al_shutdown_image_addon()",
-                          "Error initializing image subsystem"));
-
-      mixin (makeInitCode("(al_init_font_addon(), true)",
-                          "al_shutdown_font_addon()",
-                          "Error initializing font subsystem"));
-
-      mixin (makeInitCode("al_init_ttf_addon()", "al_shutdown_ttf_addon()",
-                          "Error initializing font subsystem"));
-
-      mixin (makeInitCode("al_init_primitives_addon()",
-                          "al_shutdown_primitives_addon()",
-                          "Error initializing font subsystem"));
-
-      mixin (makeInitCode("al_install_mouse()", "al_uninstall_mouse()",
-                          "Error initializing mouse"));
-
-      mixin (makeInitCode("al_install_keyboard()", "al_uninstall_keyboard()",
-                          "Error initializing keyboard"));
-
-      mixin (makeInitCode("al_install_joystick()", "al_uninstall_joystick()",
-                          "Error initializing joystick"));
-
-      // TODO: These probably shouldn't be in the core. But how to ensure that
-      //       the audio subsystem is initialized in the moment we create, say,
-      //       an AudioSample object?
-      mixin (makeInitCode("al_install_audio()", "al_uninstall_audio()",
-                          "Error initializing audio"));
-
-      if (!al_init_acodec_addon())
-         throw new Exception("Error initializing audio codecs");
+      // TODO: Shouldn't all be done here.
+      AllegroManager.initSystem();
+      AllegroManager.initImageIO();
+      AllegroManager.initFont();
+      AllegroManager.initTTF();
+      AllegroManager.initPrimitives();
+      AllegroManager.initMouse();
+      AllegroManager.initKeyboard();
+      AllegroManager.initJoystick();
+      AllegroManager.initAudio();
+      AllegroManager.initAudioCodecs();
 
       // Don't use pre-multiplied alpha by default
       al_set_blender(ALLEGRO_BLEND_OPERATIONS.ALLEGRO_ADD,
@@ -138,27 +107,9 @@ private class CoreImpl
       // TODO: calling destroyInstance() in an uninstantiated singleton is OK;
       //       but must think well about the ordering of destruction.
       EventManager.destroyInstance();
-
-      al_uninstall_joystick();
-
-      al_uninstall_keyboard();
-
-      al_uninstall_mouse();
-
       DisplayManager.destroyInstance();
       ResourceManager.destroyInstance();
-
-      al_uninstall_audio(); // TODO: This one probably shouldn't be in the core.
-
-      al_shutdown_primitives_addon();
-
-      al_shutdown_ttf_addon();
-
-      al_shutdown_font_addon();
-
-      al_shutdown_image_addon();
-
-      al_uninstall_system();
+      AllegroManager.destroyInstance();
    }
 
    /// Runs the engine main loop, with a given starting state.
