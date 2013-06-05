@@ -19,7 +19,7 @@ import fewdee.llr.low_level_resource;
  *
  * Bitmaps are created using the flags set in the $(D Engine).
  */
-class Bitmap: LowLevelResource
+public class Bitmap: LowLevelResource
 {
    /**
     * Creates a Bitmap with the given dimensions. Throws if the bitmap cannot be

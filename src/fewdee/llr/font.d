@@ -24,7 +24,7 @@ import fewdee.llr.low_level_resource;
  *       fonts. Since fonts are always drawn at their "natural" size, mip-maps
  *       will only waste memory, I think.
  */
-class Font: LowLevelResource
+public class Font: LowLevelResource
 {
    /**
     * Creates a Font, loading the data from a given file.

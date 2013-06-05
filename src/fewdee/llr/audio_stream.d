@@ -16,7 +16,7 @@ import fewdee.llr.low_level_resource;
 /**
  * A low-level bitmap resource. Encapsulates an $(D ALLEGRO_AUDIO_STREAM*).
  */
-class AudioStream: LowLevelResource
+public class AudioStream: LowLevelResource
 {
    /**
     * Creates an AudioStream, reading its contents from a given file.

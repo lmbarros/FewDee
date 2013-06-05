@@ -16,7 +16,7 @@ import fewdee.llr.low_level_resource;
 /**
  * A low-level sound sample resource. Encapsulates an $(D ALLEGRO_SAMPLE*).
  */
-class AudioSample: LowLevelResource
+public class AudioSample: LowLevelResource
 {
    /**
     * Creates an AudioSample, reading its contents from a given file.
