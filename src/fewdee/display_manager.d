@@ -80,31 +80,31 @@ public struct MonitorInfo
 public struct DisplayParams
 {
    /// Shall the Display be a full screen? (Otherwise, it is a window.)
-   bool fullScreen = true;
+   public bool fullScreen = true;
 
    /**
     * Shall the desktop resolution be used as the display resolution? If not,
     * the display size will come from $(D width) and $(D height).
     */
-   bool useDesktopResolution = true;
+   public bool useDesktopResolution = true;
 
    /**
     * The Display width, in pixels. Ignored if $(D useDesktopResolution ==
     * true).
     */
-   uint width = 640;
+   public uint width = 640;
 
    /**
     * The Display height, in pixels. Ignored if $(D useDesktopResolution ==
     * true).
     */
-   uint height = 480;
+   public uint height = 480;
 
    /// Shall VSync be enabled?
-   bool vSync = true;
+   public bool vSync = true;
 
    /// Which display adapter to use?
-   int adapter = ALLEGRO_DEFAULT_DISPLAY_ADAPTER;
+   public int adapter = ALLEGRO_DEFAULT_DISPLAY_ADAPTER;
 }
 
 
