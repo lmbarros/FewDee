@@ -10,16 +10,19 @@ import std.exception;
 import std.string;
 import allegro5.allegro_font;
 import fewdee.allegro_manager;
+import fewdee.engine;
 import fewdee.llr.low_level_resource;
 
 
 /**
  * A low-level font resource. Encapsulates an $(D ALLEGRO_FONT*).
  *
- * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
- * TODO: From the Allegro docs: "Bitmap and TTF fonts are affected by the
- *       current bitmap flags at the time the font is loaded." This means that
- *       everything I said about "global" state in Bitmap also applies here.
+ * Internally, Allegro creates a bitmap to store the font, so the bitmap
+ * creation flags set in the $(D Engine) do matter here.
+ *
+ * TODO: Maybe I should (temporarily) disable things like mip-maps when creating
+ *       fonts. Since fonts are always drawn at their "natural" size, mip-maps
+ *       will only waste memory, I think.
  */
 class Font: LowLevelResource
 {
@@ -39,6 +42,7 @@ class Font: LowLevelResource
    {
       AllegroManager.initImageIO();
       AllegroManager.initTTF();
+      Engine.applyBitmapCreationFlags();
       _font = al_load_font(path.toStringz, size, flags);
       enforce(_font !is null, "Couldn't load font from '" ~ path ~  "'");
    }

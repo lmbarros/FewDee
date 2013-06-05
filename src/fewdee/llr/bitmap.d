@@ -10,17 +10,14 @@ import std.exception;
 import std.string;
 import allegro5.allegro;
 import fewdee.allegro_manager;
+import fewdee.engine;
 import fewdee.llr.low_level_resource;
 
 
 /**
  * A low-level bitmap resource. Encapsulates an $(D ALLEGRO_BITMAP*).
  *
- * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
- * TODO: Bitmaps are created with global (actually, thread local) settings as
- *       set by al_set_new_bitmap_format() and al_set_new_bitmap_flags(). How do
- *       I want to handle this? These are two ints... perhaps I want to pass
- *       them always (with default values), or get them from the core.
+ * Bitmaps are created using the flags set in the $(D Engine).
  */
 class Bitmap: LowLevelResource
 {
@@ -34,6 +31,7 @@ class Bitmap: LowLevelResource
     */
    this(uint width, uint height)
    {
+      Engine.applyBitmapCreationFlags();
       _bitmap = al_create_bitmap(width, height);
       enforce(_bitmap !is null, "Couldn't create bitmap");
    }
@@ -47,6 +45,7 @@ class Bitmap: LowLevelResource
    this(in string path)
    {
       AllegroManager.initImageIO();
+      Engine.applyBitmapCreationFlags();
       _bitmap = al_load_bitmap(path.toStringz);
       enforce(_bitmap !is null, "Couldn't load bitmap from '" ~ path ~ "'");
    }

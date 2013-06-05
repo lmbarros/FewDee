@@ -93,11 +93,21 @@ private class EngineImpl
     */
    private final void start(Features features)
    {
-      // Initialize what we need
+      // Initialize the Allegro system
       AllegroManager.initSystem();
 
-      // Store the requested features.
+      // Store the requested features
       _requestedFeatures = features;
+
+      // Initialize bitmap creation flags
+      _newBitmapPixelFormat =
+         ALLEGRO_PIXEL_FORMAT.ALLEGRO_PIXEL_FORMAT_ANY_WITH_ALPHA;
+      _newBitmapFlags =
+         ALLEGRO_NO_PREMULTIPLIED_ALPHA // TODO: use pre-multiplied alpha!
+         | ALLEGRO_VIDEO_BITMAP
+         | ALLEGRO_MIN_LINEAR
+         | ALLEGRO_MAG_LINEAR
+         | ALLEGRO_MIPMAP;
 
       // Don't use pre-multiplied alpha by default
       al_set_blender(ALLEGRO_BLEND_OPERATIONS.ALLEGRO_ADD,
@@ -164,6 +174,46 @@ private class EngineImpl
       return _requestedFeatures;
    }
 
+   /// Returns the pixel format that will be used when creating bitmaps.
+   public final @property ALLEGRO_PIXEL_FORMAT newBitmapPixelFormat() const
+   {
+      return _newBitmapPixelFormat;
+   }
+
+   /// Sets the pixel format that will be used when creating bitmaps.
+   public final @property
+   void newBitmapPixelFormat(ALLEGRO_PIXEL_FORMAT pixelFormat)
+   {
+      _newBitmapPixelFormat = pixelFormat;
+   }
+
+   /// Returns the flags that will be used use when creating bitmaps.
+   public final @property int newBitmapFlags() const
+   {
+      return _newBitmapFlags;
+   }
+
+   /// Sets the flags that will be used use when creating bitmaps.
+   public final @property void newBitmapFlags(int flags)
+   {
+      _newBitmapFlags = flags;
+   }
+
+   /**
+    * Do the Allegro calls that effectively set the global (thread-local) flags
+    * for bitmap creation. Users shouldn't have many reasons to call this
+    * themselves.
+    *
+    * This gets called for every $(D Bitmap) created. I am assuming that this
+    * will not be critical in terms of performance (bitmap creation itself
+    * should dominate), but I may be wrong (I did no benchmarks).
+    */
+   public final void applyBitmapCreationFlags()
+   {
+      al_set_new_bitmap_format(_newBitmapPixelFormat);
+      al_set_new_bitmap_flags(_newBitmapFlags);
+   }
+
    /**
     * The one and only display.
     * TODO: This is temporary; we should use the Display Manager.
@@ -178,6 +228,12 @@ private class EngineImpl
 
    /// The requested engine features.
    private Features _requestedFeatures;
+
+   /// The pixel format to use when creating bitmaps.
+   private ALLEGRO_PIXEL_FORMAT _newBitmapPixelFormat;
+
+   /// The flags to use when creating bitmaps.
+   private int _newBitmapFlags;
 }
 
 
