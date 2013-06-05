@@ -151,14 +151,22 @@ private class DisplayManagerImpl
       _displays = typeof(_displays).init;
    }
 
-   /**
-    * Returns an array with information about all the detected monitors.
-    * TODO: Implement this!
-    */
-   public final @property MonitorInfo[] monitors()
+   /// Returns an array with information about all the detected monitors.
+   public final @property MonitorInfo[] monitors() const
    {
-      return [];
-      // ...
+      MonitorInfo[] monitors = [];
+
+      const numMonitors = al_get_num_video_adapters();
+
+      foreach (i; 0..numMonitors)
+      {
+         ALLEGRO_MONITOR_INFO info;
+         const success = al_get_monitor_info(i, &info);
+         if (success)
+            monitors ~= MonitorInfo(info);
+      }
+
+      return monitors;
    }
 
    /**

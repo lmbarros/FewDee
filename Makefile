@@ -20,7 +20,7 @@ FEWDEE_SOURCES=src/allegro5/*.d src/allegro5/internal/*.d \
 
 
 # All
-all: fewdee.a fewdeedemo.example #states_simple.example updater_simple.example \
+all: fewdee.a fewdeedemo.example list_monitors.example #states_simple.example updater_simple.example \
 #     updater_canned.example sg_solar_system.example \
 #     sg_parallax_scrolling.example interpolators_graphs.example \
 #     abstracted_input_simple.example
@@ -33,6 +33,7 @@ fewdee.a: src/fewdee/*
 
 # The examples
 fewdeedemo.example: examples/fewdeedemo.d fewdee.a
+list_monitors.example: examples/list_monitors.d fewdee.a
 states_simple.example: examples/states_simple.d fewdee.a
 updater_simple.example: examples/updater_simple.d fewdee.a
 updater_canned.example: examples/updater_canned.d fewdee.a
