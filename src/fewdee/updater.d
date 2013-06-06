@@ -9,7 +9,7 @@ module fewdee.updater;
 import allegro5.allegro;
 import std.conv;
 import fewdee.event;
-import fewdee.event_handler;
+import fewdee.low_level_event_handler;
 
 
 /**
@@ -17,7 +17,7 @@ import fewdee.event_handler;
  * thought as a simple way to run shortish animations, but can in fact be used
  * to do anything.
  */
-public class Updater: EventHandler
+public class Updater: LowLevelEventHandler
 {
    /**
     * A function callable by an Updater. It must return true if it wants to be
@@ -34,7 +34,7 @@ public class Updater: EventHandler
     * When getting a tick event, calls all updater functions and remove the ones
     * that don't want to be called anymore.
     */
-   public bool handleEvent(in ref ALLEGRO_EVENT event)
+   public override bool handleEvent(in ref ALLEGRO_EVENT event)
    {
       if (event.type != FEWDEE_EVENT_TICK)
          return false;

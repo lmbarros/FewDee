@@ -1,128 +1,277 @@
 /**
- * Manager of Game States.
+ * FewDee's State Manager.
+ *
+ * This implements a tried and true idiom: a stack of states in which, normally,
+ * only the state on top (that is, the current one) responds to events.
  *
  * Authors: Leandro Motta Barros
  */
 
 module fewdee.state_manager;
 
+import std.typecons;
 import allegro5.allegro;
 import fewdee.event;
+import fewdee.event_manager;
 import fewdee.game_state;
+import fewdee.low_level_event_handler;
+import fewdee.internal.singleton;
 
 
 /**
- * Manager of Game States. Manages a stack of states and provides the necessary
- * methods to handle it.
+ * The real implementation of the State Manager. Users shall use this through
+ * the $(D StateManager) class.
  *
- * The StateManager owns the states it manages. It will call destroy() on these
- * states as appropriate. This means that keeping external references to these
- * states is a bad idea, since they may end up pointing to invalid (destroyed)
- * states.
+ * Manages a stack of states and provides the necessary methods to handle it.
+ *
+ * The $(D StateManager) owns the states it manages. It will call $(D destroy())
+ * on these states as appropriate. This means that keeping external references
+ * to these states is a bad idea, since they may end up pointing to invalid
+ * (destroyed) states.
  */
-struct StateManager
+private class StateManagerImpl: LowLevelEventHandler
 {
-   // Disable copy.
-   @disable this(this) { }
-
    /**
-    * Destroys the StateManager. Ensures that the destructors of all remaining
+    * Destroys the State Manager. Ensures that the destructors of all remaining
     * game states (if any) are called.
     */
-   ~this()
+   public ~this()
    {
-      foreach(state; states_)
+      foreach(state; _states)
          destroy(state);
    }
 
-   /// Returns the state at the top of the stack.
-   public @property GameState top()
+   /// Returns the state at the top of the stack (AKA the current state).
+   public final @property GameState top()
    in
    {
-      assert(states_.length > 0);
+      assert(_states.length > 0);
    }
    body
    {
-      return states_[$-1];
+      return _states[$-1];
    }
 
    /// Checks whether the stack of states is empty.
-   public @property bool empty() const { return states_.length == 0; }
+   public final @property bool empty() const { return _states.length == 0; }
 
    /// Pushes a state into the stack of Game States.
-   void pushState(GameState state)
+   public final void pushState(GameState state)
    {
-      if (states_.length > 0)
-         states_[$-1].onBury();
+      import std.stdio; writefln("StateManager: pushing '%s'", state);
 
-      states_ ~= state;
-      state.stateManager_ = &this;
+      if (_states.length > 0)
+         _states[$-1].onBury();
+
+      _states ~= state;
+
+      import std.stdio; writefln("StateManager: pushed '%s'", state);
    }
 
    /**
     * Pops the state on the top of the stack of Game States. The destructor of
     * the popped state is called.
     */
-   void popState()
+   public final void popState()
    in
    {
-      assert(states_.length > 0);
+      assert(_states.length > 0);
    }
    body
    {
-      destroy(states_[$-1]); // ensure that destructor is called
-      states_ = states_[0 .. $-1];
-      if (states_.length > 0)
-         states_[$-1].onDigOut();
+      import std.stdio; writefln("StateManager: popping '%s'; size was %s.",
+                                 _states[$-1], _states.length);
+
+      removeAllStateHandlers(_states[$-1]);
+      destroy(_states[$-1]); // ensure that destructor is called
+
+      import std.stdio; writefln("11111111");
+      _states = _states[0 .. $-1];
+
+      import std.stdio; writefln("2222222");
+      if (_states.length > 0)
+      {
+         import std.stdio; writefln("3aaaaa");
+         _states[$-1].onDigOut();
+      }
+      else
+         import std.stdio; writefln("3bbbbb");
+
+      import std.stdio; writefln("StateManager: popped, new top is '%s'; new size is %s.",
+                                 _states.length > 0 ? _states[$-1] : null, _states.length);
    }
 
    /**
     * Replaces the state in the top of the stack of Game States with a new
-    * one. onDigOut() and onBury() are not called.  The destructor of the
-    * replaced state is called.
+    * one. $(D onDigOut()) and $(D onBury()) are not called.  The destructor of
+    * the replaced state is called.
     */
-   void replaceState(GameState state)
+   public final void replaceState(GameState state)
    in
    {
-      assert(states_.length > 0);
+      assert(_states.length > 0);
    }
    body
    {
-      destroy(states_[$-1]); // ensure that destructor is called
-      states_[$-1] = state;
-      state.stateManager_ = &this;
-   }
+      import std.stdio; writefln("StateManager: replacing '%s' with '%s'; size was %s.",
+                                 _states[$-1], state, _states.length);
 
-   /// Called periodically. This is the place to do all the drawing.
-   public void onDraw()
-   {
-      foreach(state; states_)
-      {
-         if (state.wantsToDraw)
-            state.onDraw();
-      }
+      removeAllStateHandlers(_states[$-1]);
+      destroy(_states[$-1]); // ensure that destructor is called
+      _states[$-1] = state;
+
+      import std.stdio; writefln("StateManager: replaced ; size now is %s.",
+                                 _states.length);
    }
 
    /**
-    * Called when an event (any event) is received. This method just forwards
-    * the event to all states that want to receive it.
+    * Called when an event (any event) is received. This method then calls the
+    * event handlers for the states that want to have their event handlers
+    * called.
     *
     * Parameters:
     *    event = The event received.
     */
-   public void onEvent(in ref ALLEGRO_EVENT event)
+   public final override bool handleEvent(in ref ALLEGRO_EVENT event)
    {
-      foreach(state; states_)
+      foreach (key, handlers; _eventHandlers)
       {
-         immutable wants = event.type == FEWDEE_EVENT_TICK
-            ? state.wantsTicks
-            : state.wantsEvents;
+         const keyType = key[1];
 
-         if (wants)
-            state.onEvent(event);
+         if (keyType != event.type)
+            continue;
+
+         const keyState = key[0];
+
+         foreach (handler; _eventHandlers[key])
+         {
+            immutable wants = event.type == FEWDEE_EVENT_DRAW
+               ? keyState.wantsToDraw
+               : (event.type == FEWDEE_EVENT_TICK
+                  ? keyState.wantsTicks
+                  : keyState.wantsEvents);
+
+            if (wants)
+               handler(event);
+         }
       }
+
+      return true;
    }
 
+   /**
+    * Adds an event handler. From this point on, whenever an event of the
+    * requested type is triggered, the handler will be called.
+    *
+    * TODO, doc: If you are using the $(D StateManager), you may wish to
+    *       use... (because then the handler will be called only when the state
+    *       is active. IOW, this global, not per state.)
+    *
+    * Parameters:
+    *    state = The $(D GameState) registering the handler.
+    *    eventType = The type of event to handle.
+    *    handler = The handler function.
+    *
+    * Return:
+    *    An ID that can be passed to $(D removeHandler()) if one desires to
+    *    remove the event handler later.
+    */
+   package final EventHandlerID addHandler(
+      in GameState state, ALLEGRO_EVENT_TYPE eventType, EventHandler handler)
+   {
+      auto key = tuple(state, eventType);
+
+      if (key !in _eventHandlers)
+         _eventHandlers[key] = typeof(_eventHandlers[key]).init;
+
+      assert(_nextEventHandlerID !in _eventHandlers[key]);
+
+      _eventHandlers[key][_nextEventHandlerID] = handler;
+
+      return _nextEventHandlerID++;
+   }
+
+   /**
+    * Removes an event handler. If the requested handler wasn't previously added
+    * to the Event Manager, nothing happens.
+    *
+    * Parameters:
+    *    id = The ID of the event handler to remove.
+    *
+    * Return:
+    *    $(D true) if the event handler was removed; $(D false) otherwise.
+    */
+   package final bool removeHandler(EventHandlerID id)
+   {
+      foreach (key, list; _eventHandlers)
+      {
+         if (id in _eventHandlers[key])
+         {
+            _eventHandlers[key].remove(id);
+            return true;
+         }
+      }
+
+      return false; // ID not found
+   }
+
+   /**
+    * Removes all event handlers associated with a given state.
+    *
+    * Parameters:
+    *    state = The state whose events handlers will be removed.
+    */
+   private final void removeAllStateHandlers(in GameState state)
+   {
+      import std.stdio; writefln("StateManager: removing handlers of '%s'", state);
+
+      stateTypePair[] toRemove;
+
+      foreach (key, handlers; _eventHandlers)
+      {
+         const keyState = key[0];
+         if (state is keyState)
+            toRemove ~= key;
+      }
+
+      foreach (key; toRemove)
+      {
+         import std.stdio; writefln("   StateManager: removing handler '%s'", key);
+         _eventHandlers.remove(key);
+      }
+
+      import std.stdio; writefln("StateManager: removed handlers of '%s'", state);
+   }
+
+   /// A pair of a $(D GameState) and an event type.
+   private alias Tuple!(const(GameState), ALLEGRO_EVENT_TYPE) stateTypePair;
+
+   /**
+    * The collection of all registered event handlers.
+    *
+    * This is an associative array indexed by a pair (game state, event
+    * type). Each value in this associative array is itself another associative
+    * array, which maps the event handler handle to the event handler itself.
+    */
+   private EventHandler[EventHandlerID][stateTypePair] _eventHandlers;
+
+   /**
+    * The next event handler ID to use. The same sequence of IDs is used for all
+    * event types.
+    */
+   private size_t _nextEventHandlerID = 0;
+
    /// An array of Game States, used as a stack.
-   private GameState[] states_;
+   private GameState[] _states;
+}
+
+
+
+/**
+ * The State Manager singleton. Provides access to the one and only $(D
+ * StateManagerImpl) instance.
+ */
+public class StateManager
+{
+   mixin LowLockSingleton!StateManagerImpl;
 }

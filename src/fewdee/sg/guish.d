@@ -9,7 +9,7 @@ module fewdee.sg.guish;
 import allegro5.allegro;
 import std.conv;
 import fewdee.event;
-import fewdee.event_handler;
+import fewdee.low_level_event_handler;
 import fewdee.sg.node;
 
 
@@ -70,7 +70,7 @@ enum EventType
 /**
  * Generates GUI-like events for registered Nodes.
  */
-class GUIshEventGenerator: EventHandler
+class GUIshEventGenerator: LowLevelEventHandler
 {
    /**
     * The type of callbacks called when GUIsh events happen. What exactly is
@@ -83,7 +83,7 @@ class GUIshEventGenerator: EventHandler
       EventCallback_t;
 
    /// Handles incoming events.
-   public bool handleEvent(in ref ALLEGRO_EVENT event)
+   public override bool handleEvent(in ref ALLEGRO_EVENT event)
    {
       switch (event.type)
       {

@@ -11,6 +11,7 @@ import allegro5.allegro;
 import fewdee.allegro_manager;
 import fewdee.engine;
 import fewdee.event;
+import fewdee.low_level_event_handler;
 import fewdee.internal.singleton;
 
 
@@ -26,6 +27,7 @@ public alias void delegate(in ref ALLEGRO_EVENT event) EventHandler;
  * Manager. It can be used to remove the handler from the list of handler.
  */
 public alias size_t EventHandlerID;
+
 
 
 /**
@@ -92,6 +94,10 @@ private class EventManagerImpl
     * Adds an event handler. From this point on, whenever an event of the
     * requested type is triggered, the handler will be called.
     *
+    * TODO, doc: If you are using the $(D StateManager), you may wish to
+    *       use... (because then the handler will be called only when the state
+    *       is active. IOW, this global, not per state.)
+    *
     * Parameters:
     *    eventType = The type of event to handle.
     *    handler = The handler function.
@@ -142,7 +148,7 @@ private class EventManagerImpl
     *
     * This is an associative array indexed by the event type. Each value in this
     * associative array is itself another associative array, which maps the
-    * event handler handle to
+    * event handler handle to the event handler itself.
     */
    private EventHandler[EventHandlerID][ALLEGRO_EVENT_TYPE] _eventHandlers;
 
@@ -151,6 +157,37 @@ private class EventManagerImpl
     * event types.
     */
    private size_t _nextEventHandlerID = 0;
+
+   /**
+    * Adds a low-level event handler. From this call on, the $(D
+    * LowLevelEventHandler) passed as parameter will have its $(D handleEvent())
+    * method called for every event triggered.
+    */
+   package final void addLowLevelEventHandler(LowLevelEventHandler handler)
+   {
+      _lowLevelEventHandlers[handler] = true;
+   }
+
+   /**
+    * Removes a low-level event handler. From this call on, the $(D
+    * LowLevelEventHandler) passed as parameter will no longer have its $(D
+    * handleEvent()) method called.
+    */
+   package final void removeLowLevelEventHandler(LowLevelEventHandler handler)
+   {
+      _lowLevelEventHandlers.remove(handler);
+   }
+
+   /**
+    * The list of low-level event handlers.
+    *
+    * This is an associative array used as a set (the Boolean value is not used,
+    * it is just a formal requirement).
+    *
+    * TODO: Replace this with a $(D std.container.RedBlackTree) or something
+    *       like this?
+    */
+   private bool[LowLevelEventHandler] _lowLevelEventHandlers;
 
    /**
     * Causes a tick event to be generated. This must be called from the main
@@ -173,7 +210,7 @@ private class EventManagerImpl
       tickEvent.user.totalTime = _tickTime;
       al_emit_user_event(&_customEventSource, &tickEvent, null);
 
-      // Call handler for all pending events (and this includes the tick event
+      // Call handlers for all pending events (and this includes the tick event
       // we just emitted)
       ALLEGRO_EVENT event;
       while (al_get_next_event(_eventQueue, &event))
@@ -183,6 +220,9 @@ private class EventManagerImpl
             foreach (handler; _eventHandlers[event.type])
                handler(event);
          }
+
+         foreach (handler, dummy; _lowLevelEventHandlers)
+            handler.handleEvent(event);
       }
    }
 
@@ -209,6 +249,10 @@ private class EventManagerImpl
          foreach (handler; _eventHandlers[FEWDEE_EVENT_DRAW])
             handler(drawEvent);
       }
+
+      // Call the low-level event handlers
+      foreach (handler, dummy; _lowLevelEventHandlers)
+         handler.handleEvent(drawEvent);
 
       // And flip the buffers
       al_flip_display();

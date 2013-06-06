@@ -9,7 +9,7 @@
 module fewdee.abstracted_input;
 
 import allegro5.allegro;
-import fewdee.event_handler;
+import fewdee.low_level_event_handler;
 
 
 /**
@@ -118,7 +118,7 @@ CommandTrigger_t joyButtonPress(int button)
  * high-level commands and, if they do, call the handlers of these high-level
  * commands.
  */
-class AbstractedInput(HighLevelCommandsEnum): EventHandler
+class AbstractedInput(HighLevelCommandsEnum): LowLevelEventHandler
    if (is(HighLevelCommandsEnum == enum))
 {
    /**

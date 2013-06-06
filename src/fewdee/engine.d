@@ -131,12 +131,17 @@ private class EngineImpl
     */
    private final void stop()
    {
+      import std.stdio; writefln("Starting to stop Engine (%s)", &this);
+
       // TODO: calling destroyInstance() in an uninstantiated singleton is OK;
       //       but must think well about the ordering of destruction.
       EventManager.destroyInstance();
+      StateManager.destroyInstance();
       DisplayManager.destroyInstance();
       ResourceManager.destroyInstance();
       AllegroManager.destroyInstance();
+
+      import std.stdio; writefln("Finished to stop Engine (%s)", &this);
    }
 
    /**
@@ -146,23 +151,44 @@ private class EngineImpl
     */
    public final void run(GameState startingState)
    {
-      TheStateManager.pushState(startingState);
+      import std.stdio; writefln("Engine: starting main loop with state '%s'", startingState);
+
+      StateManager.pushState(startingState);
 
       double prevTime = al_get_time();
 
-      while (!TheStateManager.empty)
+      while (!StateManager.empty)
       {
+         import std.stdio; write("   Engine: looping");
+
          // What time is it?
          immutable now = al_get_time();
          immutable deltaT = now - prevTime;
          prevTime = now;
 
+         import std.stdio; write("@");
+
          // Generate tick event
          EventManager.triggerTickEvent(deltaT);
 
+         // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+         // TODO: without this, draw may crash, if it accesses the (now
+         //       destroyed) state variables
+         if (StateManager.empty)
+         {
+            import std.stdio; writeln("EARLY EXIT!");
+            break;
+         }
+
+         import std.stdio; write("#");
+
          // Draw!
          EventManager.triggerDrawEvent(deltaT);
+
+         import std.stdio; writeln("$");
       }
+
+      import std.stdio; writefln("Engine: finished main loop.");
    }
 
    /**
@@ -219,12 +245,6 @@ private class EngineImpl
     * TODO: This is temporary; we should use the Display Manager.
     */
    public ALLEGRO_DISPLAY* TheDisplay;
-
-   /**
-    * The object managing the game states.
-    * TODO: This is temporary; we should use the State Manager singleton.
-    */
-   private StateManager TheStateManager;
 
    /// The requested engine features.
    private Features _requestedFeatures;

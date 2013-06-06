@@ -13,8 +13,6 @@ module fewdee.llr.low_level_resource;
  */
 public interface LowLevelResource
 {
-   /**
-    * De-allocates the resource.
-    */
+   /// De-allocates the resource.
    abstract void free();
 }

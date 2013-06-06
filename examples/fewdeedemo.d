@@ -10,8 +10,8 @@ class MyState: GameState
    {
       updater_ = new Updater();
       guish_ = new GUIshEventGenerator();
-      addEventHandler(guish_);
-      addEventHandler(updater_);
+      // addEventHandler(guish_);
+      // addEventHandler(updater_);
 
       ResourceManager.bitmaps.add("bmp1", new Bitmap("data/flag_1.png"));
       ResourceManager.bitmaps.add("bmp2", new Bitmap("data/flag_2.png"));
@@ -40,15 +40,15 @@ class MyState: GameState
       text_.color = al_map_rgba_f(0.2, 0.8, 0.2, 0.5);
 
       //addEventCallback(ALLEGRO_EVENT_MOUSE_AXES, &sayWhereMouseIs);
-      addEventCallback(ALLEGRO_EVENT_MOUSE_BUTTON_DOWN, &startAnimation);
+      addHandler(ALLEGRO_EVENT_MOUSE_BUTTON_DOWN, &startAnimation);
 
       // Quit if ESC is pressed
-      addEventCallback(ALLEGRO_EVENT_KEY_DOWN,
-                       delegate(in ref ALLEGRO_EVENT event)
-                       {
-                          if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
-                             popState();
-                       });
+      addHandler(ALLEGRO_EVENT_KEY_DOWN,
+                 delegate(in ref ALLEGRO_EVENT event)
+                 {
+                    if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+                       popState();
+                 });
 
       guish_.addEventCallback(
          sprite_, EventType.MOUSE_ENTER,
@@ -100,7 +100,7 @@ class MyState: GameState
          });
    }
 
-   public override void onDraw()
+   public void onDraw()
    {
       al_clear_to_color(al_map_rgb(200, 200, 0));
       text_.draw();
