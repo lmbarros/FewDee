@@ -224,6 +224,9 @@ private class EventManagerImpl
          foreach (handler, dummy; _lowLevelEventHandlers)
             handler.handleEvent(event);
       }
+
+      foreach (handler, dummy; _lowLevelEventHandlers)
+         handler.emptiedEventQueue();
    }
 
    /**

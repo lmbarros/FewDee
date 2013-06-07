@@ -52,4 +52,8 @@ public abstract class LowLevelEventHandler
     *       sensible with the return value.
     */
    public abstract bool handleEvent(in ref ALLEGRO_EVENT event);
+
+   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   // all events for this tick were processed.
+   public void emptiedEventQueue() { }
 }

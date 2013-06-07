@@ -60,10 +60,17 @@ private class StateManagerImpl: LowLevelEventHandler
    {
       import std.stdio; writefln("StateManager: pushing '%s'", state);
 
+      // xxxxxxxxxxxxxxxxxxx
+      // Allow just one push or pop per tick
+      if (_statePopped || _statePushed)
+         return;
+
       if (_states.length > 0)
          _states[$-1].onBury();
 
       _states ~= state;
+
+      _statePushed = state;
 
       import std.stdio; writefln("StateManager: pushed '%s'", state);
    }
@@ -82,6 +89,11 @@ private class StateManagerImpl: LowLevelEventHandler
       import std.stdio; writefln("StateManager: popping '%s'; size was %s.",
                                  _states[$-1], _states.length);
 
+      // xxxxxxxxxxxxxxxxxxx
+      // Allow just one push or pop per tick
+      if (_statePopped || _statePushed)
+         return;
+
       removeAllStateHandlers(_states[$-1]);
       destroy(_states[$-1]); // ensure that destructor is called
 
@@ -96,6 +108,8 @@ private class StateManagerImpl: LowLevelEventHandler
       }
       else
          import std.stdio; writefln("3bbbbb");
+
+      _statePopped = true;
 
       import std.stdio; writefln("StateManager: popped, new top is '%s'; new size is %s.",
                                  _states.length > 0 ? _states[$-1] : null, _states.length);
@@ -116,9 +130,17 @@ private class StateManagerImpl: LowLevelEventHandler
       import std.stdio; writefln("StateManager: replacing '%s' with '%s'; size was %s.",
                                  _states[$-1], state, _states.length);
 
+      // xxxxxxxxxxxxxxxxxxx
+      // Allow just one push or pop per tick
+      if (_statePopped || _statePushed)
+         return;
+
       removeAllStateHandlers(_states[$-1]);
       destroy(_states[$-1]); // ensure that destructor is called
       _states[$-1] = state;
+
+      _statePushed = state;
+      _statePopped = true;
 
       import std.stdio; writefln("StateManager: replaced ; size now is %s.",
                                  _states.length);
@@ -134,6 +156,11 @@ private class StateManagerImpl: LowLevelEventHandler
     */
    public final override bool handleEvent(in ref ALLEGRO_EVENT event)
    {
+      // xxxxxxxxxxxxxxx
+      // stop handling this tick's events if a state is popped
+      if (_statePopped)
+         return false;
+
       foreach (key, handlers; _eventHandlers)
       {
          const keyType = key[1];
@@ -151,13 +178,45 @@ private class StateManagerImpl: LowLevelEventHandler
                   ? keyState.wantsTicks
                   : keyState.wantsEvents);
 
-            if (wants)
+            // xxxxxxxxxxxxxxxxxxxxxxxxxxx
+            // don't handle events of a newly pushed state; wait for next tick
+            if (wants && keyState !is _statePushed)
                handler(event);
+
+            // stop handling this tick's events if a state is popped
+            if (_statePopped)
+               return false;
          }
       }
 
       return true;
    }
+
+   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   // start of new code
+   public override void emptiedEventQueue()
+   {
+      _statePopped = false;
+      _statePushed = null;
+   }
+
+   private bool _statePopped = false;
+
+   // Don't think this is necessary. Would be used to enforce the policy of "if
+   // a new state is pushed, it will not get any of its event handlers called in
+   // this tick". But if the state was just added, it will not have events in
+   // the queue, will it? Hmmm, perhaps it will... how are events added to the
+   // queue? Asynchronously, I guess... they can get there anytime.
+   //
+   // But then... the concept of "tick" (from this event queue point of view) is
+   // a bit vague... I simply handle events until the queue is empty. Perhaps
+   // this legitimates the call of event handlers from a newly pushed state.
+   private GameState _statePushed = null;
+
+   // end of new code
+   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
 
    /**
     * Adds an event handler. From this point on, whenever an event of the
