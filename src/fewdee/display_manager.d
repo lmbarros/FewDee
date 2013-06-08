@@ -177,6 +177,31 @@ private class DisplayManagerImpl
    }
 
    /**
+    * Returns a list of the supported full screen display modes.
+    *
+    * TODO:
+    *    I don't know how this works when multiple monitors are connected to the
+    *    computer. No spare monitor to test this right now, though.
+    */
+   public final @property
+   immutable(ALLEGRO_DISPLAY_MODE[]) fullScreenDisplayModes() const
+   {
+      ALLEGRO_DISPLAY_MODE[] modes = [ ];
+
+      immutable n = al_get_num_display_modes();
+      modes.length = n;
+
+      foreach (i; 0..n)
+      {
+         ALLEGRO_DISPLAY_MODE mode;
+         al_get_display_mode(i, &mode);
+         modes[i] = mode;
+      }
+
+      return assumeUnique(modes);
+   }
+
+   /**
     * Creates a new $(D Display) and puts it under the control of the $(D
     * DisplayManager).
     *
