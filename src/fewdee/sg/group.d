@@ -50,9 +50,10 @@ class Group: Node
     * Parameters:
     *    node = The child whose index is desired.
     *
-    * Return: The index of node. If node was added multiple times as child,
-    *    returns the index of the first occurrence. If node is not a child of
-    *    this Group, returns a negative number.
+    * Returns:
+    *    The index of node. If node was added multiple times as child, returns
+    *    the index of the first occurrence. If node is not a child of this
+    *    Group, returns a negative number.
     */
    public int childIndex(in Node node)
    {
@@ -106,7 +107,8 @@ class Group: Node
     * Parameters:
     *    node = The node to remove.
     *
-    * Return: true if the node was removed; false if it was not removed
+    * Returns:
+    *    $(D true) if the node was removed; $(D false) if it was not removed
     *    (necessarily because it is not a child of this Group).
     */
    public bool removeChild(in Node node)

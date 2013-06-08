@@ -45,7 +45,8 @@ public abstract class LowLevelEventHandler
     * Parameters:
     *    event = The event to handle.
     *
-    * Return: Shall return true if the event was effectively handled, or false
+    * Returns:
+    *    Shall return true if the event was effectively handled, or false
     *    otherwise.
     *
     * TODO: Make return void... I guess the EventManager cannot do anything

@@ -122,7 +122,7 @@ public class GameState
     * Parameters:
     *    id = The ID of the event handler to remove.
     *
-    * Return:
+    * Returns:
     *    $(D true) if the event handler was removed; $(D false) otherwise.
     */
    public final bool removeHandler(EventHandlerID id)

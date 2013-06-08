@@ -299,7 +299,7 @@ private class StateManagerImpl: LowLevelEventHandler
     *    eventType = The type of event to handle.
     *    handler = The handler function.
     *
-    * Return:
+    * Returns:
     *    An ID that can be passed to $(D removeHandler()) if one desires to
     *    remove the event handler later.
     */
@@ -325,7 +325,7 @@ private class StateManagerImpl: LowLevelEventHandler
     * Parameters:
     *    id = The ID of the event handler to remove.
     *
-    * Return:
+    * Returns:
     *    $(D true) if the event handler was removed; $(D false) otherwise.
     */
    package final bool removeHandler(EventHandlerID id)
