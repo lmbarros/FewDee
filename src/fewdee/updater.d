@@ -34,10 +34,10 @@ public class Updater: LowLevelEventHandler
     * When getting a tick event, calls all updater functions and remove the ones
     * that don't want to be called anymore.
     */
-   public override bool handleEvent(in ref ALLEGRO_EVENT event)
+   public override void handleEvent(in ref ALLEGRO_EVENT event)
    {
       if (event.type != FEWDEE_EVENT_TICK)
-         return false;
+         return;
 
       immutable deltaTime = event.user.deltaTime;
 
@@ -51,8 +51,6 @@ public class Updater: LowLevelEventHandler
 
       foreach(func; toRemove)
          funcs_.remove(func);
-
-      return true;
    }
 
    /// Adds an updater function to the Updater.

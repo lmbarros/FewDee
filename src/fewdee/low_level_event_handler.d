@@ -44,15 +44,8 @@ public abstract class LowLevelEventHandler
     *
     * Parameters:
     *    event = The event to handle.
-    *
-    * Returns:
-    *    Shall return true if the event was effectively handled, or false
-    *    otherwise.
-    *
-    * TODO: Make return void... I guess the EventManager cannot do anything
-    *       sensible with the return value.
     */
-   public abstract bool handleEvent(in ref ALLEGRO_EVENT event);
+   public abstract void handleEvent(in ref ALLEGRO_EVENT event);
 
    /**
     * This is called when starting to process the events of a tick.

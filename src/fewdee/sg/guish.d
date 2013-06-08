@@ -83,21 +83,21 @@ class GUIshEventGenerator: LowLevelEventHandler
       EventCallback_t;
 
    /// Handles incoming events.
-   public override bool handleEvent(in ref ALLEGRO_EVENT event)
+   public override void handleEvent(in ref ALLEGRO_EVENT event)
    {
       switch (event.type)
       {
          case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-            return handleMouseButtonDownEvent(event);
+            handleMouseButtonDownEvent(event);
+            break;
 
          case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
-            return handleMouseButtonUpEvent(event);
+            handleMouseButtonUpEvent(event);
+            break;
 
          case FEWDEE_EVENT_TICK:
-            return handleTickEvent(event);
-
-         default:
-            return false; // ignore
+            handleTickEvent(event);
+            break;
       }
    }
 
@@ -179,7 +179,7 @@ class GUIshEventGenerator: LowLevelEventHandler
     * are "relative": if a moving node crosses a static mouse pointer, the
     * events shall be generated. This is by design.
     */
-   private bool handleTickEvent(in ref ALLEGRO_EVENT event)
+   private void handleTickEvent(in ref ALLEGRO_EVENT event)
    {
       time_ += event.user.deltaTime;
 
@@ -208,13 +208,11 @@ class GUIshEventGenerator: LowLevelEventHandler
          if (nodeUnderMouse_ !is null)
             callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_ENTER, event);
       }
-
-      return true;
    }
 
 
    /// Handles a "mouse button down" event.
-   private bool handleMouseButtonDownEvent(in ref ALLEGRO_EVENT event)
+   private void handleMouseButtonDownEvent(in ref ALLEGRO_EVENT event)
    in
    {
       assert(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN);
@@ -227,13 +225,11 @@ class GUIshEventGenerator: LowLevelEventHandler
 
       // Do the bookkeeping for "Click" and "DoubleClick"
       nodeThatGotMouseDown_[event.mouse.button] = nodeUnderMouse_;
-
-      return true;
    }
 
 
    /// Handles a "mouse button up" event.
-   private bool handleMouseButtonUpEvent(in ref ALLEGRO_EVENT event)
+   private void handleMouseButtonUpEvent(in ref ALLEGRO_EVENT event)
    in
    {
       assert(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP);
@@ -264,8 +260,6 @@ class GUIshEventGenerator: LowLevelEventHandler
             timeOfLastClick_[button] = time_;
          }
       }
-
-      return true;
    }
 
 

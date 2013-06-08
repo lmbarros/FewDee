@@ -200,7 +200,7 @@ private class StateManagerImpl: LowLevelEventHandler
     * Parameters:
     *    event = The event received.
     */
-   public final override bool handleEvent(in ref ALLEGRO_EVENT event)
+   public final override void handleEvent(in ref ALLEGRO_EVENT event)
    {
       foreach (key, handlers; _eventHandlers)
       {
@@ -226,8 +226,6 @@ private class StateManagerImpl: LowLevelEventHandler
                handler(event);
          }
       }
-
-      return true;
    }
 
    /**
