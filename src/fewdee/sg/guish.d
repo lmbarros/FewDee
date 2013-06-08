@@ -98,6 +98,9 @@ class GUIshEventGenerator: LowLevelEventHandler
          case FEWDEE_EVENT_TICK:
             handleTickEvent(event);
             break;
+
+         default:
+            break;
       }
    }
 
