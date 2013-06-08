@@ -215,12 +215,6 @@ private class EngineImpl
       al_set_new_bitmap_flags(_newBitmapFlags);
    }
 
-   /**
-    * The one and only display.
-    * TODO: This is temporary; we should use the Display Manager.
-    */
-   public ALLEGRO_DISPLAY* TheDisplay;
-
    /// The requested engine features.
    private Features _requestedFeatures;
 

@@ -73,6 +73,7 @@ public struct MonitorInfo
 }
 
 
+
 /**
  * Parameters describing a Display; used when creating a new one. The defaults
  * should be reasonable for casual FewDee usage.
@@ -108,6 +109,7 @@ public struct DisplayParams
 }
 
 
+
 /// A Display, which is either a window or "a full screen".
 public class Display
 {
@@ -117,7 +119,7 @@ public class Display
     * Parameters:
     *    params = The desired Display characteristics.
     */
-   this(in DisplayParams params)
+   package this(in DisplayParams params)
    {
       _display = al_create_display(params.width, params.height);
       enforce(_display !is null);
@@ -133,6 +135,11 @@ public class Display
 
    /// The Allegro object representing the Display.
    private ALLEGRO_DISPLAY* _display;
+
+   // TODO: As of DMD 2.063, enabling the 'alias this' below causes a crash when
+   //       destroying the displays (during program shutdown). I am inclined to
+   //       blame the compiler, but I really have no idea why this happens.
+   // alias _display this; // Make usable with the Allegro API
 }
 
 
@@ -170,14 +177,21 @@ private class DisplayManagerImpl
    }
 
    /**
-    * Creates a new Display and puts it under the control of this Display
-    * Manager. The first display created will be set as the current one.
+    * Creates a new $(D Display) and puts it under the control of the $(D
+    * DisplayManager).
+    *
+    * If the created display is the only one in the internal list of displays,
+    * $(D setTargetDisplay()) is called on the newly created $(D Display),
+    * making it the target of subsequent drawing operations.
     *
     * Parameters:
     *    name = The name of the display being created. If a display with this
     *       name already exists, the old display is destroyed and replaced with
     *       the new one.
     *    params = The parameters describing the desired display features.
+    *
+    * Returns:
+    *    For eventual convenience, returns the newly created $(D Display).
     */
    public final Display createDisplay(
       in string name, in DisplayParams params = DisplayParams())
@@ -185,36 +199,45 @@ private class DisplayManagerImpl
       auto d = new Display(params);
       enforce(d !is null, "Error creating Display");
 
-      Engine.TheDisplay = d._display; // TODO: hack!
       al_register_event_source(
          EventManager.eventQueue,
-         al_get_display_event_source(Engine.TheDisplay)); // TODO: hack!
+         al_get_display_event_source(d._display));
 
       if (name in _displays)
-      {
-         if (_displays[name] == _currentDisplay)
-            _currentDisplay = d;
          destroy(_displays[name]);
-      }
 
       _displays[name] = d;
 
-      if (_currentDisplay is null)
-         _currentDisplay = d;
+      if (_displays.length == 1)
+         setTargetDisplay(name);
 
       return d;
    }
 
+   /**
+    * Sets the $(D Display) with a given name as the target for subsequent
+    * drawing operations.
+    *
+    * This is called automatically for a newly created $(D Display) when it is
+    * the only display in he internal list of $(D Display)s maintained by the
+    * $(D DisplayManager). However, you may wish to call this manually to set a
+    * different $(D Display) as the target of drawing operations. Also, calling
+    * this method is necessary if you manually set the target bitmap to
+    * something different (e.g., by calling Allegro's $(D
+    * al_set_target_bitmap()) and then wants to draw to a $(D Display) again.
+    */
+   public final void setTargetDisplay(in string displayName)
+   in
+   {
+      assert(displayName in _displays);
+   }
+   body
+   {
+      al_set_target_backbuffer(_displays[displayName]._display);
+   }
+
    /// The collection of Displays, indexed by their string keys.
    private Display[string] _displays;
-
-   /**
-    * The current Display.
-    *
-    * TODO: The definition of what exactly it means to be the current Display is
-    *       still open.
-    */
-   private Display _currentDisplay;
 }
 
 
