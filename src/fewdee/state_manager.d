@@ -290,10 +290,6 @@ private class StateManagerImpl: LowLevelEventHandler
     * Adds an event handler. From this point on, whenever an event of the
     * requested type is triggered, the handler will be called.
     *
-    * TODO, doc: If you are using the $(D StateManager), you may wish to
-    *       use... (because then the handler will be called only when the state
-    *       is active. IOW, this global, not per state.)
-    *
     * Parameters:
     *    state = The $(D GameState) registering the handler.
     *    eventType = The type of event to handle.

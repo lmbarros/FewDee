@@ -94,9 +94,13 @@ private class EventManagerImpl
     * Adds an event handler. From this point on, whenever an event of the
     * requested type is triggered, the handler will be called.
     *
-    * TODO, doc: If you are using the $(D StateManager), you may wish to
-    *       use... (because then the handler will be called only when the state
-    *       is active. IOW, this global, not per state.)
+    * If you are using the $(D StateManager) (which is probably a good idea!),
+    * you may wish to call $(GameState.addHandler()) instead. This method adds
+    * what can be seen as a "global" handler, that will get called regardless of
+    * the current game state. $(GameState.addHandler()) will add a
+    * "state-conscious" handler, which will be called only when that state is
+    * the current one (or if you explicitly said you wanted that state to
+    * receive events even when not on the top of the stack).
     *
     * Parameters:
     *    eventType = The type of event to handle.
