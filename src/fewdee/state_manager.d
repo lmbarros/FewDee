@@ -140,9 +140,6 @@ private class StateManagerImpl: LowLevelEventHandler
          return;
       }
 
-      // TODO: assert somehow that the state doing the pushing is the one on
-      // top. BTW, do the same for popping and replacing.
-
       // Allow just one push or pop per tick. See "Policies" in class' docs.
       if (_poppedState !is null || _pushedState !is null)
          return;

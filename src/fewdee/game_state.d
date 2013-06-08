@@ -15,14 +15,40 @@ import fewdee.state_manager;
 /// Base class for the states the game can be in.
 public class GameState
 {
-   /// Pushes a state on top of this one. onBury() will be called.
+   /**
+    * Pushes a state on top of this one. $(D onBury()) will be called.
+    *
+    * This must be called by the state on the top of the stack. Failing to
+    * observe this rule will trigger an $(D assert()). For pushing the first
+    * state on the stack, please use $(StateManager.pushState()).
+    *
+    * Parameters:
+    *    state = The state to push into the stack of states, just on top of this
+    *       one.
+    */
    protected final void pushState(GameState state)
+   in
+   {
+      assert(this is StateManager.top);
+   }
+   body
    {
       StateManager.pushState(state);
    }
 
-   /// Pops this state from the stack of Game States.
+   /**
+    * Pops this state from the stack of Game States. If there is an state
+    * underneath this one, its $(D onDigOut()) method will be called.
+    *
+    * This must be called by the state on the top of the stack. Failing to
+    * observe this rule will trigger an $(D assert()).
+    */
    public final void popState()
+   in
+   {
+      assert(this is StateManager.top);
+   }
+   body
    {
       StateManager.popState();
    }
@@ -30,8 +56,20 @@ public class GameState
    /**
     * Replaces this state in the top of the stack of Game States with a new
     * one. $(D onDigOut()) and $(D onBury()) are not called.
+    *
+    * This must be called by the state on the top of the stack. Failing to
+    * observe this rule will trigger an $(D assert()).
+    *
+    * Parameters:
+    *    state = The state to push into the stack of states, just on top of this
+    *       one.
     */
    public final void replaceState(GameState state)
+   in
+   {
+      assert(this is StateManager.top);
+   }
+   body
    {
       StateManager.replaceState(state);
    }
