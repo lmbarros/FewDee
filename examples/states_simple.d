@@ -40,25 +40,19 @@ private class InitialState: GameState
       addHandler(ALLEGRO_EVENT_KEY_DOWN,
                  delegate(in ref ALLEGRO_EVENT event)
                  {
-                    import std.stdio; writefln("Handling keydown (%s)", this);
-
                     if (event.keyboard.keycode == ALLEGRO_KEY_SPACE)
                        pushState(new StateA());
                     else if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
                        popState();
-
-                    import std.stdio; writefln("Handled keydown");
                  });
 
       addHandler(FEWDEE_EVENT_DRAW,
                  delegate(in ref ALLEGRO_EVENT event)
                  {
-                    import std.stdio; writefln("Handling draw (%s)", this);
                     al_clear_to_color(al_map_rgb(10, 10, 50));
                     drawText("Initial State", 30, 30);
                     drawText("Press space to push a State A", 50, 60);
                     drawText("Press ESC to quit", 50, 90);
-                    import std.stdio; writefln("Handled draw (%s)", this);
                  });
    }
 };

@@ -28,6 +28,73 @@ import fewdee.internal.singleton;
  * on these states as appropriate. This means that keeping external references
  * to these states is a bad idea, since they may end up pointing to invalid
  * (destroyed) states.
+ *
+ * Policies:
+ *
+ *    An stack of states idiom and an event-handling system based on delegates
+ *    interact in some complex ways. For example, suppose that within a very
+ *    short period, two different events trigger two different handlers of the
+ *    state on the top of the stack. One of the handlers calls $(D pushState()),
+ *    the other one calls $(D popState()). What should be done?  One more
+ *    example: a sequence of events is generated; one handler for the first
+ *    event calls $(D pushState()). Should the newly pushed state's handlers for
+ *    them be called? Should the previously-on-top state's handlers be called?
+ *
+ *    In many cases, a bad decision on what to do in theses cases can lead to
+ *    hard-to-debug problems. In other cases, the decision itself is not
+ *    critical, but may influence FewDee's users own design decisions. In either
+ *    case, it is worthwhile to know how things happen. So, here are the
+ *    policies used by the $(D StateManager) to deal with situations like those
+ *    mentioned above:
+ *
+ *    $(UL
+ *       $(LI Only the first push/pop/replace state request during a given tick
+ *          is executed.
+ *
+ *          This avoids several problems that would put the stack
+ *          in an unexpected state. Suppose the game is in an "in-game"
+ *          state. The player dies, and therefore some handler requests to
+ *          replace the current state with a "game over" state. But during the
+ *          same tick, the player also has pressed the some key that pushes the
+ *          "pause menu" state. If both stack requests were executed, the game
+ *          would end up in a "pause menu" state (where the player would be able
+ *          to, say, equip different weapons), but with a "game over" state
+ *          under it, instead of an "in-game" state".
+ *
+ *          Naturally, this has side-effects. In the same example, if the events
+ *          come in the opposite order and only the first (push "pause menu"
+ *          state) is handled, you could end up with the player escaping death,
+ *          depending on how you implemented health checks. Anyway, it shall be
+ *          far easier to handle these side-effects than to deal with all the
+ *          different possible ways in which the stack of states could get into
+ *          some invalid or unexpected configuration.)
+ *
+ *       $(LI A popped state stops having its event handlers called as soon as
+ *          it is popped.
+ *
+ *          If a state is removed from the stack, it doesn't make much sense for
+ *          it to handle more events.)
+ *
+ *       $(LI A newly pushed state will start handling events only in the next
+ *          tick.)
+ *
+ *       $(LI A state that becomes the new stack top because the state
+ *          previously on top was popped will start handling events only in the
+ *          next tick, unless it was already handling events.
+ *
+ *          Recall that the default behavior of "only the state on the top
+ *          handles events" can be overridden. So, if a non-top state was
+ *          already handling events, it will not stop to handle them for the
+ *          rest of the tick just because it became the new top. On the other
+ *          hand, if the state was not handling events, it will start to handle
+ *          them just on the next tick.)
+ *
+ *       $(LI The states' $(D onBury()) and $(D onDigOut()) are called only in
+ *          the of the tick.
+ *
+ *          This is, in fact, just the general rule from which the two previous
+ *          cases are derived.)
+ *    )
  */
 private class StateManagerImpl: LowLevelEventHandler
 {
@@ -58,21 +125,30 @@ private class StateManagerImpl: LowLevelEventHandler
    /// Pushes a state into the stack of Game States.
    public final void pushState(GameState state)
    {
-      import std.stdio; writefln("StateManager: pushing '%s'", state);
+      // The first push must do the real pushing just as it is issued (and not
+      // when 'endTick()' is called). The reason is related to the form of a
+      // typical main loop:
+      //    while (!StateManager.empty) { ... }
+      // We need a state in the stack, otherwise we'll not enter in the loop;
+      // but EventManager.triggerTickEvent() is called only when already in the
+      // loop. An alternative would be to say that if '_pushedState !is null',
+      // then the stack is not empty. But this would make 'empty()', which is
+      // called every loop iteration, a very tiny bit less efficient.
+      if (_states.length == 0)
+      {
+         _states ~= state;
+         return;
+      }
 
-      // xxxxxxxxxxxxxxxxxxx
-      // Allow just one push or pop per tick
-      if (_statePopped || _statePushed)
+      // TODO: assert somehow that the state doing the pushing is the one on
+      // top. BTW, do the same for popping and replacing.
+
+      // Allow just one push or pop per tick. See "Policies" in class' docs.
+      if (_poppedState !is null || _pushedState !is null)
          return;
 
-      if (_states.length > 0)
-         _states[$-1].onBury();
-
-      _states ~= state;
-
-      _statePushed = state;
-
-      import std.stdio; writefln("StateManager: pushed '%s'", state);
+      // Set state so that 'endTick()' can complete the operation later.
+      _pushedState = state;
    }
 
    /**
@@ -86,33 +162,12 @@ private class StateManagerImpl: LowLevelEventHandler
    }
    body
    {
-      import std.stdio; writefln("StateManager: popping '%s'; size was %s.",
-                                 _states[$-1], _states.length);
-
-      // xxxxxxxxxxxxxxxxxxx
-      // Allow just one push or pop per tick
-      if (_statePopped || _statePushed)
+      // Allow just one push or pop per tick. See "Policies" in class' docs.
+      if (_poppedState !is null || _pushedState !is null)
          return;
 
-      removeAllStateHandlers(_states[$-1]);
-      destroy(_states[$-1]); // ensure that destructor is called
-
-      import std.stdio; writefln("11111111");
-      _states = _states[0 .. $-1];
-
-      import std.stdio; writefln("2222222");
-      if (_states.length > 0)
-      {
-         import std.stdio; writefln("3aaaaa");
-         _states[$-1].onDigOut();
-      }
-      else
-         import std.stdio; writefln("3bbbbb");
-
-      _statePopped = true;
-
-      import std.stdio; writefln("StateManager: popped, new top is '%s'; new size is %s.",
-                                 _states.length > 0 ? _states[$-1] : null, _states.length);
+      // Set state so that 'endTick()' can complete the operation later.
+      _poppedState = _states[$-1];
    }
 
    /**
@@ -127,23 +182,13 @@ private class StateManagerImpl: LowLevelEventHandler
    }
    body
    {
-      import std.stdio; writefln("StateManager: replacing '%s' with '%s'; size was %s.",
-                                 _states[$-1], state, _states.length);
-
-      // xxxxxxxxxxxxxxxxxxx
-      // Allow just one push or pop per tick
-      if (_statePopped || _statePushed)
+      // Allow just one push or pop per tick. See "Policies" in class' docs.
+      if (_poppedState !is null || _pushedState !is null)
          return;
 
-      removeAllStateHandlers(_states[$-1]);
-      destroy(_states[$-1]); // ensure that destructor is called
-      _states[$-1] = state;
-
-      _statePushed = state;
-      _statePopped = true;
-
-      import std.stdio; writefln("StateManager: replaced ; size now is %s.",
-                                 _states.length);
+      // Set state so that 'endTick()' can complete the operation later.
+      _pushedState = state;
+      _poppedState = _states[$-1];
    }
 
    /**
@@ -156,11 +201,6 @@ private class StateManagerImpl: LowLevelEventHandler
     */
    public final override bool handleEvent(in ref ALLEGRO_EVENT event)
    {
-      // xxxxxxxxxxxxxxx
-      // stop handling this tick's events if a state is popped
-      if (_statePopped)
-         return false;
-
       foreach (key, handlers; _eventHandlers)
       {
          const keyType = key[1];
@@ -178,45 +218,72 @@ private class StateManagerImpl: LowLevelEventHandler
                   ? keyState.wantsTicks
                   : keyState.wantsEvents);
 
-            // xxxxxxxxxxxxxxxxxxxxxxxxxxx
-            // don't handle events of a newly pushed state; wait for next tick
-            if (wants && keyState !is _statePushed)
+            // As per the policies in the class' docs, don't handle events for
+            // newly pushed or popped states. States being "dug out" will handle
+            // events if wanting to ('_pushedState' will be null in this case)
+            if (wants && keyState !is _pushedState && keyState !is _poppedState)
                handler(event);
-
-            // stop handling this tick's events if a state is popped
-            if (_statePopped)
-               return false;
          }
       }
 
       return true;
    }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   // start of new code
-   public override void emptiedEventQueue()
+   /**
+    * This gets called in the end of every tick. This is the place where pushes
+    * and pops are effectively performed.
+    */
+   public override void endTick()
    {
-      _statePopped = false;
-      _statePushed = null;
+      if (_poppedState !is null && _pushedState !is null) // replace
+      {
+         assert(_states.length > 0);
+         assert(_poppedState is _states[$-1]);
+
+         removeAllStateHandlers(_states[$-1]);
+         destroy(_states[$-1]);
+         _states[$-1] = _pushedState;
+      }
+      else if (_poppedState !is null) // pop
+      {
+         assert(_states.length > 0);
+         assert(_poppedState is _states[$-1]);
+
+         removeAllStateHandlers(_states[$-1]);
+         destroy(_states[$-1]);
+         _states = _states[0 .. $-1];
+
+         if (_states.length > 0)
+            _states[$-1].onDigOut();
+      }
+      else if (_pushedState !is null) // push
+      {
+         if (_states.length > 0)
+            _states[$-1].onBury();
+
+         _states ~= _pushedState;
+      }
+
+      // Tick is over. Clean up internal state for the next tick.
+      _poppedState = null;
+      _pushedState = null;
    }
 
-   private bool _statePopped = false;
+   /**
+    * The state that was popped (or replaced) during the current tick. Used in
+    * the communication between $(D pushState()), $(D popState()), $(D
+    * replaceState()) and $(D endTick()). $(D null) if no state was popped
+    * during the current tick.
+    */
+   private GameState _poppedState = null;
 
-   // Don't think this is necessary. Would be used to enforce the policy of "if
-   // a new state is pushed, it will not get any of its event handlers called in
-   // this tick". But if the state was just added, it will not have events in
-   // the queue, will it? Hmmm, perhaps it will... how are events added to the
-   // queue? Asynchronously, I guess... they can get there anytime.
-   //
-   // But then... the concept of "tick" (from this event queue point of view) is
-   // a bit vague... I simply handle events until the queue is empty. Perhaps
-   // this legitimates the call of event handlers from a newly pushed state.
-   private GameState _statePushed = null;
-
-   // end of new code
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-
+   /**
+    * The state that was pushed (or replaced another one) during the current
+    * tick. Used in the communication between $(D pushState()), $(D popState()),
+    * $(D replaceState()) and $(D endTick()). $(D null) if no state was pushed
+    * during the current tick.
+    */
+   private GameState _pushedState = null;
 
    /**
     * Adds an event handler. From this point on, whenever an event of the
@@ -282,8 +349,6 @@ private class StateManagerImpl: LowLevelEventHandler
     */
    private final void removeAllStateHandlers(in GameState state)
    {
-      import std.stdio; writefln("StateManager: removing handlers of '%s'", state);
-
       stateTypePair[] toRemove;
 
       foreach (key, handlers; _eventHandlers)
@@ -294,12 +359,7 @@ private class StateManagerImpl: LowLevelEventHandler
       }
 
       foreach (key; toRemove)
-      {
-         import std.stdio; writefln("   StateManager: removing handler '%s'", key);
          _eventHandlers.remove(key);
-      }
-
-      import std.stdio; writefln("StateManager: removed handlers of '%s'", state);
    }
 
    /// A pair of a $(D GameState) and an event type.

@@ -47,8 +47,6 @@ private class AllegroManagerImpl
     */
    package ~this()
    {
-      import std.stdio; writefln("Starting to destroy AllegroManagerImpl (%s)", &this);
-
       // Unload support for file formats
       if (_isImageIOInitialized)
          al_shutdown_image_addon();
@@ -96,8 +94,6 @@ private class AllegroManagerImpl
       // Unload the Allegro system
       if (_isSystemInitialized)
          al_uninstall_system();
-
-      writefln("Finished to destroy AllegroManagerImpl (%s)", &this);
    }
 
    /// Loads the Allegro System, if it is not already loaded.

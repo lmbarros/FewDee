@@ -53,7 +53,19 @@ public abstract class LowLevelEventHandler
     */
    public abstract bool handleEvent(in ref ALLEGRO_EVENT event);
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   // all events for this tick were processed.
-   public void emptiedEventQueue() { }
+   /**
+    * This is called when starting to process the events of a tick.
+    *
+    * TODO: This should be $(D package) instead of $(D public), but D (as of DMD
+    *    2.063) doesn't seem to like $(D package) virtual functions.
+    */
+   public void beginTick() { }
+
+   /**
+    * This is called when finished to process the events of a tick.
+    *
+    * TODO: This should be $(D package) instead of $(D public), but D (as of DMD
+    *    2.063) doesn't seem to like $(D package) virtual functions.
+    */
+   public void endTick() { }
 }
