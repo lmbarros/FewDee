@@ -32,11 +32,18 @@ body
 }
 
 
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+// This is the state in which the example starts.
 private class InitialState: GameState
 {
+   // In the constructor, we register the two event handlers we need: one to
+   // handle key presses, and to handle drawing.
    public this()
    {
+      // When pressing space, push a new 'StateA' state on top of this one
+      // (which will become the new current state). When pressing "Escape", pop
+      // this state from the stack of states (and, since this is the last state
+      // in the stack, the stack will become empty and the program will exit
+      // main loop).
       addHandler(ALLEGRO_EVENT_KEY_DOWN,
                  delegate(in ref ALLEGRO_EVENT event)
                  {
@@ -46,6 +53,8 @@ private class InitialState: GameState
                        popState();
                  });
 
+      // Handle drawing. Just use a blueish background color and print some
+      // informative text.
       addHandler(FEWDEE_EVENT_DRAW,
                  delegate(in ref ALLEGRO_EVENT event)
                  {
@@ -58,10 +67,16 @@ private class InitialState: GameState
 };
 
 
+
+// The 'StateA' game state.
 private class StateA: GameState
 {
    public this()
    {
+      // Handles key presses. Similar to the handler of 'InitialState'; the
+      // novelty here is the use of 'replaceState()', which will take the
+      // current state out of the stack, and replace it another one (a
+      // 'StateB').
       addHandler(ALLEGRO_EVENT_KEY_DOWN,
                  delegate(in ref ALLEGRO_EVENT event)
                  {
@@ -71,17 +86,22 @@ private class StateA: GameState
                        popState();
                  });
 
+      /// Nothing new here. Reddish background and informational texts.
       addHandler(FEWDEE_EVENT_DRAW,
                  delegate(in ref ALLEGRO_EVENT event)
                  {
                     al_clear_to_color(al_map_rgb(50, 10, 10));
                     drawText("State A", 30, 30);
-                    drawText("Press ESC to go back to the initial state", 50, 60);
-                    drawText("Press \"B\" to replace this state with State B", 50, 90);
+                    drawText("Press ESC to go back to the initial state",
+                             50, 60);
+                    drawText("Press \"B\" to replace this state with State B",
+                             50, 90);
                  });
    }
 }
 
+
+// And yet another state. Very similar to the one we just defined.
 private class StateB: GameState
 {
    public this()
@@ -95,24 +115,38 @@ private class StateB: GameState
                        popState();
                  });
 
+      // Greenish background, and (this is getting repetitive...) informational
+      // texts.
       addHandler(FEWDEE_EVENT_DRAW,
                  delegate(in ref ALLEGRO_EVENT event)
                  {
                     al_clear_to_color(al_map_rgb(10, 50, 10));
                     drawText("State B", 30, 30);
-                    drawText("Press ESC to go back to the initial state", 50, 60);
-                    drawText("Press \"A\" to replace this state with State A", 50, 90);
+                    drawText("Press ESC to go back to the initial state",
+                             50, 60);
+                    drawText("Press \"A\" to replace this state with State A",
+                             50, 90);
                  });
    }
 }
 
+
+
+// Program execution starts here.
 void main()
 {
+   // Start the engine.
    scope crank = new fewdee.engine.Crank();
+
+   // Create a display named "default", using default settings.
    DisplayManager.createDisplay("default");
 
+   // Load the font. This will throw if some error happens.
    theFont = new Font("data/bluehigl.ttf", 30);
 
+   // Starts the game main loop, with an 'InitialState' as the starting
+   // state. The loop will run as long as there is at least one state in the
+   // stack of states maintained by the 'StateManager'.
    Engine.run(new InitialState());
 
    // As said above, we are managing resources manually. Resources must be
