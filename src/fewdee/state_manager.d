@@ -125,15 +125,19 @@ private class StateManagerImpl: LowLevelEventHandler
    /// Pushes a state into the stack of Game States.
    public final void pushState(GameState state)
    {
-      // The first push must do the real pushing just as it is issued (and not
-      // when 'endTick()' is called). The reason is related to the form of a
-      // typical main loop:
+      // The first push must do the real pushing at the moment this is called
+      // (and not latter, when 'endTick()' is called). The reason is related to
+      // the form of a typical main loop:
+      //
       //    while (!StateManager.empty) { ... }
-      // We need a state in the stack, otherwise we'll not enter in the loop;
-      // but EventManager.triggerTickEvent() is called only when already in the
-      // loop. An alternative would be to say that if '_pushedState !is null',
-      // then the stack is not empty. But this would make 'empty()', which is
-      // called every loop iteration, a very tiny bit less efficient.
+      //
+      // We need a state in the stack, otherwise we'll not even enter in the
+      // loop; but 'EventManager.triggerTickEvent()' is called only when er are
+      // already in the loop. An alternative would be to change the
+      // implementation of 'empty()' such that if '_pushedState !is null', then
+      // the stack is not considered empty. But this would make 'empty()', which
+      // is called every loop iteration, a very tiny bit less efficient (for no
+      // gain).
       if (_states.length == 0)
       {
          _states ~= state;
