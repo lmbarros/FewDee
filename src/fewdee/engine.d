@@ -141,17 +141,37 @@ private class EngineImpl
    }
 
    /**
-    * Runs the engine main loop, with a given starting state.
+    * Runs the engine main loop, with a given starting state. This will loop
+    * until $(D StateManager)'s stake of states gets empty.
+    *
+    * Parameters:
+    *    startingState = The starting state. This will be only state in the
+    *       stack as the loop starts.
+    *
     * TODO: Implement different main loop strategies, with or without the State
     *       Manager.
     */
    public final void run(GameState startingState)
    {
       StateManager.pushState(startingState);
+      run(() => !StateManager.empty);
+   }
 
+   /**
+    * Runs the engine main loop while a certain condition is $(D true).
+    *
+    * Parameters:
+    *    condition = A delegate returning a Boolean value. While it returns $(D
+    *       true), the loop will keep looping.
+    *
+    * TODO: Implement different main loop strategies, with or without the State
+    *       Manager.
+    */
+   public final void run(bool delegate() condition)
+   {
       double prevTime = al_get_time();
 
-      while (!StateManager.empty)
+      while (condition())
       {
          // What time is it?
          immutable now = al_get_time();
