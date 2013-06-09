@@ -138,8 +138,8 @@ void main()
    // Start the engine.
    scope crank = new fewdee.engine.Crank();
 
-   // Create a display named "default", using default settings.
-   DisplayManager.createDisplay("default");
+   // Create a display named "main", using default settings.
+   DisplayManager.createDisplay("main");
 
    // Load the font. This will throw if some error happens.
    theFont = new Font("data/bluehigl.ttf", 30);
