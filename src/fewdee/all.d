@@ -18,7 +18,7 @@ public import allegro5.allegro_primitives;
 // The FewDee public interface is imported here
 public import fewdee.aabb;
 public import fewdee.abstracted_input;
-// public import fewdee.allegro_manager; // shouldn't be "too public", I guess
+public import fewdee.allegro_manager;
 public import fewdee.canned_updaters;
 public import fewdee.display_manager;
 public import fewdee.engine;
