@@ -74,9 +74,6 @@ auto period = 0.3;
 // stores the interpolator used to draw the graphs.
 Interpolator_t theInterpolator;
 
-// When this is set to 'true', we'll exit the main loop.
-bool exitPlease = false;
-
 // And this is our neat "graph paper" bitmap that will be used as the background
 // image.
 Bitmap bmpBG;
@@ -318,6 +315,9 @@ void main()
    // Load the background image. (Since we are not using the ResourceManager,
    // we'll need to free it manually later).
    bmpBG = new Bitmap("data/interpolators_graphs_bg.png");
+
+   // When this is set to 'true', we'll exit the main loop.
+   bool exitPlease = false;
 
    // Now register all the event handlers we'll need
 
