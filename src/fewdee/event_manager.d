@@ -167,7 +167,8 @@ private class EventManagerImpl
     * LowLevelEventHandler) passed as parameter will have its $(D handleEvent())
     * method called for every event triggered.
     */
-   package final void addLowLevelEventHandler(LowLevelEventHandler handler)
+   package final
+   void addLowLevelEventHandler(LowLevelEventHandlerInterface handler)
    {
       _lowLevelEventHandlers[handler] = true;
    }
@@ -177,7 +178,8 @@ private class EventManagerImpl
     * LowLevelEventHandler) passed as parameter will no longer have its $(D
     * handleEvent()) method called.
     */
-   package final void removeLowLevelEventHandler(LowLevelEventHandler handler)
+   package final
+   void removeLowLevelEventHandler(LowLevelEventHandlerInterface handler)
    {
       _lowLevelEventHandlers.remove(handler);
    }
@@ -191,7 +193,7 @@ private class EventManagerImpl
     * TODO: Replace this with a $(D std.container.RedBlackTree) or something
     *       like this?
     */
-   private bool[LowLevelEventHandler] _lowLevelEventHandlers;
+   private bool[LowLevelEventHandlerInterface] _lowLevelEventHandlers;
 
    /**
     * Causes a tick event to be generated. This must be called from the main

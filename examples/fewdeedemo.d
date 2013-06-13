@@ -8,7 +8,7 @@ class MyState: GameState
 {
    this()
    {
-      updater_ = new Updater();
+      updater_ = new TickBasedUpdater();
       guish_ = new GUIshEventGenerator();
       // addEventHandler(guish_);
       // addEventHandler(updater_);
