@@ -113,8 +113,7 @@ class GUIshEventGenerator: LowLevelEventHandler
     *   event = The desired event type.
     *   callback = The callback to run.
     */
-   public void addEventCallback(Node obj, EventType event,
-                                EventCallback_t callback)
+   public void addHandler(Node obj, EventType event, EventCallback_t callback)
    {
       eventCallbacks_[obj][event] ~= callback;
    }
