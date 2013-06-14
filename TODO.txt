@@ -86,6 +86,23 @@ ResourceManager
    - TODO: how to deal with the "one image file contains many 'logical
      bitmaps', which may be combined in various ways in a single sprite?"
 
+ Post-Architecture Organization
+--------------------------------
+
+ - If we use the destructor to free low-level resources, then we can
+   just create 'scope' resources when needed (specially in examples,
+   where there is always that "eill need to free resources"
+   disclaimer). Must consider this change after the main "conversion"
+   is complete!
+
+ - Scan the untouched modules for things like
+   - Adding 'final' or making methods free functions called with UFCS.
+   - Adding $(D ...) macros
+   - Improving and updating docs
+   - Replace foo_ with _foo.
+
+
+
  Assorted TODOs
 ----------------
 
