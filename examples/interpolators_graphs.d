@@ -7,7 +7,6 @@
  * Authors: Leandro Motta Barros
  */
 
-import std.conv;
 import std.exception;
 import std.stdio;
 import fewdee.all;
@@ -432,8 +431,7 @@ void main()
                      ++currentInterpolator;
                }
 
-               writefln("Interpolator = %s",
-                        std.conv.to!string(currentInterpolator));
+               writefln("Interpolator = %s", currentInterpolator);
                remakeInterpolator();
 
                break;
