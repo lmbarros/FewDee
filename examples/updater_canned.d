@@ -1,8 +1,8 @@
 /**
- * The "Canned Updaters" example.
+ * FewDee's "Canned Updaters" example.
  *
  * Canned updaters are a handy way to do things like smoothly moving things
- * around the screen or changing their sizes or colors.
+ * around the screen or smoothly changing their sizes or colors.
  *
  * Authors: Leandro Motta Barros
  */

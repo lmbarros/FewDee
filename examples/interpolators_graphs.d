@@ -24,7 +24,7 @@ enum HEIGHT = 480;
 // An enumeration with all interpolators supported by this example (which should
 // be all the standard interpolators provided by FewDee, which should be all of
 // Robert Penner's easing functions (http://robertpenner.com/easing).
-enum Interpolator
+enum InterpolatorType
 {
    Linear,
    QuadraticIn, QuadraticOut, QuadraticInOut,
@@ -46,7 +46,7 @@ enum Interpolator
 // short example like this simpler to understand).
 
 // This is the type of interpolator ("easing function") to use.
-Interpolator currentInterpolator = Interpolator.Linear;
+InterpolatorType currentInterpolator = InterpolatorType.Linear;
 
 // The starting interpolation value.
 auto from = -10.0;
@@ -71,7 +71,7 @@ auto period = 0.3;
 // Interpolators in FewDee are delegates that take one parameter (the "t" value)
 // and return the interpolated value. In this example, the following variable
 // stores the interpolator used to draw the graphs.
-Interpolator_t theInterpolator;
+Interpolator theInterpolator;
 
 // And this is our neat "graph paper" bitmap that will be used as the background
 // image.
@@ -89,109 +89,109 @@ Bitmap bmpBG;
 // types, but the default values for "amplitude" and "period" will be used).
 private void remakeInterpolator()
 {
-   final switch(currentInterpolator)
+   final switch (currentInterpolator) with (InterpolatorType)
    {
       // This is the simplest case of calling the 'interpolator()' function. The
       // template parameter (here, "t") determines the type of interpolator that
       // will be created and returned (in this case, a linear interpolator).
-      case Interpolator.Linear:
+      case Linear:
          theInterpolator = interpolator!"t"(from, to, duration);
          break;
 
       // Here, we are creating a quadratic interpolator ("t^2"), which will ease
       // in (that is the meaning of the opening square brackets).
-      case Interpolator.QuadraticIn:
+      case QuadraticIn:
          theInterpolator = interpolator!"[t^2"(from, to, duration);
          break;
 
       // This is like above, but we use closing square brackets. This means that
       // the interpolator will ease out.
-      case Interpolator.QuadraticOut:
+      case QuadraticOut:
          theInterpolator = interpolator!"t^2]"(from, to, duration);
          break;
 
       // And here we use both opening and closing square brackets: the
       // interpolator will ease in and out.
-      case Interpolator.QuadraticInOut:
+      case QuadraticInOut:
          theInterpolator = interpolator!"[t^2]"(from, to, duration);
          break;
 
       // From now on, most calls are similar... just the template parameter
       // changes. The documentation of 'interpolator()' lists all accepted
       // values, including variations like "[cubic" instead of "[t^3".
-      case Interpolator.CubicIn:
+      case CubicIn:
          theInterpolator = interpolator!"[t^3"(from, to, duration);
          break;
 
-      case Interpolator.CubicOut:
+      case CubicOut:
          theInterpolator = interpolator!"t^3]"(from, to, duration);
          break;
 
-      case Interpolator.CubicInOut:
+      case CubicInOut:
          theInterpolator = interpolator!"[t^3]"(from, to, duration);
          break;
 
-      case Interpolator.QuarticIn:
+      case QuarticIn:
          theInterpolator = interpolator!"[t^4"(from, to, duration);
          break;
 
-      case Interpolator.QuarticOut:
+      case QuarticOut:
          theInterpolator = interpolator!"t^4]"(from, to, duration);
          break;
 
-      case Interpolator.QuarticInOut:
+      case QuarticInOut:
          theInterpolator = interpolator!"[t^4]"(from, to, duration);
          break;
 
-      case Interpolator.QuinticIn:
+      case QuinticIn:
          theInterpolator = interpolator!"[t^5"(from, to, duration);
          break;
 
-      case Interpolator.QuinticOut:
+      case QuinticOut:
          theInterpolator = interpolator!"t^5]"(from, to, duration);
          break;
 
-      case Interpolator.QuinticInOut:
+      case QuinticInOut:
          theInterpolator = interpolator!"[t^5]"(from, to, duration);
          break;
 
-      case Interpolator.SineIn:
+      case SineIn:
          theInterpolator = interpolator!"[sin"(from, to, duration);
          break;
 
-      case Interpolator.SineOut:
+      case SineOut:
          theInterpolator = interpolator!"sin]"(from, to, duration);
          break;
 
-      case Interpolator.SineInOut:
+      case SineInOut:
          theInterpolator = interpolator!"[sin]"(from, to, duration);
          break;
 
-      case Interpolator.CircleIn:
+      case CircleIn:
          theInterpolator = interpolator!"[circle"(from, to, duration);
          break;
 
-      case Interpolator.CircleOut:
+      case CircleOut:
          theInterpolator = interpolator!"circle]"(from, to, duration);
          break;
 
-      case Interpolator.CircleInOut:
+      case CircleInOut:
          theInterpolator = interpolator!"[circle]"(from, to, duration);
          break;
 
-      case Interpolator.ExponentialIn:
+      case ExponentialIn:
          theInterpolator = interpolator!"[exp"(from, to, duration);
          break;
 
-      case Interpolator.ExponentialOut:
+      case ExponentialOut:
          theInterpolator = interpolator!"exp]"(from, to, duration);
          break;
 
-      case Interpolator.ExponentialInOut:
+      case ExponentialInOut:
          theInterpolator = interpolator!"[exp]"(from, to, duration);
          break;
 
-      case Interpolator.BackIn:
+      case BackIn:
          // Here's the first case in which we don't use 'interpolator()' to
          // create an interpolator. Since we are creating a "back" interpolator
          // *and* want to set its "nonstandard" "amplitude" parameter, we have o
@@ -202,44 +202,44 @@ private void remakeInterpolator()
             makeBackInInterpolator(from, to, amplitude, duration);
          break;
 
-      case Interpolator.BackOut:
+      case BackOut:
          theInterpolator =
             makeBackOutInterpolator(from, to, amplitude, duration);
          break;
 
-      case Interpolator.BackInOut:
+      case BackInOut:
          theInterpolator =
             makeBackInOutInterpolator(from, to, amplitude, duration);
          break;
 
-      case Interpolator.BounceIn:
+      case BounceIn:
          theInterpolator = interpolator!"[bounce"(from, to, duration);
          break;
 
-      case Interpolator.BounceOut:
+      case BounceOut:
          theInterpolator = interpolator!"bounce]"(from, to, duration);
          break;
 
-      case Interpolator.BounceInOut:
+      case BounceInOut:
          theInterpolator = interpolator!"[bounce]"(from, to, duration);
          break;
 
-      case Interpolator.ElasticIn:
+      case ElasticIn:
          theInterpolator =
             makeElasticInInterpolator(from, to, amplitude, period, duration);
          break;
 
-      case Interpolator.ElasticOut:
+      case ElasticOut:
          theInterpolator =
             makeElasticOutInterpolator(from, to, amplitude, period, duration);
          break;
 
-      case Interpolator.ElasticInOut:
+      case ElasticInOut:
          theInterpolator =
             makeElasticInOutInterpolator(from, to, amplitude, period, duration);
          break;
 
-      case Interpolator.Count:
+      case Count:
          assert(false); // can't happen
    }
 }
@@ -426,7 +426,7 @@ void main()
                }
                else
                {
-                  auto limit = Interpolator.Count - 1;
+                  auto limit = InterpolatorType.Count - 1;
                   if (currentInterpolator < limit)
                      ++currentInterpolator;
                }

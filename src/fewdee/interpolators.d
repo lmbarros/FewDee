@@ -1,5 +1,10 @@
 /**
- * Various means to interpolate between two values.
+ * Various means to interpolate between two values (AKA "easing").
+ *
+ * The functions provided here interpolate between floating point numbers. If
+ * you want to interpolate more concrete things, like the position or color of
+ * an object, take a look at module $(D fewdee.canned_updaters); it may be just
+ * what you need.
  *
  * Authors: Leandro Motta Barros, based on Action Script code originally written
  *     by Robert Penner.
@@ -17,32 +22,32 @@ import std.math;
 
 /**
  * A type representing a function (er, delegate) used to interpolate between two
- * values. The function takes a single parameter, t, which is the desired
- * "time". It returns the interpolated value at time t.
+ * values. The function takes a single parameter, $(D t), which is the desired
+ * "time". It returns the interpolated value at time $(D t).
  *
- * The t parameter shall normally range between 0 and the requested
+ * The $(D t) parameter shall normally range between 0 and the requested
  * duration. Values out of this range are always acceptable and sometimes have
- * useful behavior (for example, passing increasing t values with a Sine
- * interpolator produces values oscillating between the two extremes.)
+ * useful behavior (for example, passing increasingly larger $(D t) values with
+ * a Sine interpolator produces values oscillating between the two extremes.)
  *
  * For most interpolators, the return value will be in the range between the two
- * requested extremes as long as t is between zero and the duration. A few
+ * requested extremes as long as $(D t) is between zero and the duration. A few
  * interpolators, like the Elastic, produces values out of this "expected"
  * range. Most interpolators will return values out of the expected range if
- * they are passed a t parameter out of the zero-to-duration interval.
+ * they are passed a $(D t) parameter out of the zero-to-duration interval.
  */
-public alias double delegate(double t) Interpolator_t;
+public alias double delegate(double t) Interpolator;
 
 
 /**
  * A generic interpolator maker interface (a delegate). Most interpolator makers
  * are implemented as functions that have exactly this same signature. However,
- * some interpolators (elastic and back interpolators, as I write this) accept
+ * some interpolators (Elastic and Back interpolators, as I write this) accept
  * some extra parameters, and thus have a different interface. For these
  * nonstandard interpolator makers, there are adapters, which return one
  * delegate of this type.
  */
-public alias Interpolator_t delegate(double from, double to, double duration)
+public alias Interpolator delegate(double from, double to, double duration)
    GenericInterpolatorMakerDelegate_t;
 
 
@@ -51,25 +56,27 @@ public alias Interpolator_t delegate(double from, double to, double duration)
  * Creates and returns an interpolator. This is the easiest way to create one of
  * the provided interpolators, and should probably be the best choice for most
  * uses. This interface has just one shortcoming: it doesn't provide a way to
- * specify the special parameters accepted by the "back" and "elastic"
- * interpolators (the default value for these parameters will be used).
+ * specify the special parameters accepted by the Back and Elastic interpolators
+ * (the default value for these parameters will be used).
  *
  * Parameters:
  *    type = This specifies what type of interpolator is desired. The general
- *       string format should be "[#" (easing in), "#]" (easing out) or "[#]"
- *       (both easing in and out). The exception is the linear interpolator,
- *       which doesn't accept brackets. "#" must be replaced by the desired
- *       interpolator type, which can be "t", "linear", "t^2", "quadratic",
- *       "t^3", "cubic", "t^4", "quartic", "t^5", "quintic", "sin", "sine",
- *       "circle", "exp", "back", "bounce" or "elastic". (Notice that many of
- *       these are synonyms, like "t" and "linear", or "sin" and "sine".)
+ *       string format should be $(D "[#") (easing in), $(D "#]") (easing out)
+ *       or $(D "[#]") (both easing in and out). The exception is the linear
+ *       interpolator, which doesn't accept brackets. $(D "#") must be replaced
+ *       by the desired interpolator type, which can be $(D "t"), $(D "linear"),
+ *       $(D "t^2"), $(D "quadratic"), $(D "t^3"), $(D "cubic"), $(D "t^4"), $(D
+ *       "quartic"), $(D "t^5"), $(D "quintic"), $(D "sin"), $(D "sine"), $(D
+ *       "circle"), $(D "exp"), $(D "back"), $(D "bounce") or $(D
+ *       "elastic"). (Notice that many of these are synonyms, like $(D "t") and
+ *       $(D "linear"), or $(D "sin") and $(D "sine").)
  *    from = The starting interpolation value.
  *    to = The ending interpolation value.
  *    duration = The interpolation duration. In other words, the returned
- *       interpolator will interpolate from "from" to "to", as its independent
- *       parameter varies from 0.0 to "duration".
+ *       interpolator will interpolate from $(D from) to $(D to), as its
+ *       independent parameter varies from $(D 0.0) to $(D duration).
  */
-Interpolator_t
+public Interpolator
 interpolator(string type)(double from, double to, double duration = 1.0)
 {
    static if (type == "t" || type == "linear")
@@ -149,9 +156,9 @@ interpolator(string type)(double from, double to, double duration = 1.0)
  *
  * Parameters:
  *    type = This specifies what type of interpolator is desired. The possible
- *       values are the same as in the interpolator() function.
+ *       values are the same as in the $(D interpolator()) function.
  */
-GenericInterpolatorMakerDelegate_t interpolatorMaker(string type)()
+public GenericInterpolatorMakerDelegate_t interpolatorMaker(string type)()
 {
    import std.functional;
 
@@ -238,7 +245,7 @@ GenericInterpolatorMakerDelegate_t interpolatorMaker(string type)()
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeLinearInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -258,7 +265,7 @@ makeLinearInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeQuadraticInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -278,7 +285,7 @@ makeQuadraticInInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeQuadraticOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -298,7 +305,7 @@ makeQuadraticOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeQuadraticInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -320,7 +327,7 @@ makeQuadraticInOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeCubicInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -340,7 +347,7 @@ makeCubicInInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeCubicOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -360,7 +367,7 @@ makeCubicOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeCubicInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -382,7 +389,7 @@ makeCubicInOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeQuarticInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -402,7 +409,7 @@ makeQuarticInInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeQuarticOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -422,7 +429,7 @@ makeQuarticOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeQuarticInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -444,7 +451,7 @@ makeQuarticInOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeQuinticInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -464,7 +471,7 @@ makeQuinticInInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeQuinticOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -484,7 +491,7 @@ makeQuinticOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeQuinticInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -507,7 +514,7 @@ makeQuinticInOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeSineInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -527,7 +534,7 @@ makeSineInInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeSineOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -547,7 +554,7 @@ makeSineOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeSineInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -567,7 +574,7 @@ makeSineInOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeCircleInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -593,7 +600,7 @@ makeCircleInInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeCircleOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -619,7 +626,7 @@ makeCircleOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeCircleInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -648,7 +655,7 @@ makeCircleInOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeExponentialInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -670,7 +677,7 @@ makeExponentialInInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeExponentialOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -692,7 +699,7 @@ makeExponentialOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeExponentialInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -723,7 +730,7 @@ makeExponentialInOutInterpolator(double from, double to, double duration = 1.0)
  *       the [from, to] range.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeBackInInterpolator(double from, double to, double amplitude = 1.70158,
                        double duration = 1.0)
 {
@@ -746,7 +753,7 @@ makeBackInInterpolator(double from, double to, double amplitude = 1.70158,
  *       the [from, to] range.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeBackOutInterpolator(double from, double to, double amplitude = 1.70158,
                         double duration = 1.0)
 {
@@ -771,7 +778,7 @@ makeBackOutInterpolator(double from, double to, double amplitude = 1.70158,
  *       the [from, to] range.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeBackInOutInterpolator(double from, double to, double amplitude = 1.70158,
                           double duration = 1.0)
 {
@@ -788,8 +795,14 @@ makeBackInOutInterpolator(double from, double to, double amplitude = 1.70158,
 }
 
 
-/// Helper to create a generic interpolator from a "back in interpolator".
-GenericInterpolatorMakerDelegate_t
+/**
+ * Creates a generic interpolator maker for a "Back In" interpolator, which is
+ * usually created through a nonstandard interface.
+ *
+ * In other words, this function adapts the interface of $(D
+ * makeBackInInterpolator()) to a $(D GenericInterpolatorMakerDelegate_t).
+ */
+public GenericInterpolatorMakerDelegate_t
 makeGenericBackInInterpolatorMaker(double amplitude = 1.70158)
 {
    return delegate(from, to, duration)
@@ -799,8 +812,14 @@ makeGenericBackInInterpolatorMaker(double amplitude = 1.70158)
 }
 
 
-/// Helper to create a generic interpolator from a "back out interpolator".
-GenericInterpolatorMakerDelegate_t
+/**
+ * Creates a generic interpolator maker for s "Back Out" interpolator, which is
+ * usually created through a nonstandard interface.
+ *
+ * In other words, this function adapts the interface of $(D
+ * makeBackOutInterpolator()) to a $(D GenericInterpolatorMakerDelegate_t).
+ */
+public GenericInterpolatorMakerDelegate_t
 makeGenericBackOutInterpolatorMaker(double amplitude = 1.70158)
 {
    return delegate(from, to, duration)
@@ -810,8 +829,14 @@ makeGenericBackOutInterpolatorMaker(double amplitude = 1.70158)
 }
 
 
-/// Helper to create a generic interpolator from a "back in/out interpolator".
-GenericInterpolatorMakerDelegate_t
+/**
+ * Creates a generic interpolator maker for a "Back In/Out" interpolator, which
+ * is usually created through a nonstandard interface.
+ *
+ * In other words, this function adapts the interface of $(D
+ * makeBackInOutInterpolator()) to a $(D GenericInterpolatorMakerDelegate_t).
+ */
+public GenericInterpolatorMakerDelegate_t
 makeGenericBackInOutInterpolatorMaker(double amplitude = 1.70158)
 {
    return delegate(from, to, duration)
@@ -821,8 +846,8 @@ makeGenericBackInOutInterpolatorMaker(double amplitude = 1.70158)
 }
 
 
-/// Helper function used by Bounce interpolators.
-private double
+/// Helper function used internally by Bounce interpolators.
+private pure nothrow double
 bounceInterpolatorHelper(double t, double from, double c, double duration)
 {
    if ((t /= duration) < (1 / 2.75))
@@ -844,7 +869,7 @@ bounceInterpolatorHelper(double t, double from, double c, double duration)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeBounceInInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -864,7 +889,7 @@ makeBounceInInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeBounceOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -884,7 +909,7 @@ makeBounceOutInterpolator(double from, double to, double duration = 1.0)
  *    to = The target value.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeBounceInOutInterpolator(double from, double to, double duration = 1.0)
 {
    immutable c = to - from;
@@ -919,7 +944,7 @@ makeBounceInOutInterpolator(double from, double to, double duration = 1.0)
  *       about a third of the duration) will be used.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeElasticInInterpolator(double from, double to, double amplitude = double.nan,
                           double period = double.nan, double duration = 1.0)
 {
@@ -961,15 +986,15 @@ makeElasticInInterpolator(double from, double to, double amplitude = double.nan,
  *    from = The starting value.
  *    to = The target value.
  *    amplitude = The larger this value, the larger the "ripples" will be. Only
- *       values larger than the difference between from and to will make the
- *       "ripples" actually larger. When passing a NaN (the default), this is
- *       initialized with the difference between from and to.
+ *       values larger than the difference between $(D from) and $(D to) will
+ *       make the "ripples" actually larger. When passing a NaN (the default),
+ *       this is initialized with the difference between $(D from) and $(D to).
  *    period = The closer this value is to zero, the more "ripples" will be.
  *       When passing a NaN (the default), a pleasant-looking value (which is
  *       about a third of the duration) will be used.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeElasticOutInterpolator(double from, double to,
                            double amplitude = double.nan,
                            double period = double.nan, double duration = 1.0)
@@ -1012,15 +1037,15 @@ makeElasticOutInterpolator(double from, double to,
  *    from = The starting value.
  *    to = The target value.
  *    amplitude = The larger this value, the larger the "ripples" will be. Only
- *       values larger than the difference between from and to will make the
- *       "ripples" actually larger. When passing a NaN (the default), this is
- *       initialized with the difference between from and to.
+ *       values larger than the difference between $(D from) and $(D to) will
+ *       make the "ripples" actually larger. When passing a NaN (the default),
+ *       this is initialized with the difference between $(D from) and $(D to).
  *    period = The closer this value is to zero, the more "ripples" will be.
  *       When passing a NaN (the default), a pleasant-looking value (which is
  *       about a third of the duration) will be used.
  *    duration = The duration of the interpolation.
  */
-public Interpolator_t
+public Interpolator
 makeElasticInOutInterpolator(double from, double to,
                              double amplitude = double.nan,
                              double period = double.nan, double duration = 1.0)
@@ -1067,8 +1092,14 @@ makeElasticInOutInterpolator(double from, double to,
 }
 
 
-/// Helper to create a generic interpolator from an "elastic in interpolator".
-GenericInterpolatorMakerDelegate_t
+/**
+ * Creates a generic interpolator maker for an "Elastic In" interpolator, which
+ * is usually created through a nonstandard interface.
+ *
+ * In other words, this function adapts the interface of $(D
+ * makeElasticInInterpolator()) to a $(D GenericInterpolatorMakerDelegate_t).
+ */
+public GenericInterpolatorMakerDelegate_t
 makeGenericElasticInInterpolatorMaker(double amplitude = double.nan,
                                       double period = double.nan)
 {
@@ -1079,8 +1110,14 @@ makeGenericElasticInInterpolatorMaker(double amplitude = double.nan,
 }
 
 
-/// Helper to create a generic interpolator from an "elastic out interpolator".
-GenericInterpolatorMakerDelegate_t
+/**
+ * Creates a generic interpolator maker for an "Elastic Out" interpolator, which
+ * is usually created through a nonstandard interface.
+ *
+ * In other words, this function adapts the interface of $(D
+ * makeElasticOutInterpolator()) to a $(D GenericInterpolatorMakerDelegate_t).
+ */
+public GenericInterpolatorMakerDelegate_t
 makeGenericElasticOutInterpolatorMaker(double amplitude = double.nan,
                                        double period = double.nan)
 {
@@ -1092,10 +1129,13 @@ makeGenericElasticOutInterpolatorMaker(double amplitude = double.nan,
 
 
 /**
- * Helper to create a generic interpolator from an "elastic in/out
- * interpolator".
+ * Creates a generic interpolator maker for an "Elastic In/Out" interpolator,
+ * which is usually created through a nonstandard interface.
+ *
+ * In other words, this function adapts the interface of $(D
+ * makeElasticInOutInterpolator()) to a $(D GenericInterpolatorMakerDelegate_t).
  */
-GenericInterpolatorMakerDelegate_t
+public GenericInterpolatorMakerDelegate_t
 makeGenericElasticInOutInterpolatorMaker(double amplitude = double.nan,
                                          double period = double.nan)
 {
