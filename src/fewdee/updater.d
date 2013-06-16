@@ -34,6 +34,13 @@ public alias bool delegate(double deltaTime) UpdaterFunc;
 public alias size_t UpdaterFuncID;
 
 
+/**
+ * An "updater function ID" that is guaranteed to never be equal to any real
+ * updater function ID. It is safe to pass $(D InvalidUpdaterFuncID) to $(D
+ * Updater.remove()).
+ */
+public immutable UpdaterFuncID InvalidUpdaterFuncID = 0;
+
 
 /**
  * Base class for updaters.
@@ -88,7 +95,9 @@ public class Updater
     * considers itself complete, or an updater that always returns $(D true).
     *
     * Parameters:
-    *    id = The ID of the updater function to be removed.
+    *    id = The ID of the updater function to be removed. $(D
+    *       InvalidUpdaterFuncID) can be safely passed here (this function will
+    *       do nothing, in this case).
     *
     * Returns: $(D true) if the updater function was removed; $(D false)
     *    otherwise (which means that an updater function with the given ID does
@@ -106,7 +115,7 @@ public class Updater
     * The next updater function ID to use. Notice that the ID is unique only
     * within a certain $(D Updater).
     */
-   private size_t _nextUpdaterFuncID = 0;
+   private size_t _nextUpdaterFuncID = 1;
 }
 
 

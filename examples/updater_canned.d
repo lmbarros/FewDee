@@ -45,6 +45,23 @@ void main()
    sprite.x = WIDTH/2.0;
    sprite.y = HEIGHT/2.0;
 
+   // Updater functions are a bit naïve, in the sense that they don't know about
+   // each other. If two updater functions are active at the same time, trying
+   // to update the same variable, they'll "fight" for controlling the object,
+   // which will be subject of erratic behavior. To avoid this, before adding a
+   // new canned updater for a certain attribute, we'll remove any previous
+   // canned updater working on the same attribute. The following variables
+   // store the ID of the current updater for each attribute we are modifying
+   // (well, not necessarily the "current", since it may have already finished
+   // execution). They are initialized with 'InvalidUpdaterFuncID', which is a
+   // value garanteed to never conflict with a real updater ID. (Notice that it
+   // is safe to try to remove an updater function that is already finished.)
+   UpdaterFuncID currentPositionUpdater = InvalidUpdaterFuncID;
+   UpdaterFuncID currentAlphaUpdater = InvalidUpdaterFuncID;
+   UpdaterFuncID currentColorUpdater = InvalidUpdaterFuncID;
+   UpdaterFuncID currentScaleUpdater = InvalidUpdaterFuncID;
+   UpdaterFuncID currentRotationUpdater = InvalidUpdaterFuncID;
+
    // And now, add lots of event handlers. Canned updaters will be added in
    // response to key presses.
 
@@ -83,7 +100,8 @@ void main()
                // easiest thing to do is just to use 'interpolatorMaker()'
                // passing the desired type of interpolator (here, we are using
                // linear interpolation).
-               updater.addPositionUpdater(
+               updater.remove(currentPositionUpdater);
+               currentPositionUpdater = updater.addPositionUpdater(
                   sprite, 30.0, 30.0, 3.5,
                   interpolatorMaker!"t");
                break;
@@ -93,7 +111,8 @@ void main()
             {
                // Just like above, but using a quadratic interpolator that eases
                // in and out.
-               updater.addPositionUpdater(
+               updater.remove(currentPositionUpdater);
+               currentPositionUpdater = updater.addPositionUpdater(
                   sprite, 600, 40, 3.5,
                   interpolatorMaker!"[t^2]");
                break;
@@ -104,7 +123,8 @@ void main()
                // This is getting boring to comment... look at the
                // 'interpolatorMaker()' docs if you need to know what "elastic]"
                // or something like that means.
-               updater.addPositionUpdater(
+               updater.remove(currentPositionUpdater);
+               currentPositionUpdater = updater.addPositionUpdater(
                   sprite, 530, 410, 6.0,
                   interpolatorMaker!"elastic]");
                break;
@@ -112,7 +132,8 @@ void main()
 
             case ALLEGRO_KEY_Z:
             {
-               updater.addPositionUpdater(
+               updater.remove(currentPositionUpdater);
+               currentPositionUpdater = updater.addPositionUpdater(
                   sprite, 55, 430, 2.0,
                   interpolatorMaker!"[bounce");
                break;
@@ -125,7 +146,8 @@ void main()
                // interpolates the translucency of an object. This works as in
                // the case of the position canned updaters, but we need to pass
                // just one number as the target value (1.0, in this case).
-               updater.addAlphaUpdater(
+               updater.remove(currentAlphaUpdater);
+               currentAlphaUpdater = updater.addAlphaUpdater(
                   sprite, 1.0, 2.0,
                   interpolatorMaker!"t^2]");
                break;
@@ -133,7 +155,8 @@ void main()
 
             case ALLEGRO_KEY_W:
             {
-               updater.addAlphaUpdater(
+               updater.remove(currentAlphaUpdater);
+               currentAlphaUpdater = updater.addAlphaUpdater(
                   sprite, 0.66, 2.0,
                   interpolatorMaker!"[circle");
                break;
@@ -141,7 +164,8 @@ void main()
 
             case ALLEGRO_KEY_S:
             {
-               updater.addAlphaUpdater(
+               updater.remove(currentAlphaUpdater);
+               currentAlphaUpdater = updater.addAlphaUpdater(
                   sprite, 0.33, 2.0,
                   interpolatorMaker!"t^5]");
                break;
@@ -149,7 +173,8 @@ void main()
 
             case ALLEGRO_KEY_X:
             {
-               updater.addAlphaUpdater(
+               updater.remove(currentAlphaUpdater);
+               currentAlphaUpdater = updater.addAlphaUpdater(
                   sprite, 0.0, 2.0,
                   interpolatorMaker!"[exp]");
                break;
@@ -164,7 +189,9 @@ void main()
                immutable color =
                   al_map_rgba_f(1.0, 1.0, 1.0, 1.0);
 
-               updater.addColorUpdater(
+               updater.remove(currentColorUpdater);
+
+               currentColorUpdater = updater.addColorUpdater(
                   sprite, color, 2.0,
                   interpolatorMaker!"[t^3");
                break;
@@ -175,7 +202,9 @@ void main()
                immutable color =
                   al_map_rgba_f(1.0, 0.0, 0.0, 0.1);
 
-               updater.addColorUpdater(
+               updater.remove(currentColorUpdater);
+
+               currentColorUpdater = updater.addColorUpdater(
                   sprite, color, 2.0,
                   interpolatorMaker!"sin]");
                break;
@@ -186,7 +215,9 @@ void main()
                immutable color =
                   al_map_rgba_f(0.2, 0.2, 1.0, 1.0);
 
-               updater.addColorUpdater(
+               updater.remove(currentColorUpdater);
+
+               currentColorUpdater = updater.addColorUpdater(
                   sprite, color, 2.0,
                   interpolatorMaker!"[t^4]");
                break;
@@ -197,7 +228,9 @@ void main()
                immutable color =
                   al_map_rgba_f(0.1, 0.9, 0.3, 0.9);
 
-               updater.addColorUpdater(
+               updater.remove(currentColorUpdater);
+
+               currentColorUpdater = updater.addColorUpdater(
                   sprite, color, 2.0,
                   interpolatorMaker!"[exp");
                break;
@@ -208,7 +241,8 @@ void main()
             {
                // Now we are updating the object scale. We pass two numbers as
                // target (1.0, 1.0), which represent the scale on both axes.
-               updater.addScaleUpdater(
+               updater.remove(currentScaleUpdater);
+               currentScaleUpdater = updater.addScaleUpdater(
                   sprite, 1.0, 1.0, 2.0,
                   interpolatorMaker!"bounce]");
                break;
@@ -216,7 +250,8 @@ void main()
 
             case ALLEGRO_KEY_R:
             {
-               updater.addScaleUpdater(
+               updater.remove(currentScaleUpdater);
+               currentScaleUpdater = updater.addScaleUpdater(
                   sprite, 0.5, 0.5, 2.0,
                   interpolatorMaker!"[t^3]");
                break;
@@ -224,7 +259,8 @@ void main()
 
             case ALLEGRO_KEY_F:
             {
-               updater.addScaleUpdater(
+               updater.remove(currentScaleUpdater);
+               currentScaleUpdater = updater.addScaleUpdater(
                   sprite, 1.7, -0.8, 2.0,
                   interpolatorMaker!"[t^4");
                break;
@@ -232,7 +268,8 @@ void main()
 
             case ALLEGRO_KEY_V:
             {
-               updater.addScaleUpdater(
+               updater.remove(currentScaleUpdater);
+               currentScaleUpdater = updater.addScaleUpdater(
                   sprite, 1.8, 1.8, 2.0,
                   interpolatorMaker!"[back");
                break;
@@ -245,7 +282,8 @@ void main()
                // target value is passed (the rotation angle, in radians;
                // increasing the value makes the object rotate in the clockwise
                // direction).
-               updater.addRotationUpdater(
+               updater.remove(currentRotationUpdater);
+               currentRotationUpdater = updater.addRotationUpdater(
                   sprite, 0.0, 2.0,
                   interpolatorMaker!"[back]");
                break;
@@ -253,7 +291,8 @@ void main()
 
             case ALLEGRO_KEY_T:
             {
-               updater.addRotationUpdater(
+               updater.remove(currentRotationUpdater);
+               currentRotationUpdater = updater.addRotationUpdater(
                   sprite, PI, 2.0,
                   interpolatorMaker!"[elastic]");
                break;
@@ -261,7 +300,8 @@ void main()
 
             case ALLEGRO_KEY_G:
             {
-               updater.addRotationUpdater(
+               updater.remove(currentRotationUpdater);
+               currentRotationUpdater = updater.addRotationUpdater(
                   sprite, -PI, 2.0,
                   interpolatorMaker!"[circle]");
                break;
@@ -269,7 +309,8 @@ void main()
 
             case ALLEGRO_KEY_B:
             {
-               updater.addRotationUpdater(
+               updater.remove(currentRotationUpdater);
+               currentRotationUpdater = updater.addRotationUpdater(
                   sprite, 5*PI, 2.0,
                   interpolatorMaker!"sin]");
                break;

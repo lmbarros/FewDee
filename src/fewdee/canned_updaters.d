@@ -40,17 +40,22 @@ import fewdee.updater;
  *    maker = A function that will be used to create the necessary
  *       interpolators. You'll typically call $(D
  *       fewdee.interpolators.interpolatorMaker()) here.
+ *
+ * Returns:
+ *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
+ *    remove()) method in order to stop the canned updater before it finishes.
  */
-public void addPositionUpdater(Updater updater, Positionable target,
-                               float destX, float destY, double duration,
-                               GenericInterpolatorMakerDelegate_t maker)
+public
+UpdaterFuncID addPositionUpdater(Updater updater, Positionable target,
+                                 float destX, float destY, double duration,
+                                 GenericInterpolatorMakerDelegate_t maker)
 {
    auto t = 0.0;
 
    auto xInterpolator = maker(target.x, destX, duration);
    auto yInterpolator = maker(target.y, destY, duration);
 
-   updater.add(
+   return updater.add(
       delegate(dt)
       {
          t += dt;
@@ -85,10 +90,14 @@ public void addPositionUpdater(Updater updater, Positionable target,
  *    maker = A function that will be used to create the necessary
  *       interpolators. You'll typically call $(D
  *       fewdee.interpolators.interpolatorMaker()) here.
+ *
+ * Returns:
+ *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
+ *    remove()) method in order to stop the canned updater before it finishes.
  */
-public void addAlphaUpdater(Updater updater, Colorable target,
-                            float destAlpha, double duration,
-                            GenericInterpolatorMakerDelegate_t maker)
+public UpdaterFuncID addAlphaUpdater(Updater updater, Colorable target,
+                                     float destAlpha, double duration,
+                                     GenericInterpolatorMakerDelegate_t maker)
 {
    auto t = 0.0;
 
@@ -97,7 +106,7 @@ public void addAlphaUpdater(Updater updater, Colorable target,
 
    auto alphaInterpolator = maker(ia, destAlpha, duration);
 
-   updater.add(
+   return updater.add(
       delegate(dt)
       {
          t += dt;
@@ -134,11 +143,16 @@ public void addAlphaUpdater(Updater updater, Colorable target,
  *       interpolators. You'll typically call $(D
  *       fewdee.interpolators.interpolatorMaker()) here.
  *
+ * Returns:
+ *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
+ *    remove()) method in order to stop the canned updater before it finishes.
+ *
  * See_Also: addAlphaUpdater
  */
-public void addColorUpdater(Updater updater, Colorable target,
-                            in ref ALLEGRO_COLOR destColor, double duration,
-                            GenericInterpolatorMakerDelegate_t maker)
+public
+UpdaterFuncID addColorUpdater(Updater updater, Colorable target,
+                              in ref ALLEGRO_COLOR destColor, double duration,
+                              GenericInterpolatorMakerDelegate_t maker)
 {
    auto t = 0.0;
 
@@ -153,7 +167,7 @@ public void addColorUpdater(Updater updater, Colorable target,
    auto bInterpolator = maker(ib, fb, duration);
    auto aInterpolator = maker(ia, fa, duration);
 
-   updater.add(
+   return updater.add(
       delegate(dt)
       {
          t += dt;
@@ -185,17 +199,22 @@ public void addColorUpdater(Updater updater, Colorable target,
  *    maker = A function that will be used to create the necessary
  *       interpolators. You'll typically call $(D
  *       fewdee.interpolators.interpolatorMaker()) here.
+ *
+ * Returns:
+ *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
+ *    remove()) method in order to stop the canned updater before it finishes.
  */
-public void addScaleUpdater(Updater updater, Scalable target,
-                            float destScaleX, float destScaleY, double duration,
-                            GenericInterpolatorMakerDelegate_t maker)
+public UpdaterFuncID
+addScaleUpdater(Updater updater, Scalable target,
+                float destScaleX, float destScaleY, double duration,
+                GenericInterpolatorMakerDelegate_t maker)
 {
    auto t = 0.0;
 
    auto xScaleInterpolator = maker(target.scaleX, destScaleX, duration);
    auto yScaleInterpolator = maker(target.scaleY, destScaleY, duration);
 
-   updater.add(
+   return updater.add(
       delegate(dt)
       {
          t += dt;
@@ -222,16 +241,21 @@ public void addScaleUpdater(Updater updater, Scalable target,
  *    maker = A function that will be used to create the necessary
  *       interpolators. You'll typically call $(D
  *       fewdee.interpolators.interpolatorMaker()) here.
+ *
+ * Returns:
+ *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
+ *    remove()) method in order to stop the canned updater before it finishes.
  */
-public void addRotationUpdater(Updater updater, Rotatable target,
-                               float destRotation, double duration,
-                               GenericInterpolatorMakerDelegate_t maker)
+public
+UpdaterFuncID addRotationUpdater(Updater updater, Rotatable target,
+                                 float destRotation, double duration,
+                                 GenericInterpolatorMakerDelegate_t maker)
 {
    auto t = 0.0;
 
    auto rotInterpolator = maker(target.rotation, destRotation, duration);
 
-   updater.add(
+   return updater.add(
       delegate(dt)
       {
          t += dt;
