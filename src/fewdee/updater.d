@@ -115,7 +115,7 @@ public class Updater
     * The next updater function ID to use. Notice that the ID is unique only
     * within a certain $(D Updater).
     */
-   private size_t _nextUpdaterFuncID = 1;
+   private size_t _nextUpdaterFuncID = InvalidUpdaterFuncID + 1;
 }
 
 
