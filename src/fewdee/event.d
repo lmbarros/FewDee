@@ -9,7 +9,7 @@ module fewdee.event;
 import allegro5.allegro;
 import std.math;
 
-enum
+public enum
 {
    /**
     * An event sent on every game engine tick. Handling it is the preferred way
@@ -17,7 +17,7 @@ enum
     * time elapsed so far (both in seconds) are encoded in the event "user
     * parameters".
     *
-    * See_Also: deltaTime, totalTime.
+    * See_Also: $(D deltaTime), $(D totalTime).
     */
    FEWDEE_EVENT_TICK = ALLEGRO_GET_EVENT_TYPE('F','e','w','D'),
 
@@ -27,7 +27,7 @@ enum
     * and the total time elapsed so far (both in seconds) are encoded in the
     * event "user parameters".
     *
-    * See_Also: deltaTime, totalTime.
+    * See_Also: $(D deltaTime), $(D totalTime).
     */
    FEWDEE_EVENT_DRAW,
 }
@@ -41,7 +41,7 @@ enum
  * D's uniform function call syntax and properties allow to use this just as if
  * an $(D ALLEGRO_USER_EVENT) had a $(D deltaTime) member.
  */
-@property void deltaTime(ref ALLEGRO_USER_EVENT event, double deltaTime)
+public @property void deltaTime(ref ALLEGRO_USER_EVENT event, double deltaTime)
 {
    event.data1 = cast(typeof(event.data1))
       (floor(deltaTime));
@@ -57,7 +57,7 @@ enum
  * D's uniform function call syntax and properties allow to use this just as if
  * an ALLEGRO_USER_EVENT had a deltaTime member.
  */
-@property double deltaTime(const ref ALLEGRO_USER_EVENT event)
+public @property double deltaTime(const ref ALLEGRO_USER_EVENT event)
 {
    return event.data1 + (event.data2 / 1_000_000_000.0);
 }
@@ -70,7 +70,7 @@ enum
  * D's uniform function call syntax and properties allow to use this just as if
  * an $(D ALLEGRO_USER_EVENT) had a $(D totalTime) member.
  */
-@property void totalTime(ref ALLEGRO_USER_EVENT event, double totalTime)
+public @property void totalTime(ref ALLEGRO_USER_EVENT event, double totalTime)
 {
    event.data3 = cast(typeof(event.data3))
       (floor(totalTime));
@@ -86,7 +86,7 @@ enum
  * D's uniform function call syntax and properties allow to use this just as if
  * an $(D ALLEGRO_USER_EVENT) had a $(D totalTime) member.
  */
-@property double totalTime(const ref ALLEGRO_USER_EVENT event)
+public @property double totalTime(const ref ALLEGRO_USER_EVENT event)
 {
    return event.data3 + (event.data4 / 1_000_000_000.0);
 }
