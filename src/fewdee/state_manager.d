@@ -285,8 +285,10 @@ private class StateManagerImpl: LowLevelEventHandler
    private GameState _pushedState = null;
 
    /**
-    * Adds an event handler. From this point on, whenever an event of the
-    * requested type is triggered, the handler will be called.
+    * Adds an event handler for a given state. From this point on, whenever an
+    * event of the requested type is triggered and the state passed as parameter
+    * "wants" to get the events (according to its $(D wantsTicks), $(D
+    * wantsEvents) and $(D wantsToDraw) properties), the handler will be called.
     *
     * Parameters:
     *    state = The $(D GameState) registering the handler.
