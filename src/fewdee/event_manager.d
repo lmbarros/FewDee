@@ -29,6 +29,13 @@ public alias void delegate(in ref ALLEGRO_EVENT event) EventHandler;
 public alias size_t EventHandlerID;
 
 
+/**
+ * An $(D EventHandlerID) that is guaranteed to be different to all real $(D
+ * EventHandlerID)s. It is safe to pass this value to $(D
+ * EventManager.removeHandler()): the function will do nothing.
+ */
+public immutable EventHandlerID InvalidEventHandlerID = 0;
+
 
 /**
  * The real implementation of the Event Manager. Users shall use this through
@@ -160,7 +167,7 @@ private class EventManagerImpl
     * The next event handler ID to use. The same sequence of IDs is used for all
     * event types.
     */
-   private size_t _nextEventHandlerID = 0;
+   private EventHandlerID _nextEventHandlerID = InvalidEventHandlerID + 1;
 
    /**
     * Adds a low-level event handler. From this call on, the $(D

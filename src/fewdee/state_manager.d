@@ -373,7 +373,7 @@ private class StateManagerImpl: LowLevelEventHandler
     * The next event handler ID to use. The same sequence of IDs is used for all
     * event types.
     */
-   private size_t _nextEventHandlerID = 0;
+   private EventHandlerID _nextEventHandlerID = InvalidEventHandlerID + 1;
 
    /// An array of Game States, used as a stack.
    private GameState[] _states;
