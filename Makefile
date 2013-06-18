@@ -22,8 +22,8 @@ FEWDEE_SOURCES=src/allegro5/*.d src/allegro5/internal/*.d \
 # All
 all: fewdee.a fewdeedemo.example display_manager_info.example states_simple.example \
      interpolators_graphs.example updater_simple.example updater_canned.example \
-     sg_solar_system.example sg_parallax_scrolling.example
-#     abstracted_input_simple.example
+     sg_solar_system.example sg_parallax_scrolling.example \
+     abstracted_input_simple.example
 
 
 # The library
