@@ -47,7 +47,7 @@ void main()
    // times in sequence.
    EventManager.addHandler(
       ALLEGRO_EVENT_MOUSE_BUTTON_UP,
-      delegate (in ref ALLEGRO_EVENT event)
+      delegate(in ref ALLEGRO_EVENT event)
       {
          // Here we create a closure and add it to the Updater. This will run
          // for one and a half second.
@@ -84,7 +84,7 @@ void main()
    // as the updaters are called.
    EventManager.addHandler(
       FEWDEE_EVENT_DRAW,
-      delegate (in ref ALLEGRO_EVENT event)
+      delegate(in ref ALLEGRO_EVENT event)
       {
          al_clear_to_color(al_map_rgb(50, 50, 50));
          drawText("Updater simple example", 30, 30);
