@@ -150,7 +150,10 @@ public class Display
  */
 private class DisplayManagerImpl
 {
-   /// Destroys the DisplayManager, which, in turn, destroys all Displays.
+   /**
+    * Destroys the $(D DisplayManager), which, in turn, destroys all $(D
+    * Displays).
+    */
    package ~this()
    {
       foreach(d; _displays)
@@ -261,7 +264,7 @@ private class DisplayManagerImpl
       al_set_target_backbuffer(_displays[displayName]._display);
    }
 
-   /// The collection of Displays, indexed by their string keys.
+   /// The collection of $(D Display)s, indexed by their string keys.
    private Display[string] _displays;
 }
 
