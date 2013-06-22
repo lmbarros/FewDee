@@ -101,7 +101,10 @@ ResourceManager
    - Improving and updating docs
    - Replace foo_ with _foo.
 
-
+ - Consider modifying the canned updaters to templates. The current
+   design, based in interfaces, will not work with
+   AudioSampleInstance, which is a struct (and I'd like to have canned
+   updaters for fade in and fade out, at least).
 
  Assorted TODOs
 ----------------
