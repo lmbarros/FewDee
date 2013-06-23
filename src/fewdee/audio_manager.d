@@ -324,6 +324,32 @@ private class AudioManagerImpl
       return AudioSampleInstance(key);
    }
 
+   /**
+    * Connects the given audio stream to the mixer.
+    *
+    * TODO: This shouldn't be public, but $(D
+    *    fewdee.llw.audio_sample.AudioStream) needs to call it. One more
+    *    argument to bring the "low level resources" to the $(D fewdee) root
+    *    package.
+    */
+   public final void addAudioStream(ALLEGRO_AUDIO_STREAM* stream)
+   {
+      al_attach_audio_stream_to_mixer(stream, _mixer);
+   }
+
+   /**
+    * Disconnects the given audio stream to the mixer.
+    *
+    * TODO: This shouldn't be public, but $(D
+    *    fewdee.llw.audio_sample.AudioStream) needs to call it. One more
+    *    argument to bring the "low level resources" to the $(D fewdee) root
+    *    package.
+    */
+   public final void removeAudioStream(ALLEGRO_AUDIO_STREAM* stream)
+   {
+      al_detach_audio_stream(stream);
+   }
+
    //
    // Methods that do the real work of 'AudioSampleInstance' ("ASI") methods
    //
