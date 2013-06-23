@@ -85,17 +85,21 @@ struct AudioSampleInstance
    }
 
    /**
-    * Sets the playback mode (play once, loop...) for this $(D
-    * AudioSampleInstance).
+    * The playback mode (play once, loop...) for this $(D AudioSampleInstance).
     *
-    * Parameters:
-    *    playMode = The desired playback mode. For easier reference, here are
-    *       the possible values as of Allegro 5.0.7: $(D ALLEGRO_PLAYMODE_ONCE),
-    *       $(D ALLEGRO_PLAYMODE_LOOP) and $(D ALLEGRO_PLAYMODE_BIDIR).
+    * For reference, here are the possible values as of Allegro 5.0.7: $(D
+    * ALLEGRO_PLAYMODE_ONCE), $(D ALLEGRO_PLAYMODE_LOOP) and $(D
+    * ALLEGRO_PLAYMODE_BIDIR).
     */
+   public final @property ALLEGRO_PLAYMODE playMode()
+   {
+      return AudioManager.asiGetPlayMode(_asiKey);
+   }
+
+   /// Ditto
    public final @property void playMode(ALLEGRO_PLAYMODE playMode)
    {
-      AudioManager.asiSetPlaymode(_asiKey, playMode);
+      AudioManager.asiSetPlayMode(_asiKey, playMode);
    }
 
    /**
@@ -242,136 +246,9 @@ private class AudioManagerImpl
       al_destroy_voice(_voice);
    }
 
-   //
-   // The public interface
-   //
-
    /**
-    * Plays an audio sample, using audio data from a given $(D AudioSample).
-    *
-    * This method is the most "fire-and-forget" way to play a sound sample. It
-    * will play the sound and automatically manage the necessary resources. If
-    * you simply call this method using the default play mode (play once) and
-    * ignore its return value, you'll not do anything wrong.
-    *
-    * But this method offers a little bit of extra flexibility, which you can
-    * leverage if you pay attention to one little detail: the $(D
-    * AudioSampleInstance) returned by this method will be managed by the $(D
-    * AudioManager), but the $(D AudioManager) doesn't know how to check if the
-    * sound finished playing. So, it will assume that it can destroy the
-    * resources associated with the sample instance when and only when it
-    * notices that the sound is paused.
-    *
-    * This brings two consequences:
-    *
-    * $(OL
-    *    $(LI If you manually call $(D pause()), you are effectively saying "I
-    *       am done with this audio sample instance; please, $(D AudioManager),
-    *       destroy it when you find it appropriate.")
-    *    $(LI If you play the sound in a playing mode that loops forever, the
-    *       audio sample instance resources will not be freed (after all, it
-    *       never pause). In this case, you are expected to $(D pause()) when
-    *       you don't want it anymore. (You can also explicitly $(D destroy())
-    *       it, but pausing it is enough to guarantee its eventual destruction
-    *       by the $(D AudioManager))).
-    * )
-    *
-    * If you need to able to pause and resume the returned $(D
-    * AudioSampleInstance), use $(D createAudioSampleInstance()) instead.
-    *
-    * Parameters:
-    *    sample = The audio sample to be played. Not $(D null), please.
-    *    playMode = The desired play mode.
-    *
-    * Returns:
-    *    An $(D AudioSampleInstance) that can be used to control the playing
-    *    parameters. (But read this method's full documentation for some
-    *    warnings about using it.)
-    */
-   public final AudioSampleInstance play(
-      AudioSample sample,
-      ALLEGRO_PLAYMODE playMode = ALLEGRO_PLAYMODE.ALLEGRO_PLAYMODE_ONCE)
-   in
-   {
-      assert(sample !is null);
-   }
-   body
-   {
-      auto asi = createAudioSampleInstance(sample, true);
-      asi.playMode = playMode;
-      asi.play();
-
-      return asi;
-   }
-
-   /**
-    * Convenience overload that takes the audio sample data from the $(D
-    * ResourceManager).
-    *
-    * This is just like the overload taking a $(D AudioSampleInstance) as
-    * parameter, but it takes a string instead. This string is used as the key
-    * to retrieve the audio sample data from the $(D ResourceManager).
-    *
-    * All details, caveats and warnings mentioned in the documentation of the
-    * other overload also apply here, so take a look there.
-    */
-   public final AudioSampleInstance play(
-      string key,
-      ALLEGRO_PLAYMODE playMode = ALLEGRO_PLAYMODE.ALLEGRO_PLAYMODE_ONCE)
-   {
-      auto sample = ResourceManager.samples[key];
-
-      enforce(sample !is null, "Audio sample '" ~ key ~ "' not found");
-
-      return play(sample);
-   }
-
-   /**
-    * Creates and returns an audio sample instance from a given $(D
-    * AudioSample).
-    *
-    * You are responsible for destroying the returned $(D AudioSampleInstance),
-    * by calling its $(D destroy()) method.
-    *
-    * Parameters:
-    *    sample = The audio sample data to use. No $(D null)s here, please.
-    *
-    * Returns:
-    *    A newly constructed $(D AudioSampleInstance). You are responsible for
-    *    destroying it.
-    */
-   public final AudioSampleInstance
-   createAudioSampleInstance(AudioSample sample)
-   in
-   {
-      assert(sample !is null);
-   }
-   body
-   {
-      return createAudioSampleInstance(sample, false);
-   }
-
-   /**
-    * Convenience overload that creates and returns an audio sample instance
-    * from an audio sample in the $(ResourceManager).
-    *
-    * This is just like the overload taking a $(D AudioSampleInstance) as
-    * parameter, but it takes a string instead. This string is used as the key
-    * to retrieve the audio sample data from the $(D ResourceManager).
-    *
-    * All details, caveats and warnings mentioned in the documentation of the
-    * other overload also apply here, so take a look there.
-    */
-   public final AudioSampleInstance createAudioSampleInstance(string key)
-   {
-      auto sample = ResourceManager.samples[key];
-      enforce(sample, "Audio sample '" ~ key ~ "' not found");
-      return createAudioSampleInstance(sample);
-   }
-
-   /**
-    * Destroys the audio sample instances that are marked as "auto destroy" $(I
-    * and) have finished playing.
+    * Destroys the audio sample instances that were started via $(D
+    * AudioSample.play()) $(I and) have finished playing.
     *
     * Well, actually we cannot really detected if the audio sample instance
     * really finished playing. The implementation assumes that a paused sample
@@ -400,7 +277,7 @@ private class AudioManagerImpl
    }
 
    //
-   // Private helper methods
+   // Helper methods for internal usage only
    //
 
    /**
@@ -419,9 +296,14 @@ private class AudioManagerImpl
     *
     * Returns:
     *    A newly constructed $(D AudioSampleInstance).
+    *
+    * TODO: This shouldn't be public, but $(D
+    *    fewdee.llw.audio_sample.AudioSample) needs to call it. One more
+    *    argument to bring the "low level resources" to the $(D fewdee) root
+    *    package.
     */
-   private final AudioSampleInstance
-   createAudioSampleInstance(AudioSample sample, bool autoDestroy)
+   public final AudioSampleInstance
+   createAudioSampleInstance(ALLEGRO_SAMPLE* sample, bool autoDestroy)
    in
    {
       assert(sample !is null);
@@ -443,7 +325,7 @@ private class AudioManagerImpl
    }
 
    //
-   // Methods that do the real work of AudioSampleInstance ("ASI") methods
+   // Methods that do the real work of 'AudioSampleInstance' ("ASI") methods
    //
 
    /// Destroys the "ASI" whose key passed as parameter.
@@ -537,8 +419,17 @@ private class AudioManagerImpl
          al_set_sample_instance_speed(_asis[asiKey], speed);
    }
 
+   /// Gets the playing mode of the "ASI" whose key passed as parameter.
+   private final ALLEGRO_PLAYMODE asiGetPlayMode(size_t asiKey)
+   {
+      if (asiKey !in _asis)
+         return ALLEGRO_PLAYMODE.ALLEGRO_PLAYMODE_ONCE;
+
+      return al_get_sample_instance_playmode(_asis[asiKey]);
+   }
+
    /// Sets the playing mode of the "ASI" whose key passed as parameter.
-   private final void asiSetPlaymode(size_t asiKey, ALLEGRO_PLAYMODE playMode)
+   private final void asiSetPlayMode(size_t asiKey, ALLEGRO_PLAYMODE playMode)
    {
       if (asiKey in _asis)
          al_set_sample_instance_playmode(_asis[asiKey], playMode);

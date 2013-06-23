@@ -10,11 +10,14 @@ import std.exception;
 import std.string;
 import allegro5.allegro_audio;
 import fewdee.allegro_manager;
+import fewdee.audio_manager;
 import fewdee.llr.low_level_resource;
 
 
 /**
- * A low-level sound sample resource. Encapsulates an $(D ALLEGRO_SAMPLE*).
+ * A low-level sound sample resource. Owns audio sample data.
+ *
+ * Encapsulates an $(D ALLEGRO_SAMPLE*).
  */
 public class AudioSample: LowLevelResource
 {
@@ -37,6 +40,51 @@ public class AudioSample: LowLevelResource
    {
       al_destroy_sample(_sample);
       _sample = null;
+   }
+
+   /**
+    * Plays the audio sample once.
+    *
+    * The resources associated with the returned $(D AudioSampleInstance) will
+    * be automatically freed by the $(D AudioManager) some time after the
+    * playing is paused (either because it paused automatically after finished
+    * playing or because you paused it manually by calling the $(D pause())
+    * method).
+    *
+    * Returns:
+    *    An $(D AudioSampleInstance) that can be used to query or tinker with
+    *    the playing parameters.
+    */
+   public final AudioSampleInstance play()
+   {
+      auto asi = AudioManager.createAudioSampleInstance(_sample, true);
+      asi.playMode = ALLEGRO_PLAYMODE.ALLEGRO_PLAYMODE_ONCE;
+      asi.play();
+
+      return asi;
+   }
+
+   /**
+    * Creates and returns an $(D AudioSampleInstance) using audio sample data
+    * from this $(D AudioSample).
+    *
+    * The caller is responsible for freeing the resources associated with the
+    * returned $(D AudioSampleInstance) (by calling its $(D destroy()) method).
+    *
+    * The returned $(D AudioSampleInstance) is created in the paused state, and
+    * with a "play once" playback mode.
+    *
+    * Returns:
+    *    An $(D AudioSampleInstance). The caller is responsible for freeing its
+    *    resources by calling its $(D destroy()) method.
+    */
+   public final AudioSampleInstance createInstance()
+   {
+      auto asi = AudioManager.createAudioSampleInstance(_sample, false);
+      asi.playMode = ALLEGRO_PLAYMODE.ALLEGRO_PLAYMODE_ONCE;
+      asi.pause();
+
+      return asi;
    }
 
    /**
