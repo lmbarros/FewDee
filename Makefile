@@ -23,7 +23,7 @@ FEWDEE_SOURCES=src/allegro5/*.d src/allegro5/internal/*.d \
 all: fewdee.a fewdeedemo.example display_manager_info.example states_simple.example \
      interpolators_graphs.example updater_simple.example updater_canned.example \
      sg_solar_system.example sg_parallax_scrolling.example \
-     abstracted_input_simple.example
+     abstracted_input_simple.example audio_sample_simple.example
 
 
 # The library
@@ -41,6 +41,7 @@ sg_solar_system.example: examples/sg_solar_system.d fewdee.a
 sg_parallax_scrolling.example: examples/sg_parallax_scrolling.d fewdee.a
 interpolators_graphs.example: examples/interpolators_graphs.d fewdee.a
 abstracted_input_simple.example: examples/abstracted_input_simple.d fewdee.a
+audio_sample_simple.example: examples/audio_sample_simple.d fewdee.a
 
 
 # Unit tests

@@ -10,6 +10,7 @@ module fewdee.engine;
 import allegro5.allegro;
 import fewdee.internal.singleton;
 import fewdee.allegro_manager;
+import fewdee.audio_manager;
 import fewdee.event_manager;
 import fewdee.game_state;
 import fewdee.state_manager;
@@ -135,6 +136,7 @@ private class EngineImpl
       //       but must think well about the ordering of destruction.
       EventManager.destroyInstance();
       StateManager.destroyInstance();
+      AudioManager.destroyInstance();
       DisplayManager.destroyInstance();
       ResourceManager.destroyInstance();
       AllegroManager.destroyInstance();

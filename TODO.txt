@@ -106,6 +106,16 @@ ResourceManager
    AudioSampleInstance, which is a struct (and I'd like to have canned
    updaters for fade in and fade out, at least).
 
+ - Initialization: if the sound cannot be initialized, the audio
+   examples crash. There must be an easy and clean way for checking if
+   the sound was not properly initialized (so that programs usinf
+   FewDee could say "sorry, no sound, do you want to proceed anyway?"
+   (Looks like we are just throwing an exception now, so this part is
+   easy). But then, if proceeding without sound support, no
+   audio-related call should throw anything. All calls should simply
+   be no-ops. This would be great, since the FewDee user wouldn't need
+   to code worrying if audio is available or not. Graceful degration.
+
  Assorted TODOs
 ----------------
 

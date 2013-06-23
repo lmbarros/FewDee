@@ -19,6 +19,7 @@ public import allegro5.allegro_primitives;
 public import fewdee.aabb;
 public import fewdee.abstracted_input;
 public import fewdee.allegro_manager;
+public import fewdee.audio_manager;
 public import fewdee.canned_updaters;
 public import fewdee.display_manager;
 public import fewdee.engine;
