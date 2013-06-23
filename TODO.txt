@@ -1,123 +1,31 @@
-Architecture
---------------
+ Assorted TODOs
+----------------
 
-Notes about the redesign (or, in fact, the first real design) of the
-architecture.
+If we use the destructor to free low-level resources, then we can just
+create 'scope' resources when needed (specially in examples, where
+there is always that "eill need to free resources" disclaimer). Must
+consider this change after the main "conversion" is complete!
 
-Engine (core)
-   - knows who is inited...
-   - ...so that it can stop them afterward
-   - initializes the Allegro core and perhaps some other module
-     (native dialogs?)
-
-EventManager
-   - loads addons: mouse, keyboard, joystick.
-   - allows to register and de-register event listeners
-   - translates Allegro events to FewDee events (performance?! use tricks like
-     free lists?)
-   - TODO: needs to be called by the main loop, so that it can call
-     al_get_next_event() andthe like.
-        - TODO: Perhaps it should somehow provide run()
-   - TODO: how to identify events? OK, subsystem/event pair, but what are
-     "subsystem" and "event"? Must be easily extensible and not too
-     slow. Benchmark uints versus strings.
-   - In addition to "please call this callback when this specific
-     event happens", we need a low-level event handler, to implement
-     things like AbstractedInput. This should probably be usable by
-     end users... they should be able to provide their own
-     abstracted input mechanisms, if desired.
-
-DisplayManager
-   - loads lots of addons: image, font, ttf. Perhaps primitives.
-   - provide information about available monitors and their capabilities
-   - create, destroy, manage displays.
-   - get the default display.
-   - display identified by string IDs.
-   - TODO: what is the default display? One named "default"? The first created?
-     One explicitly flagged as such?
-
-AudioManager
-   - loads addons: audio, audio codecs.
-   - play samples and streams (play, pause, loop, volume, etc)
-   - stops everything upon destruction
-   - TODO: how to chose the parameter to al_reserve_samples()?
-
-ResourceManager
-   - seems that must be destroyed after all other managers (just the core is
-     destroyed afterward), because they may still reference stuff from here
-     (like, streams playing -- if this is destroyed before AudioManager,
-     AudioManager may try to read from a deleted audio stream).
-   - Resources are identified by strings.
-   - Clean resources by regexp: "please, clean resources named "level_01-*".
-   - TODO: how to specify which resources are loaded from which files? May want
-     to read from a hardcoded string or from a file.
-   - TODO: and what about resource archives? Not an issue for now, but... maybe
-     a resource manager can use some kind of helper class to actually read data
-     from disk... by default, uses a FileSystemReader, but could be replaced by
-     an ArchiveReader or whatever.
-        - How Allegro deals with this: there a struct,
-          ALLEGRO_FILE_INTERFACE, with pointers to all file
-          system-related functions (open, close, read, write, flush,
-          tell, seek, etc). Then, there are functions like
-          al_set_new_file_interface() and
-          al_set_standard_file_interface() that allow to change the
-          current set of funcions used for all I/O operations in the
-          current thread.
-        - So, a Reader would have to somehow provide pointers to these
-          functions.
-        - And how to set the current Reader? An IOManager? Or add this
-          to the core engine? In any case, reading from the file
-          system will be the default, so I don't have to worry about
-          this now. Er, I may want to add a mean to set the data root
-          directory (CWD by default)... but then, I would have to
-          provide the interfaces, and a FileSystemReader with a
-          setRoot() method.
-        - Also note that there are funcions like al_load_bitmap_f()
-          that take a pointer to an ALLEGRO_FILE -- these functions
-          are probably a better alternative to use (if possible),
-          since they don't rely on a global state set by
-          al_set_standard_file_interface() and friends.
-   - TODO: one resource manager to rule them all or one resource manager per
-     type of resource? Do I want to allow "user-defined" resources (like, say,
-     "scripts")?
-        - Best idea so far: add a pool of "generic resources"
-          (LowLevelResources). The user can put whatever he wants
-          there. Not elegant, but let's KISS.
-   - TODO: how to deal with the "one image file contains many 'logical
-     bitmaps', which may be combined in various ways in a single sprite?"
-
- Post-Architecture Organization
---------------------------------
-
- - If we use the destructor to free low-level resources, then we can
-   just create 'scope' resources when needed (specially in examples,
-   where there is always that "eill need to free resources"
-   disclaimer). Must consider this change after the main "conversion"
-   is complete!
-
- - Scan the untouched modules for things like
+Scan the untouched modules for things like
    - Adding 'final' or making methods free functions called with UFCS.
    - Adding $(D ...) macros
    - Improving and updating docs
    - Replace foo_ with _foo.
 
- - Consider modifying the canned updaters to templates. The current
-   design, based in interfaces, will not work with
-   AudioSampleInstance, which is a struct (and I'd like to have canned
-   updaters for fade in and fade out, at least).
+Consider modifying the canned updaters to templates. The current
+design, based in interfaces, will not work with AudioSampleInstance,
+which is a struct (and I'd like to have canned updaters for fade in
+and fade out, at least).
 
- - Initialization: if the sound cannot be initialized, the audio
-   examples crash. There must be an easy and clean way for checking if
-   the sound was not properly initialized (so that programs usinf
-   FewDee could say "sorry, no sound, do you want to proceed anyway?"
-   (Looks like we are just throwing an exception now, so this part is
-   easy). But then, if proceeding without sound support, no
-   audio-related call should throw anything. All calls should simply
-   be no-ops. This would be great, since the FewDee user wouldn't need
-   to code worrying if audio is available or not. Graceful degration.
-
- Assorted TODOs
-----------------
+Initialization: if the sound cannot be initialized, the audio examples
+crash. There must be an easy and clean way for checking if the sound
+was not properly initialized (so that programs usinf FewDee could say
+"sorry, no sound, do you want to proceed anyway?"  (Looks like we are
+just throwing an exception now, so this part is easy). But then, if
+proceeding without sound support, no audio-related call should throw
+anything. All calls should simply be no-ops. This would be great,
+since the FewDee user wouldn't need to code worrying if audio is
+available or not. Graceful degration.
 
 Check how exactly font sizes are specified in Allegro. Ensure that
 AllegroFont works as documented.
