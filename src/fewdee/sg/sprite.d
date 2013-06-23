@@ -117,7 +117,7 @@ class Sprite: Drawable, Positionable, Rotatable, Colorable, Scalable
          y,
          scaleX,
          scaleY,
-         rotation_,
+         rotation,
          flags);
    }
 

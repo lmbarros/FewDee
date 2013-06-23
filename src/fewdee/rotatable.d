@@ -23,23 +23,23 @@ interface Rotatable
 
 
 /**
- * A default implementation for Rotatable objects. The "postSet" parameter, if
- * not an empty string, shall contain code to be executed after the rotation is
- * changed. One typical action to perform after changing the coordinates is to
- * dirty the bounding box.
+ * A default implementation for $(D Rotatable) objects. The $(D postSet)
+ * parameter, if not an empty string, shall contain code to be executed after
+ * the rotation is changed. One typical action to perform after changing the
+ * coordinates is to dirty the bounding box.
  */
 mixin template RotatableDefaultImplementation(string postSet = "")
 {
-   public @property float rotation() const{ return rotation_; }
+   public @property float rotation() const{ return _rotation; }
 
    public @property void rotation(float rotation)
    {
-      this.rotation_ = rotation;
+      this._rotation = rotation;
       static if (postSet != "")
       {
          mixin(postSet);
       }
    }
 
-   private float rotation_ = 0.0;
+   private float _rotation = 0.0;
 }

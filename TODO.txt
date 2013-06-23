@@ -6,12 +6,6 @@ create 'scope' resources when needed (specially in examples, where
 there is always that "eill need to free resources" disclaimer). Must
 consider this change after the main "conversion" is complete!
 
-Scan the untouched modules for things like
-   - Adding 'final' or making methods free functions called with UFCS.
-   - Adding $(D ...) macros
-   - Improving and updating docs
-   - Replace foo_ with _foo.
-
 Consider modifying the canned updaters to templates. The current
 design, based in interfaces, will not work with AudioSampleInstance,
 which is a struct (and I'd like to have canned updaters for fade in

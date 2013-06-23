@@ -25,7 +25,10 @@ struct AABB
       this.right = right;
    }
 
-   /// Makes this AABB be the union of itself with the one passed as parameter.
+   /**
+    * Makes this $(D AABB) be the union of itself with the one passed as
+    * parameter.
+    */
    void unionWith(in AABB other)
    {
       top = min(this.top, other.top);
@@ -51,16 +54,16 @@ struct AABB
          ~ ", " ~ to!string(left) ~ ", " ~ to!string(right) ~ "]";
    }
 
-   /// The AABB's top, measured from the top of the screen.
+   /// The $(D AABB)'s top, measured from the top of the screen.
    public float top;
 
-   /// The AABB's bottom, measured from the top of the screen.
+   /// The $(D AABB)'s bottom, measured from the top of the screen.
    public float bottom;
 
-   /// The AABB's left side, measured from the left of the screen.
+   /// The $(D AABB)'s left side, measured from the left of the screen.
    public float left;
 
-   /// The AABB's right side, measured from the left of the screen.
+   /// The $(D AABB)'s right side, measured from the left of the screen.
    public float right;
 
    // Tests AABB.contains()
