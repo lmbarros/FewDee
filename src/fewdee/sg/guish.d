@@ -9,7 +9,7 @@ module fewdee.sg.guish;
 import allegro5.allegro;
 import std.conv;
 import fewdee.event;
-import fewdee.event_handler;
+import fewdee.low_level_event_handler;
 import fewdee.sg.node;
 
 
@@ -70,7 +70,7 @@ enum EventType
 /**
  * Generates GUI-like events for registered Nodes.
  */
-class GUIshEventGenerator: EventHandler
+class GUIshEventGenerator: LowLevelEventHandler
 {
    /**
     * The type of callbacks called when GUIsh events happen. What exactly is
@@ -83,21 +83,24 @@ class GUIshEventGenerator: EventHandler
       EventCallback_t;
 
    /// Handles incoming events.
-   public bool handleEvent(in ref ALLEGRO_EVENT event)
+   public override void handleEvent(in ref ALLEGRO_EVENT event)
    {
       switch (event.type)
       {
          case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-            return handleMouseButtonDownEvent(event);
+            handleMouseButtonDownEvent(event);
+            break;
 
          case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
-            return handleMouseButtonUpEvent(event);
+            handleMouseButtonUpEvent(event);
+            break;
 
          case FEWDEE_EVENT_TICK:
-            return handleTickEvent(event);
+            handleTickEvent(event);
+            break;
 
          default:
-            return false; // ignore
+            break;
       }
    }
 
@@ -110,8 +113,7 @@ class GUIshEventGenerator: EventHandler
     *   event = The desired event type.
     *   callback = The callback to run.
     */
-   public void addEventCallback(Node obj, EventType event,
-                                EventCallback_t callback)
+   public void addHandler(Node obj, EventType event, EventCallback_t callback)
    {
       eventCallbacks_[obj][event] ~= callback;
    }
@@ -179,7 +181,7 @@ class GUIshEventGenerator: EventHandler
     * are "relative": if a moving node crosses a static mouse pointer, the
     * events shall be generated. This is by design.
     */
-   private bool handleTickEvent(in ref ALLEGRO_EVENT event)
+   private void handleTickEvent(in ref ALLEGRO_EVENT event)
    {
       time_ += event.user.deltaTime;
 
@@ -208,13 +210,11 @@ class GUIshEventGenerator: EventHandler
          if (nodeUnderMouse_ !is null)
             callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_ENTER, event);
       }
-
-      return true;
    }
 
 
    /// Handles a "mouse button down" event.
-   private bool handleMouseButtonDownEvent(in ref ALLEGRO_EVENT event)
+   private void handleMouseButtonDownEvent(in ref ALLEGRO_EVENT event)
    in
    {
       assert(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN);
@@ -227,13 +227,11 @@ class GUIshEventGenerator: EventHandler
 
       // Do the bookkeeping for "Click" and "DoubleClick"
       nodeThatGotMouseDown_[event.mouse.button] = nodeUnderMouse_;
-
-      return true;
    }
 
 
    /// Handles a "mouse button up" event.
-   private bool handleMouseButtonUpEvent(in ref ALLEGRO_EVENT event)
+   private void handleMouseButtonUpEvent(in ref ALLEGRO_EVENT event)
    in
    {
       assert(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP);
@@ -264,8 +262,6 @@ class GUIshEventGenerator: EventHandler
             timeOfLastClick_[button] = time_;
          }
       }
-
-      return true;
    }
 
 

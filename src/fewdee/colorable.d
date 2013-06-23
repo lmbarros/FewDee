@@ -21,20 +21,20 @@ interface Colorable
 
 
 /**
- * A default implementation for Colorable objects. The "postSet" parameter, if
- * not an empty string, shall contain code to be executed after the color is
- * changed.
+ * A default implementation for $(D Colorable) objects. The $(D postSet)
+ * parameter, if not an empty string, shall contain code to be executed after
+ * the color is changed.
  */
 mixin template ColorableDefaultImplementation(string postSet = "")
 {
    public @property ALLEGRO_COLOR color() const
    {
-      return color_;
+      return _color;
    }
 
    public @property void color(in ALLEGRO_COLOR color)
    {
-      this.color_ = color;
+      this._color = color;
 
       static if (postSet != "")
       {
@@ -42,7 +42,7 @@ mixin template ColorableDefaultImplementation(string postSet = "")
       }
    }
 
-   private ALLEGRO_COLOR color_ = { 1.0, 1.0, 1.0, 1.0 };
+   private ALLEGRO_COLOR _color = { 1.0, 1.0, 1.0, 1.0 };
 }
 
 

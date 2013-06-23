@@ -1,8 +1,6 @@
 /**
- * The game engine. The engine is implemented as a module, with a bunch of free
- * functions. This is similar to a singleton, just without lying to myself and
- * pretending that I am not using globals. All functions are thread safe (if
- * they are not, that's a bug).
+ * The engine core. Provides some very fundamental services, plus some
+ * utilities.
  *
  * Authors: Leandro Motta Barros
  */
@@ -10,237 +8,298 @@
 module fewdee.engine;
 
 import allegro5.allegro;
-import allegro5.allegro_font;
-import allegro5.allegro_ttf;
-import allegro5.allegro_image;
-import allegro5.allegro_primitives;
-import fewdee.event;
+import fewdee.internal.singleton;
+import fewdee.allegro_manager;
+import fewdee.audio_manager;
+import fewdee.event_manager;
 import fewdee.game_state;
-import fewdee.ref_counted_wrappers;
 import fewdee.state_manager;
+import fewdee.display_manager;
+import fewdee.resource_manager;
 
 
-/// The one and only display (window) where we show things.
-private AllegroDisplay TheDisplay;
-
-/// The source of custom events.
-private ALLEGRO_EVENT_SOURCE TheCustomEventSource;
-
-/// The one and only event queue.
-private ALLEGRO_EVENT_QUEUE* TheEventQueue;
-
-/// The object managing the game states.
-private StateManager TheStateManager;
-
-
-
-// xxxxxxx doc-me. And maybe move to a different module.
-struct DisplayParams
+/// A list of features that can be enabled when initializing the engine.
+enum Features
 {
-   bool fullScreen = true;
-   bool useDesktopResolution = true;
-   uint width = 640;
-   uint height = 480;
-   bool vSync = true;
-   int monitor = 0;
+   /// Enable generation of mouse events.
+   MOUSE = 0x00000001,
+
+   /// Enable generation of keyboard events.
+   KEYBOARD = 0x00000002,
+
+   /// Enable generation of joystick events.
+   JOYSTICK = 0x00000004,
+
+   /// Disable all supported features.
+   NONE = 0,
+
+   /// Enable all supported features.
+   I_WANT_IT_ALL = MOUSE | KEYBOARD | JOYSTICK
 }
 
 
 /**
- * A handy way to start the engine (and stop it). Crank, handy, start an
- * engine... witty naming, uh?
+ * A handy way to start the engine. "Crank", "handy", "start an engine"... witty
+ * naming, uh? (Incidentally, FewDee's Crank also stops the engine.)
  *
- * This is a value type (struct), so that we guarantee that its destructor will
- * Notice that this is a "scope class", so it must be instantiated with the $(D
- * scope) keyword.
+ * Notice that this is a $(D scope class), so it must be instantiated with the
+ * $(D scope) keyword.
  *
  * See_also: https://en.wikipedia.org/wiki/Crank_%28mechanism%29#20th_Century
  */
-scope class Crank
+public scope class Crank
 {
    /**
     * Creates the $D(Crank), which causes the engine to be started ($(D
-    * fewdee.engine.start()) is called).
+    * fewdee.core.Core.start()) is called).
     *
-    * Params:
-    *    createDisplay = If $(D true) (the default), a Display will be created
-    *       when initializing the engine.
-    *    dp = The parameters describing the display that will be created as part
-    *       of the engine initialization process. This is ignored if $(D
-    *       createDisplay == false).
+    * Parameters:
+    *    features = The desired engine features. By default, all features are
+    *       enabled. If you know that, say keyboard events will not be used in
+    *       your program, you can pass $(Features.D I_WANT_IT_ALL &
+    *       ~Features.KEYBOARD) here and hope to spare a few microsseconds per
+    *       frame.
     */
-   this(bool createDisplay = true, in DisplayParams dp = DisplayParams())
+   public this(Features features = Features.I_WANT_IT_ALL)
    {
-      fewdee.engine.start();
-      if (createDisplay)
-         fewdee.engine.createDisplay(dp);
+      Engine.start(features);
    }
 
    /**
     * Destroys the $D(Crank), which causes the engine to be stopped
-    * ($D(fewdee.engine.stop()) is called).
+    * ($D(fewdee.core.Core.stop()) is called).
     */
-   ~this()
+   public ~this()
    {
-      fewdee.engine.stop();
+      Engine.stop();
    }
-}
-
-
-
-
-/**
- * Starts the engine. This sets everything up so that the engine can be used,
- * and must be called before any other $(D fewdee.engine) function.
- *
- * That said, you should use a tool to start the engine: $(D Crank) (crude, but
- * effective).
- *
- * See_also: Crank
- */
-void start()
-{
-   // A "macro" for initializing something with the proper error checking,
-   // recovery and reporting.
-   string makeInitCode(string initCode, string cleanupCode, string errMsg)
-   {
-      return "if (!" ~ initCode ~ ")
-                    throw new Exception(\"" ~ errMsg ~ "\");
-                 scope (failure) " ~ cleanupCode ~ ";";
-   }
-
-   mixin (makeInitCode("al_init()", "al_uninstall_system()",
-                       "Initialization failed miserably"));
-
-   mixin (makeInitCode("al_init_image_addon()", "al_shutdown_image_addon()",
-                       "Error initializing image subsystem"));
-
-   mixin (makeInitCode("(al_init_font_addon(), true)",
-                       "al_shutdown_font_addon()",
-                       "Error initializing font subsystem"));
-
-   mixin (makeInitCode("al_init_ttf_addon()", "al_shutdown_ttf_addon()",
-                       "Error initializing font subsystem"));
-
-   mixin (makeInitCode("al_init_primitives_addon()",
-                       "al_shutdown_primitives_addon()",
-                       "Error initializing font subsystem"));
-
-   mixin (makeInitCode("al_install_mouse()", "al_uninstall_mouse()",
-                       "Error initializing mouse"));
-
-   mixin (makeInitCode("al_install_keyboard()", "al_uninstall_keyboard()",
-                       "Error initializing keyboard"));
-
-   mixin (makeInitCode("al_install_joystick()", "al_uninstall_joystick()",
-                       "Error initializing joystick"));
-
-   al_init_user_event_source(&TheCustomEventSource);
-   scope (failure)
-      al_destroy_user_event_source(&TheCustomEventSource);
-
-   TheEventQueue = al_create_event_queue();
-   mixin (makeInitCode("(TheEventQueue !is null)",
-                       "al_destroy_event_queue(TheEventQueue)",
-                       "Error creating event queue."));
-
-   al_register_event_source(TheEventQueue, al_get_mouse_event_source());
-   al_register_event_source(TheEventQueue, al_get_keyboard_event_source());
-   al_register_event_source(TheEventQueue, al_get_joystick_event_source());
-   al_register_event_source(TheEventQueue, &TheCustomEventSource);
-
-   // Don't use pre-multiplied alpha by default
-   al_set_blender(ALLEGRO_BLEND_OPERATIONS.ALLEGRO_ADD,
-                  ALLEGRO_BLEND_MODE.ALLEGRO_ALPHA,
-                  ALLEGRO_BLEND_MODE.ALLEGRO_INVERSE_ALPHA);
-
-   al_set_new_bitmap_flags(ALLEGRO_NO_PREMULTIPLIED_ALPHA
-                           | ALLEGRO_MIN_LINEAR
-                           | ALLEGRO_MAG_LINEAR);
 }
 
 
 /**
- * Stops the engine. This sets shuts everything down so that your program shuts
- * down gracefully. You cannot call any other $(D fewdee.engine) after calling
- * this function.
- *
- * BTW, you should use a $(D Crank) to start and stop the engine, instead of
- * calling this manually.
- *
- * See_also: Crank
+ * The real implementation of the Engine. Users shall use this through the $(D
+ * Engine) class.
  */
-void stop()
+private class EngineImpl
 {
-   al_destroy_event_queue(TheEventQueue);
-
-   al_destroy_user_event_source(&TheCustomEventSource);
-
-   al_uninstall_joystick();
-
-   al_uninstall_keyboard();
-
-   al_uninstall_mouse();
-
-   if (TheDisplay !is null)
-      al_destroy_display(TheDisplay);
-
-   al_shutdown_primitives_addon();
-
-   al_shutdown_ttf_addon();
-
-   al_shutdown_font_addon();
-
-   al_shutdown_image_addon();
-
-   al_uninstall_system();
-}
-
-
-// xxxxxxx doc-me
-void createDisplay(const ref DisplayParams dp)
-{
-   TheDisplay = AllegroDisplay(dp.width, dp.height);
-   if (TheDisplay is null)
-      throw new Exception("Error creating display.");
-
-   scope (failure)
-      al_destroy_display(TheDisplay);
-
-   al_register_event_source(TheEventQueue,
-                            al_get_display_event_source(TheDisplay));
-}
-
-
-
-/// Runs the engine main loop, with a given starting state.
-void run(GameState startingState)
-{
-   TheStateManager.pushState(startingState);
-
-   double prevTime = al_get_time();
-
-   while (!TheStateManager.empty)
+   /**
+    * Starts the engine. This sets everything up so that the engine can be used,
+    * and must be called before any other Engine method.
+    *
+    * That said, you should use a tool to start the engine: a $(D Crank) (crude,
+    * but effective).
+    *
+    * Parameters:
+    *    features = The desired engine features.
+    */
+   private final void start(Features features)
    {
-      // What time is it?
-      double now = al_get_time();
-      auto deltaTime = now - prevTime;
-      prevTime = now;
+      // Initialize the Allegro system
+      AllegroManager.initSystem();
 
-      // Generate tick event
-      ALLEGRO_EVENT tickEvent;
-      tickEvent.user.type = FEWDEE_EVENT_TICK;
-      tickEvent.user.deltaTime(deltaTime);
-      al_emit_user_event(&TheCustomEventSource, &tickEvent, null);
+      // Store the requested features
+      _requestedFeatures = features;
 
-      // Handle pending events
-      ALLEGRO_EVENT event;
-      while (al_get_next_event(TheEventQueue, &event))
-         TheStateManager.onEvent(event);
+      // Initialize bitmap creation flags
+      _newBitmapPixelFormat =
+         ALLEGRO_PIXEL_FORMAT.ALLEGRO_PIXEL_FORMAT_ANY_WITH_ALPHA;
+      _newBitmapFlags =
+         ALLEGRO_NO_PREMULTIPLIED_ALPHA // TODO: use pre-multiplied alpha!
+         | ALLEGRO_VIDEO_BITMAP
+         | ALLEGRO_MIN_LINEAR
+         | ALLEGRO_MAG_LINEAR
+         | ALLEGRO_MIPMAP;
 
-      // Draw!
-      al_set_target_backbuffer(TheDisplay);
-      TheStateManager.onDraw();
-      al_flip_display();
+      // Don't use pre-multiplied alpha by default
+      al_set_blender(ALLEGRO_BLEND_OPERATIONS.ALLEGRO_ADD,
+                     ALLEGRO_BLEND_MODE.ALLEGRO_ALPHA,
+                     ALLEGRO_BLEND_MODE.ALLEGRO_INVERSE_ALPHA);
+
+      al_set_new_bitmap_flags(ALLEGRO_NO_PREMULTIPLIED_ALPHA
+                              | ALLEGRO_MIN_LINEAR
+                              | ALLEGRO_MAG_LINEAR);
    }
+
+   /**
+    * Stops the engine. This sets shuts everything down so that your program
+    * shuts down gracefully. You cannot call any other Engine after calling this
+    * function.
+    *
+    * BTW, you should use a $(D Crank) to start and stop the engine -- this is
+    * $(D private), you cannot even call this manually.
+    *
+    * See_also: Crank
+    */
+   private final void stop()
+   {
+      // TODO: calling destroyInstance() in an uninstantiated singleton is OK;
+      //       but must think well about the ordering of destruction.
+      EventManager.destroyInstance();
+      StateManager.destroyInstance();
+      AudioManager.destroyInstance();
+      DisplayManager.destroyInstance();
+      ResourceManager.destroyInstance();
+      AllegroManager.destroyInstance();
+   }
+
+   /**
+    * Runs the engine main loop, with a given starting state. This will loop
+    * until $(D StateManager)'s stake of states gets empty.
+    *
+    * Parameters:
+    *    startingState = The starting state. This will be only state in the
+    *       stack as the loop starts.
+    *
+    * TODO: Implement different main loop strategies, with or without the State
+    *       Manager.
+    */
+   public final void run(GameState startingState)
+   {
+      StateManager.pushState(startingState);
+      run(() => !StateManager.empty);
+   }
+
+   /**
+    * Runs the engine main loop while a certain condition is $(D true).
+    *
+    * Parameters:
+    *    condition = A delegate returning a Boolean value. While it returns $(D
+    *       true), the loop will keep looping.
+    *
+    * TODO: Implement different main loop strategies, with or without the State
+    *       Manager.
+    */
+   public final void run(bool delegate() condition)
+   {
+      double prevTime = al_get_time();
+
+      while (condition())
+      {
+         // What time is it?
+         immutable now = al_get_time();
+         immutable deltaT = now - prevTime;
+         prevTime = now;
+
+         // Generate tick event
+         EventManager.triggerTickEvent(deltaT);
+
+         // Draw!
+         EventManager.triggerDrawEvent(deltaT);
+      }
+   }
+
+   /**
+    * Returns the engine features requested by the user when initializing the
+    * Engine.
+    */
+   package final @property Features requestedFeatures() const
+   {
+      return _requestedFeatures;
+   }
+
+   /// Returns the pixel format that will be used when creating bitmaps.
+   public final @property ALLEGRO_PIXEL_FORMAT newBitmapPixelFormat() const
+   {
+      return _newBitmapPixelFormat;
+   }
+
+   /// Sets the pixel format that will be used when creating bitmaps.
+   public final @property
+   void newBitmapPixelFormat(ALLEGRO_PIXEL_FORMAT pixelFormat)
+   {
+      _newBitmapPixelFormat = pixelFormat;
+   }
+
+   /// Returns the flags that will be used use when creating bitmaps.
+   public final @property int newBitmapFlags() const
+   {
+      return _newBitmapFlags;
+   }
+
+   /// Sets the flags that will be used use when creating bitmaps.
+   public final @property void newBitmapFlags(int flags)
+   {
+      _newBitmapFlags = flags;
+   }
+
+   /**
+    * Do the Allegro calls that effectively set the global (thread-local) flags
+    * for bitmap creation. Users shouldn't have many reasons to call this
+    * themselves.
+    *
+    * This gets called for every $(D Bitmap) created. I am assuming that this
+    * will not be critical in terms of performance (bitmap creation itself
+    * should dominate), but I may be wrong (I did no benchmarks).
+    */
+   public final void applyBitmapCreationFlags()
+   {
+      al_set_new_bitmap_format(_newBitmapPixelFormat);
+      al_set_new_bitmap_flags(_newBitmapFlags);
+   }
+
+   /// The requested engine features.
+   private Features _requestedFeatures;
+
+   /// The pixel format to use when creating bitmaps.
+   private ALLEGRO_PIXEL_FORMAT _newBitmapPixelFormat;
+
+   /// The flags to use when creating bitmaps.
+   private int _newBitmapFlags;
+}
+
+
+
+/**
+ * The Engine singleton. Provides access to the one and only $(D EngineImpl)
+ * instance.
+ */
+public class Engine
+{
+   mixin LowLockSingleton!EngineImpl;
+}
+
+
+//
+// Unit tests
+//
+
+// All engine features disabled
+unittest
+{
+   import std.functional;
+   import fewdee.event_manager;
+
+   // Start the Engine requesting no features
+   scope crank = new Crank(Features.NONE);
+
+   // Initialize the Event Manager, which in turn will initialize all requested
+   // input devices (none, in this case).
+   auto em = EventManager.instance;
+
+   // Use the Allegro API to ensure that the input subsystems were not
+   // initialized.
+   assert(!al_is_keyboard_installed());
+   assert(!al_is_mouse_installed());
+   assert(!al_is_joystick_installed());
+}
+
+
+// All engine features enabled (the default)
+unittest
+{
+   import std.functional;
+   import fewdee.event_manager;
+
+   // Start the Engine requesting all features (the default)
+   scope crank = new Crank();
+
+   // Initialize the Event Manager, which in turn will initialize all requested
+   // input devices (in this case, all of them).
+   auto em = EventManager.instance;
+
+   // Use the Allegro API to ensure that the input subsystems were not
+   // initialized.
+   assert(al_is_keyboard_installed());
+   assert(al_is_mouse_installed());
+   assert(al_is_joystick_installed());
 }

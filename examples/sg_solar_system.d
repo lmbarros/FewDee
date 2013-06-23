@@ -1,5 +1,7 @@
 /**
- * The good and old solar system graphics programming exercise.
+ * FewDee's "Solar System Scene Graph" example.
+ *
+ * The good and old solar system graphics programming exercise, now in FewDee.
  *
  * Authors: Leandro Motta Barros
  */
@@ -8,107 +10,124 @@ import std.exception;
 import fewdee.all;
 
 
+// We'll use these to position things on the screen.
 immutable WIDTH = 640;
 immutable HEIGHT = 480;
 
-class TheState: GameState
-{
-   this()
-   {
-      // Create the bitmaps
-      bmpAll_ = AllegroBitmap("data/solar_system.png");
-      enforce(bmpAll_ !is null);
-
-      bmpSun1_ = al_create_sub_bitmap(bmpAll_, 0, 0, 64, 64);
-      enforce(bmpSun1_ !is null);
-
-      bmpSun2_ = al_create_sub_bitmap(bmpAll_, 64, 0, 64, 64);
-      enforce(bmpSun2_ !is null);
-
-      bmpPlanet_ = al_create_sub_bitmap(bmpAll_, 128, 0, 64, 64);
-      enforce(bmpPlanet_ !is null);
-
-      bmpMoon_ = al_create_sub_bitmap(bmpAll_, 192, 0, 64, 64);
-      enforce(bmpMoon_ !is null);
-
-      // Create the scene graph
-
-      //              srtRoot_
-      //              /      \
-      //          srtPlanet  sprSun
-      //          /      \
-      //     srtMoon    sprPlanet
-      //        |
-      //     sprMoon
-
-      srtRoot_ = new SRT();
-      auto srtPlanet = new SRT();
-      auto srtMoon = new SRT();
-      auto sprSun = new Sprite(64, 64, 32, 32);
-      auto sprPlanet = new Sprite(64, 64, 32, 32);
-      auto sprMoon = new Sprite(64, 64, 32, 32);
-
-      srtRoot_.addChild(srtPlanet);
-      srtRoot_.addChild(sprSun);
-      srtPlanet.addChild(srtMoon);
-      srtPlanet.addChild(sprPlanet);
-      srtMoon.addChild(sprMoon);
-
-      sprSun.addBitmap(bmpSun1_);
-      sprSun.addBitmap(bmpSun2_);
-
-      srtRoot_.tx = WIDTH / 2.0;
-      srtRoot_.ty = HEIGHT / 2.0;
-
-      sprPlanet.addBitmap(bmpPlanet_);
-      srtPlanet.tx = 200;
-
-      sprMoon.addBitmap(bmpMoon_);
-      srtMoon.tx = 60;
-
-      // Quit if ESC is pressed
-      addEventCallback(ALLEGRO_EVENT_KEY_DOWN,
-                       delegate(in ref ALLEGRO_EVENT event)
-                       {
-                          if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
-                             popState();
-                       });
-
-      // Animate!
-      double time = 0;
-
-      addEventCallback(FEWDEE_EVENT_TICK,
-                       delegate(in ref ALLEGRO_EVENT event)
-                       {
-                          auto dt = event.user.deltaTime;
-                          time += dt;
-                          sprSun.currentIndex = cast(int)(time*10) % 2;
-
-                          srtPlanet.r = srtPlanet.r + dt;
-                          srtMoon.r = srtMoon.r + dt * 3;
-                       });
-   }
-
-   public override void onDraw()
-   {
-      al_clear_to_color(al_map_rgb(16, 16, 32));
-
-      auto dv = new DrawingVisitor();
-      srtRoot_.accept(dv);
-      dv.draw();
-   }
-
-   private AllegroBitmap bmpAll_;
-   private AllegroBitmap bmpSun1_;
-   private AllegroBitmap bmpSun2_;
-   private AllegroBitmap bmpPlanet_;
-   private AllegroBitmap bmpMoon_;
-
-   private SRT srtRoot_;
-}
 
 void main()
 {
+   // Start the engine
    scope crank = new fewdee.engine.Crank();
-   fewdee.engine.run(new TheState());
+
+   // When this is set to 'true', we'll exit the main loop.
+   bool exitPlease = false;
+
+   // Initialize the only resource we'll use. We are not using the
+   // 'ResourceManager' here, so we'll have to release the resources manually
+   // when the program ends.
+   auto bmpAll = new Bitmap("data/solar_system.png");
+
+   // We have all the resources packed in a single image (a sprite sheet). Here,
+   // we use the Allegro API to create sub bitmaps representing the individual
+   // images we are interested in using.
+   //
+   // TODO: This is too low-level. FewDee needs to provide a nicer way to use
+   //       sprite sheets.
+   auto bmpSun1 = al_create_sub_bitmap(bmpAll, 0, 0, 64, 64);
+   enforce(bmpSun1 !is null);
+
+   auto bmpSun2 = al_create_sub_bitmap(bmpAll, 64, 0, 64, 64);
+   enforce(bmpSun2 !is null);
+
+   auto bmpPlanet = al_create_sub_bitmap(bmpAll, 128, 0, 64, 64);
+   enforce(bmpPlanet !is null);
+
+   auto bmpMoon = al_create_sub_bitmap(bmpAll, 192, 0, 64, 64);
+   enforce(bmpMoon !is null);
+
+   // Now, create the scene graph. We want to create a scene graph like the one
+   // shown below. The code just create the nodes and connections between nodes.
+   //
+   //              srtRoot
+   //              /      \
+   //          srtPlanet  sprSun
+   //          /      \
+   //     srtMoon    sprPlanet
+   //        |
+   //     sprMoon
+
+   auto srtRoot = new SRT();
+   auto srtPlanet = new SRT();
+   auto srtMoon = new SRT();
+   auto sprSun = new Sprite(64, 64, 32, 32);
+   auto sprPlanet = new Sprite(64, 64, 32, 32);
+   auto sprMoon = new Sprite(64, 64, 32, 32);
+
+   srtRoot.addChild(srtPlanet);
+   srtRoot.addChild(sprSun);
+   srtPlanet.addChild(srtMoon);
+   srtPlanet.addChild(sprPlanet);
+   srtMoon.addChild(sprMoon);
+
+   sprSun.addBitmap(bmpSun1);
+   sprSun.addBitmap(bmpSun2);
+
+   srtRoot.tx = WIDTH / 2.0;
+   srtRoot.ty = HEIGHT / 2.0;
+
+   sprPlanet.addBitmap(bmpPlanet);
+   srtPlanet.tx = 200;
+
+   sprMoon.addBitmap(bmpMoon);
+   srtMoon.tx = 60;
+
+   // Time to create event handlers.
+
+   // Quit if ESC is pressed
+   EventManager.addHandler(
+      ALLEGRO_EVENT_KEY_DOWN,
+      delegate(in ref ALLEGRO_EVENT event)
+      {
+         if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+            exitPlease = true;
+      });
+
+   // Animate! In response to "tick" events, we update the rotations of the
+   // celestial bodies nodes. (And we also alternate between the two sun
+   // images, for a poor man's glowing effect.)
+   auto time = 0.0;
+   EventManager.addHandler(
+      FEWDEE_EVENT_TICK,
+      delegate(in ref ALLEGRO_EVENT event)
+      {
+         auto dt = event.user.deltaTime;
+         time += dt;
+         sprSun.currentIndex = cast(int)(time*10) % 2;
+
+         srtPlanet.r = srtPlanet.r + dt;
+         srtMoon.r = srtMoon.r + dt * 3;
+      });
+
+   // And draw. Drawing is done by making a 'DrawingVisitor' visit the scene
+   // graph.
+   //
+   // TODO: This is probably not the nicest interface for drawing. FewDee
+   //       needs more love here.
+   EventManager.addHandler(
+      FEWDEE_EVENT_TICK,
+      delegate(in ref ALLEGRO_EVENT event)
+      {
+         al_clear_to_color(al_map_rgb(16, 16, 32));
+
+         auto dv = new DrawingVisitor();
+         srtRoot.accept(dv);
+         dv.draw();
+      });
+
+   // Create a display
+   DisplayManager.createDisplay("main");
+
+   // Run the main loop while 'exitPlease' is true.
+   Engine.run(() => !exitPlease);
 }

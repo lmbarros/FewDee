@@ -1,21 +1,30 @@
 /**
- * Example plotting the interpolators' graphs. Yes, you can change the
- * interpolation parameters and see the results right there.
+ * FewDee's "Interpolator's Graphs" example.
+ *
+ * Plots the interpolators' graphs. Allows to change the interpolation
+ * parameters and see the results right there.
  *
  * Authors: Leandro Motta Barros
  */
 
-import std.conv;
 import std.exception;
 import std.stdio;
 import fewdee.all;
 
 
-immutable WIDTH = 640;
-immutable HEIGHT = 480;
+// To make our life easier, this example runs in a fixed resolution. Here are
+// two manifest constants defining the desired window size. This matches the
+// image we use in the background (and there are also a few other hardcoded
+// values in the code, so changing these values will probably not work very
+// well).
+enum WIDTH = 640;
+enum HEIGHT = 480;
 
 
-enum Interpolator
+// An enumeration with all interpolators supported by this example (which should
+// be all the standard interpolators provided by FewDee, which should be all of
+// Robert Penner's easing functions (http://robertpenner.com/easing).
+enum InterpolatorType
 {
    Linear,
    QuadraticIn, QuadraticOut, QuadraticInOut,
@@ -32,156 +41,215 @@ enum Interpolator
 }
 
 
-Interpolator CurrentInterpolator = Interpolator.Linear;
-auto From = -10.0;
-auto To = 10.0;
-auto Duration = 1.0;
-auto Amplitude = 2.0;
-auto Period = 0.3;
+// Now, let's define some global variables that will store the interpolation
+// parameters that the user will be able to tweak. (Yes, globals can make a
+// short example like this simpler to understand).
 
-Interpolator_t TheInterpolator;
+// This is the type of interpolator ("easing function") to use.
+InterpolatorType currentInterpolator = InterpolatorType.Linear;
 
-void RemakeInterpolator()
+// The starting interpolation value.
+auto from = -10.0;
+
+// The target value, which will be reached at the end of the interpolation.
+auto to = 10.0;
+
+// All interpolators generate interpolated values as a certain variable (usually
+// called "t") grows from zero to a certain value (usually 1.0). This is this
+// certain value.
+auto duration = 1.0;
+
+// "Amplitude" is a parameter used only by the "back" and "elastic"
+// interpolators. (And even those have default values for these parameters, so
+// in many cases you don't have to worry about "amplitude").
+auto amplitude = 2.0;
+
+// "Period" is used by the "elastic" interpolators; like "amplitude", "period"
+// has a default value that may be just you need in practice.
+auto period = 0.3;
+
+// Interpolators in FewDee are delegates that take one parameter (the "t" value)
+// and return the interpolated value. In this example, the following variable
+// stores the interpolator used to draw the graphs.
+Interpolator theInterpolator;
+
+// And this is our neat "graph paper" bitmap that will be used as the background
+// image.
+Bitmap bmpBG;
+
+
+// Whenever the user changes an interpolation parameter, we need to reset the
+// 'theInterpolator' variable with an updated interpolator. That's what this
+// function does.
+//
+// The easiest way to create an interpolator is to call the 'interpolator()'
+// template function. The only drawback of 'interpolator()' is that it doesn't
+// allow to set the "amplitude" and "period" parameters of "back" and "elastic"
+// interpolators (you can use 'interpolator()' to create interpolators of these
+// types, but the default values for "amplitude" and "period" will be used).
+private void remakeInterpolator()
 {
-   final switch(CurrentInterpolator)
+   final switch (currentInterpolator) with (InterpolatorType)
    {
-      case Interpolator.Linear:
-         TheInterpolator = interpolator!"t"(From, To, Duration);
+      // This is the simplest case of calling the 'interpolator()' function. The
+      // template parameter (here, "t") determines the type of interpolator that
+      // will be created and returned (in this case, a linear interpolator).
+      case Linear:
+         theInterpolator = interpolator!"t"(from, to, duration);
          break;
 
-      case Interpolator.QuadraticIn:
-         TheInterpolator = interpolator!"[t^2"(From, To, Duration);
+      // Here, we are creating a quadratic interpolator ("t^2"), which will ease
+      // in (that is the meaning of the opening square brackets).
+      case QuadraticIn:
+         theInterpolator = interpolator!"[t^2"(from, to, duration);
          break;
 
-      case Interpolator.QuadraticOut:
-         TheInterpolator = interpolator!"t^2]"(From, To, Duration);
+      // This is like above, but we use closing square brackets. This means that
+      // the interpolator will ease out.
+      case QuadraticOut:
+         theInterpolator = interpolator!"t^2]"(from, to, duration);
          break;
 
-      case Interpolator.QuadraticInOut:
-         TheInterpolator = interpolator!"[t^2]"(From, To, Duration);
+      // And here we use both opening and closing square brackets: the
+      // interpolator will ease in and out.
+      case QuadraticInOut:
+         theInterpolator = interpolator!"[t^2]"(from, to, duration);
          break;
 
-      case Interpolator.CubicIn:
-         TheInterpolator = interpolator!"[t^3"(From, To, Duration);
+      // From now on, most calls are similar... just the template parameter
+      // changes. The documentation of 'interpolator()' lists all accepted
+      // values, including variations like "[cubic" instead of "[t^3".
+      case CubicIn:
+         theInterpolator = interpolator!"[t^3"(from, to, duration);
          break;
 
-      case Interpolator.CubicOut:
-         TheInterpolator = interpolator!"t^3]"(From, To, Duration);
+      case CubicOut:
+         theInterpolator = interpolator!"t^3]"(from, to, duration);
          break;
 
-      case Interpolator.CubicInOut:
-         TheInterpolator = interpolator!"[t^3]"(From, To, Duration);
+      case CubicInOut:
+         theInterpolator = interpolator!"[t^3]"(from, to, duration);
          break;
 
-      case Interpolator.QuarticIn:
-         TheInterpolator = interpolator!"[t^4"(From, To, Duration);
+      case QuarticIn:
+         theInterpolator = interpolator!"[t^4"(from, to, duration);
          break;
 
-      case Interpolator.QuarticOut:
-         TheInterpolator = interpolator!"t^4]"(From, To, Duration);
+      case QuarticOut:
+         theInterpolator = interpolator!"t^4]"(from, to, duration);
          break;
 
-      case Interpolator.QuarticInOut:
-         TheInterpolator = interpolator!"[t^4]"(From, To, Duration);
+      case QuarticInOut:
+         theInterpolator = interpolator!"[t^4]"(from, to, duration);
          break;
 
-      case Interpolator.QuinticIn:
-         TheInterpolator = interpolator!"[t^5"(From, To, Duration);
+      case QuinticIn:
+         theInterpolator = interpolator!"[t^5"(from, to, duration);
          break;
 
-      case Interpolator.QuinticOut:
-         TheInterpolator = interpolator!"t^5]"(From, To, Duration);
+      case QuinticOut:
+         theInterpolator = interpolator!"t^5]"(from, to, duration);
          break;
 
-      case Interpolator.QuinticInOut:
-         TheInterpolator = interpolator!"[t^5]"(From, To, Duration);
+      case QuinticInOut:
+         theInterpolator = interpolator!"[t^5]"(from, to, duration);
          break;
 
-      case Interpolator.SineIn:
-         TheInterpolator = interpolator!"[sin"(From, To, Duration);
+      case SineIn:
+         theInterpolator = interpolator!"[sin"(from, to, duration);
          break;
 
-      case Interpolator.SineOut:
-         TheInterpolator = interpolator!"sin]"(From, To, Duration);
+      case SineOut:
+         theInterpolator = interpolator!"sin]"(from, to, duration);
          break;
 
-      case Interpolator.SineInOut:
-         TheInterpolator = interpolator!"[sin]"(From, To, Duration);
+      case SineInOut:
+         theInterpolator = interpolator!"[sin]"(from, to, duration);
          break;
 
-      case Interpolator.CircleIn:
-         TheInterpolator = interpolator!"[circle"(From, To, Duration);
+      case CircleIn:
+         theInterpolator = interpolator!"[circle"(from, to, duration);
          break;
 
-      case Interpolator.CircleOut:
-         TheInterpolator = interpolator!"circle]"(From, To, Duration);
+      case CircleOut:
+         theInterpolator = interpolator!"circle]"(from, to, duration);
          break;
 
-      case Interpolator.CircleInOut:
-         TheInterpolator = interpolator!"[circle]"(From, To, Duration);
+      case CircleInOut:
+         theInterpolator = interpolator!"[circle]"(from, to, duration);
          break;
 
-      case Interpolator.ExponentialIn:
-         TheInterpolator = interpolator!"[exp"(From, To, Duration);
+      case ExponentialIn:
+         theInterpolator = interpolator!"[exp"(from, to, duration);
          break;
 
-      case Interpolator.ExponentialOut:
-         TheInterpolator = interpolator!"exp]"(From, To, Duration);
+      case ExponentialOut:
+         theInterpolator = interpolator!"exp]"(from, to, duration);
          break;
 
-      case Interpolator.ExponentialInOut:
-         TheInterpolator = interpolator!"[exp]"(From, To, Duration);
+      case ExponentialInOut:
+         theInterpolator = interpolator!"[exp]"(from, to, duration);
          break;
 
-      case Interpolator.BackIn:
-         TheInterpolator =
-            makeBackInInterpolator(From, To, Amplitude, Duration);
+      case BackIn:
+         // Here's the first case in which we don't use 'interpolator()' to
+         // create an interpolator. Since we are creating a "back" interpolator
+         // *and* want to set its "nonstandard" "amplitude" parameter, we have o
+         // use a specific function to create it. Notice that, if you were OK to
+         // use the default value for "amplitude", you could call
+         // 'interpolator!"[back"()' here.
+         theInterpolator =
+            makeBackInInterpolator(from, to, amplitude, duration);
          break;
 
-      case Interpolator.BackOut:
-         TheInterpolator =
-            makeBackOutInterpolator(From, To, Amplitude, Duration);
+      case BackOut:
+         theInterpolator =
+            makeBackOutInterpolator(from, to, amplitude, duration);
          break;
 
-      case Interpolator.BackInOut:
-         TheInterpolator =
-            makeBackInOutInterpolator(From, To, Amplitude, Duration);
+      case BackInOut:
+         theInterpolator =
+            makeBackInOutInterpolator(from, to, amplitude, duration);
          break;
 
-      case Interpolator.BounceIn:
-         TheInterpolator = interpolator!"[bounce"(From, To, Duration);
+      case BounceIn:
+         theInterpolator = interpolator!"[bounce"(from, to, duration);
          break;
 
-      case Interpolator.BounceOut:
-         TheInterpolator = interpolator!"bounce]"(From, To, Duration);
+      case BounceOut:
+         theInterpolator = interpolator!"bounce]"(from, to, duration);
          break;
 
-      case Interpolator.BounceInOut:
-         TheInterpolator = interpolator!"[bounce]"(From, To, Duration);
+      case BounceInOut:
+         theInterpolator = interpolator!"[bounce]"(from, to, duration);
          break;
 
-      case Interpolator.ElasticIn:
-         TheInterpolator =
-            makeElasticInInterpolator(From, To, Amplitude, Period, Duration);
+      case ElasticIn:
+         theInterpolator =
+            makeElasticInInterpolator(from, to, amplitude, period, duration);
          break;
 
-      case Interpolator.ElasticOut:
-         TheInterpolator =
-            makeElasticOutInterpolator(From, To, Amplitude, Period, Duration);
+      case ElasticOut:
+         theInterpolator =
+            makeElasticOutInterpolator(from, to, amplitude, period, duration);
          break;
 
-      case Interpolator.ElasticInOut:
-         TheInterpolator =
-            makeElasticInOutInterpolator(From, To, Amplitude, Period, Duration);
+      case ElasticInOut:
+         theInterpolator =
+            makeElasticInOutInterpolator(from, to, amplitude, period, duration);
          break;
 
-      case Interpolator.Count:
+      case Count:
          assert(false); // can't happen
    }
 }
 
-void DrawGraph()
+
+// And here's the function that uses 'theTnterpolator' to draw the graphs.
+private void drawGraph()
 {
+   // These two nested functions just translate "raw" coordinate values to
+   // values that will fit nicely in our gridded background image.
    pure nothrow double convX(double x)
    {
       return x * (WIDTH/4.0) + (WIDTH/4.0);
@@ -192,21 +260,28 @@ void DrawGraph()
       return HEIGHT - (y * (HEIGHT/40.0) + (HEIGHT/2.0));
    }
 
+   // Here we begin the actual drawing. One thing to notice is that it is OK to
+   // call the interpolators passing values out of the [from, to] range. You
+   // could use, for instance, a sine interpolator to make something
+   // continuously and smoothly vary back and forth between two values. Or you
+   // could use a linear interpolator to (linearly) extrapolate.
    auto prevX = -1.0;
-   auto prevY = TheInterpolator(-1.0);
+   auto prevY = theInterpolator(-1.0);
    enum delta = 0.01;
 
    for (auto t = -1.0; t <= 3.0; t += delta)
    {
+      // Use a more discrete color for the values out of the [0, duration]
+      // interval.
       auto color = al_map_rgba_f(0.9, 0.1, 0.1, 0.85);
-      if (t < 0.0 + delta || t > Duration + delta)
+      if (t < 0.0 + delta || t > duration + delta)
          color = al_map_rgba_f(0.9, 0.6, 0.6, 0.85);
 
-      auto thickness = 2.5;
+      enum thickness = 2.5;
       auto x1 = prevX;
       auto y1 = prevY;
       auto x2 = t;
-      auto y2 = TheInterpolator(t);
+      auto y2 = theInterpolator(t); // the interpolator is actually used here
 
       al_draw_line(convX(x1), convY(y1),
                    convX(x2), convY(y2),
@@ -216,159 +291,179 @@ void DrawGraph()
       prevY = y2;
    }
 
-   al_draw_filled_circle(convX(0.0), convY(From),
+   // Mark the "from" and "to" points in the graph.
+   al_draw_filled_circle(convX(0.0), convY(from),
                          4.5, al_map_rgba_f(0.1, 0.9, 0.1, 0.9));
 
-   al_draw_filled_circle(convX(Duration), convY(To),
+   al_draw_filled_circle(convX(duration), convY(to),
                          4.5, al_map_rgba_f(0.1, 0.1, 0.9, 0.9));
 }
 
-class TheState: GameState
-{
-   this()
-   {
-      // Load the background image
-      bmpBG_ = AllegroBitmap("data/interpolators_graphs_bg.png");
-      enforce(bmpBG_ !is null);
 
-      // Quit if ESC is pressed
-      addEventCallback(ALLEGRO_EVENT_KEY_DOWN,
-                       delegate(in ref ALLEGRO_EVENT event)
-                       {
-                          if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
-                             popState();
-                       });
 
-      // Handle other keys
-      addEventCallback(ALLEGRO_EVENT_KEY_CHAR,
-                       delegate(in ref ALLEGRO_EVENT event)
-                       {
-                          switch (event.keyboard.keycode)
-                          {
-                             // Duration
-                             case ALLEGRO_KEY_D:
-                             {
-                                auto mod = event.keyboard.modifiers;
-                                if (mod & ALLEGRO_KEYMOD_SHIFT)
-                                   Duration -= 0.1;
-                                else
-                                   Duration += 0.1;
-
-                                if (Duration < 0.1)
-                                   Duration = 0.1;
-
-                                writefln("Duration = %s", Duration);
-                                RemakeInterpolator();
-
-                                break;
-                             }
-
-                             // From
-                             case ALLEGRO_KEY_F:
-                             {
-                                auto mod = event.keyboard.modifiers;
-                                if (mod & ALLEGRO_KEYMOD_SHIFT)
-                                   From -= 1.0;
-                                else
-                                   From += 1.0;
-
-                                writefln("From = %s", From);
-                                RemakeInterpolator();
-
-                                break;
-                             }
-
-                             // To
-                             case ALLEGRO_KEY_T:
-                             {
-                                auto mod = event.keyboard.modifiers;
-                                if (mod & ALLEGRO_KEYMOD_SHIFT)
-                                   To -= 1.0;
-                                else
-                                   To += 1.0;
-
-                                writefln("To = %s", To);
-                                RemakeInterpolator();
-
-                                break;
-                             }
-
-                             // Amplitude
-                             case ALLEGRO_KEY_A:
-                             {
-                                auto mod = event.keyboard.modifiers;
-                                if (mod & ALLEGRO_KEYMOD_SHIFT)
-                                   Amplitude -= 0.1;
-                                else
-                                   Amplitude += 0.1;
-
-                                writefln("Amplitude = %s", Amplitude);
-                                RemakeInterpolator();
-
-                                break;
-                             }
-
-                             // Period
-                             case ALLEGRO_KEY_P:
-                             {
-                                auto mod = event.keyboard.modifiers;
-                                if (mod & ALLEGRO_KEYMOD_SHIFT)
-                                   Period -= 0.1;
-                                else
-                                   Period += 0.1;
-
-                                writefln("Period = %s", Period);
-                                RemakeInterpolator();
-
-                                break;
-                             }
-
-                             // Interpolator
-                             case ALLEGRO_KEY_I:
-                             {
-                                auto mod = event.keyboard.modifiers;
-                                if (mod & ALLEGRO_KEYMOD_SHIFT)
-                                {
-                                   if (CurrentInterpolator > 0)
-                                      --CurrentInterpolator;
-                                }
-                                else
-                                {
-                                   auto limit = Interpolator.Count - 1;
-                                   if (CurrentInterpolator < limit)
-                                      ++CurrentInterpolator;
-                                }
-
-                                writefln("Interpolator = %s",
-                                         to!string(CurrentInterpolator));
-                                RemakeInterpolator();
-
-                                break;
-                             }
-
-                             default:
-                             {
-                                break; // do nothing
-                             }
-                          }
-                       });
-
-      // Ensure we have a valid interpolator
-      RemakeInterpolator();
-   }
-
-   public override void onDraw()
-   {
-      al_clear_to_color(al_map_rgb(255, 255, 255));
-      al_draw_bitmap(bmpBG_, 0.0, 0.0, 0);
-      DrawGraph();
-   }
-
-   private AllegroBitmap bmpBG_;
-}
-
+// The main function. You should now what it is :-)
 void main()
 {
+   // Start the engine
    scope crank = new fewdee.engine.Crank();
-   fewdee.engine.run(new TheState());
+
+   // We are using the functions provided by the Allegro primitives add on, so
+   // we have to initialize it.
+   AllegroManager.initPrimitives();
+
+   // Load the background image. (Since we are not using the ResourceManager,
+   // we'll need to free it manually later).
+   bmpBG = new Bitmap("data/interpolators_graphs_bg.png");
+
+   // When this is set to 'true', we'll exit the main loop.
+   bool exitPlease = false;
+
+   // Now register all the event handlers we'll need
+
+   // Quit if ESC is pressed
+   EventManager.addHandler(
+      ALLEGRO_EVENT_KEY_DOWN,
+      delegate(in ref ALLEGRO_EVENT event)
+      {
+         if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+            exitPlease = true;
+      });
+
+   // Handle other keys. These just allow the user to change the interpolator
+   // parameters. Nothing really interesting is done here.
+   EventManager.addHandler(
+      ALLEGRO_EVENT_KEY_CHAR,
+      delegate(in ref ALLEGRO_EVENT event)
+      {
+         switch (event.keyboard.keycode)
+         {
+            // duration
+            case ALLEGRO_KEY_D:
+            {
+               auto mod = event.keyboard.modifiers;
+               if (mod & ALLEGRO_KEYMOD_SHIFT)
+                  duration -= 0.1;
+               else
+                  duration += 0.1;
+
+               if (duration < 0.1)
+                  duration = 0.1;
+
+               writefln("duration = %s", duration);
+               remakeInterpolator();
+
+               break;
+            }
+
+            // from
+            case ALLEGRO_KEY_F:
+            {
+               auto mod = event.keyboard.modifiers;
+               if (mod & ALLEGRO_KEYMOD_SHIFT)
+                  from -= 1.0;
+               else
+                  from += 1.0;
+
+               writefln("from = %s", from);
+               remakeInterpolator();
+
+               break;
+            }
+
+            // to
+            case ALLEGRO_KEY_T:
+            {
+               auto mod = event.keyboard.modifiers;
+               if (mod & ALLEGRO_KEYMOD_SHIFT)
+                  to -= 1.0;
+               else
+                  to += 1.0;
+
+               writefln("to = %s", to);
+               remakeInterpolator();
+
+               break;
+            }
+
+            // amplitude
+            case ALLEGRO_KEY_A:
+            {
+               auto mod = event.keyboard.modifiers;
+               if (mod & ALLEGRO_KEYMOD_SHIFT)
+                  amplitude -= 0.1;
+               else
+                  amplitude += 0.1;
+
+               writefln("amplitude = %s", amplitude);
+               remakeInterpolator();
+
+               break;
+            }
+
+            // period
+            case ALLEGRO_KEY_P:
+            {
+               auto mod = event.keyboard.modifiers;
+               if (mod & ALLEGRO_KEYMOD_SHIFT)
+                  period -= 0.1;
+               else
+                  period += 0.1;
+
+               writefln("period = %s", period);
+               remakeInterpolator();
+
+               break;
+            }
+
+            // Interpolator
+            case ALLEGRO_KEY_I:
+            {
+               auto mod = event.keyboard.modifiers;
+               if (mod & ALLEGRO_KEYMOD_SHIFT)
+               {
+                  if (currentInterpolator > 0)
+                     --currentInterpolator;
+               }
+               else
+               {
+                  auto limit = InterpolatorType.Count - 1;
+                  if (currentInterpolator < limit)
+                     ++currentInterpolator;
+               }
+
+               writefln("Interpolator = %s", currentInterpolator);
+               remakeInterpolator();
+
+               break;
+            }
+
+            default:
+            {
+               break; // do nothing
+            }
+         }
+      });
+
+   // Handle draw events. Clear all to white, draw the background, plot the
+   // graph. Nothing unexpected.
+   EventManager.addHandler(
+      FEWDEE_EVENT_DRAW,
+      delegate(in ref ALLEGRO_EVENT event)
+      {
+         al_clear_to_color(al_map_rgb(255, 255, 255));
+         al_draw_bitmap(bmpBG, 0.0, 0.0, 0);
+         drawGraph();
+      });
+
+   // Initialize 'theInterpolator'.
+   remakeInterpolator();
+
+   // Create a display
+   DisplayManager.createDisplay("main");
+
+   // Run the main loop while 'exitPlease' is true.
+   Engine.run(() => !exitPlease);
+
+   // And free the one resource we allocated in this example.
+   bmpBG.free();
 }

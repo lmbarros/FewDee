@@ -29,35 +29,35 @@ interface Positionable
 
 
 /**
- * A default implementation for Positionable objects. The "postSet" parameter,
- * if not an empty string, shall contain code to be executed after one of the
- * position coordinates is changed. One typical action to perform after changing
- * the coordinates is to dirty the bounding box.
+ * A default implementation for $(D Positionable) objects. The $(D postSet)
+ * parameter, if not an empty string, shall contain code to be executed after
+ * one of the position coordinates is changed. One typical action to perform
+ * after changing the coordinates is to dirty the bounding box.
  */
 mixin template PositionableDefaultImplementation(string postSet = "")
 {
-   public @property float x() const{ return x_; }
+   public @property float x() const{ return _x; }
 
    public @property void x(float x)
    {
-      this.x_ = x;
+      this._x = x;
       static if (postSet != "")
       {
          mixin(postSet);
       }
    }
 
-   public @property float y() const { return y_; }
+   public @property float y() const { return _y; }
 
    public @property void y(float y)
    {
-      this.y_ = y;
+      this._y = y;
       static if (postSet != "")
       {
          mixin(postSet);
       }
    }
 
-   private float x_ = 0.0;
-   private float y_ = 0.0;
+   private float _x = 0.0;
+   private float _y = 0.0;
 }

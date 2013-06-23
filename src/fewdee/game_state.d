@@ -6,39 +6,80 @@
 
 module fewdee.game_state;
 
+import std.conv;
 import allegro5.allegro;
-import fewdee.event_handler;
+import fewdee.event_manager;
 import fewdee.state_manager;
 
 
 /// Base class for the states the game can be in.
-class GameState
+public class GameState
 {
-   /// Pushes a state on top of this one. onBury() will be called.
-   protected void pushState(GameState state)
+   /**
+    * Pushes a state on top of this one. $(D onBury()) will be called.
+    *
+    * This must be called by the state on the top of the stack. Failing to
+    * observe this rule will trigger an $(D assert()). For pushing the first
+    * state on the stack, please use $(StateManager.pushState()).
+    *
+    * Parameters:
+    *    state = The state to push into the stack of states, just on top of this
+    *       one.
+    */
+   protected final void pushState(GameState state)
+   in
    {
-      stateManager_.pushState(state);
+      assert(this is StateManager.top);
+   }
+   body
+   {
+      StateManager.pushState(state);
    }
 
-   /// Pops this state from the stack of Game States.
-   public void popState()
+   /**
+    * Pops this state from the stack of Game States. If there is an state
+    * underneath this one, its $(D onDigOut()) method will be called.
+    *
+    * This must be called by the state on the top of the stack. Failing to
+    * observe this rule will trigger an $(D assert()).
+    */
+   public final void popState()
+   in
    {
-      stateManager_.popState();
+      assert(this is StateManager.top);
+   }
+   body
+   {
+      StateManager.popState();
    }
 
    /**
     * Replaces this state in the top of the stack of Game States with a new
-    * one. onDigOut() and onBury() are not called.
+    * one. $(D onDigOut()) and $(D onBury()) are not called.
+    *
+    * This must be called by the state on the top of the stack. Failing to
+    * observe this rule will trigger an $(D assert()).
+    *
+    * Parameters:
+    *    state = The state to push into the stack of states, just on top of this
+    *       one.
     */
-   public void replaceState(GameState state)
+   public final void replaceState(GameState state)
+   in
+   {
+      assert(this is StateManager.top);
+   }
    body
    {
-      stateManager_.replaceState(state);
+      StateManager.replaceState(state);
    }
 
    /**
     * Called when this state is buried under another one (that is, when a new
     * state is pushed into the stack, just on top of this one).
+    *
+    * The default implementation simply says that this state no longer desires
+    * to receive any events.
     */
    public void onBury()
    {
@@ -50,6 +91,9 @@ class GameState
    /**
     * Called when this state becomes the one on the top of stack again, after
     * the state previously on top was popped.
+    *
+    * The default implementation simply says that this state desires to restart
+    * receiving all events.
     */
    public void onDigOut()
    {
@@ -58,30 +102,6 @@ class GameState
       wantsToDraw = true;
    };
 
-   /// Called periodically. This is the place to do all the drawing.
-   public void onDraw() { };
-
-   /**
-    * Called when an event is received. Calls all event callbacks registered for
-    * event.type and forwards the event to the registered event handlers.
-    *
-    * Parameters:
-    *    event = The event received.
-    */
-   public void onEvent(in ref ALLEGRO_EVENT event)
-   {
-      auto pCallbacks = event.type in eventCallbacks_;
-      if (pCallbacks !is null)
-      {
-         foreach (callback; *pCallbacks)
-            callback(event);
-      }
-
-      foreach (eventHandler; eventHandlers_)
-         eventHandler.handleEvent(event);
-   }
-
-
    /**
     * Adds an event handler. Its handleEvent() method will be called from now on
     * for every event handled by this game state.
@@ -89,65 +109,57 @@ class GameState
     * Parameters:
     *    handler = The event handler to add.
     */
-   public void addEventHandler(EventHandler handler)
+   public final EventHandlerID addHandler(
+      ALLEGRO_EVENT_TYPE eventType, EventHandler handler)
    {
-      eventHandlers_ ~= handler;
+      return StateManager.addHandler(this, eventType, handler);
    }
 
-
    /**
-    * Adds an event callback for a given type. The callback will be called
-    * whenever an event of the requested type arrives. It is OK to add multiple
-    * callbacks for the same event type; all of them will be called.
+    * Removes an event handler. If the requested handler wasn't previously
+    * added, nothing happens.
+    *
+    * Parameters:
+    *    id = The ID of the event handler to remove.
+    *
+    * Returns:
+    *    $(D true) if the event handler was removed; $(D false) otherwise.
     */
-   void addEventCallback(ALLEGRO_EVENT_TYPE type, EventCallback_t callback)
+   public final bool removeHandler(EventHandlerID id)
    {
-      eventCallbacks_[type] ~= callback;
+      return StateManager.removeHandler(id);
+   }
+
+   /// Converts the $(D GameState) to a $(D string).
+   public override string toString() const
+   {
+      return "GameState(" ~ typeid(this).name ~ ")";
    }
 
    /// Does this GameState want to receive "tick" events?
-   public @property bool wantsTicks() const { return wantsTicks_; }
+   public final @property bool wantsTicks() const { return _wantsTicks; }
 
    /// Does this GameState want to receive "tick" events?
-   public @property wantsTicks(bool wants) { wantsTicks_ = wants; }
+   public final @property void wantsTicks(bool wants) { _wantsTicks = wants; }
 
    /// Does this GameState want to receive events other than "tick"?
-   public @property bool wantsEvents() const { return wantsEvents_; }
+   public final @property bool wantsEvents() const { return _wantsEvents; }
 
    /// Does this GameState want to receive events other than "tick"?
-   public @property wantsEvents(bool wants) { wantsEvents_ = wants; }
+   public final @property void wantsEvents(bool wants) { _wantsEvents = wants; }
 
    /// Does this GameState want to draw?
-   public @property bool wantsToDraw() const { return wantsToDraw_; }
+   public final @property bool wantsToDraw() const { return _wantsToDraw; }
 
    /// Does this GameState want to draw?
-   public @property wantsToDraw(bool wants) { wantsToDraw_ = wants; }
-
-   /**
-    * A pointer to the StateManager managing this state. This is set by the
-    * StateManager itself, as soon as this is added to it.
-    */
-   package StateManager* stateManager_;
+   public final @property void wantsToDraw(bool wants) { _wantsToDraw = wants; }
 
    /// Does this GameState want to receive "tick" events?
-   private bool wantsTicks_ = true;
+   private bool _wantsTicks = true;
 
    /// Does this GameState want to receive events other than "tick"?
-   private bool wantsEvents_ = true;
+   private bool _wantsEvents = true;
 
    /// Does this GameState want to draw?
-   private bool wantsToDraw_ = true;
-
-   /// A type for an event callback.
-   protected alias void delegate(in ref ALLEGRO_EVENT event) EventCallback_t;
-
-   /**
-    * The registered event callbacks. This is an associative array whose index
-    * is the event type, and whose value is an array with the registered
-    * callbacks for that type.
-    */
-   private EventCallback_t[][ALLEGRO_EVENT_TYPE] eventCallbacks_;
-
-   /// The list of objects that want to receive events to handle them.
-   private EventHandler[] eventHandlers_;
+   private bool _wantsToDraw = true;
 }
