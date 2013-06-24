@@ -24,41 +24,19 @@ available or not. Graceful degration.
 Check how exactly font sizes are specified in Allegro. Ensure that
 AllegroFont works as documented.
 
-Think about a sane way to do manage Allegro resources. Some ideas and
-thoughts:
+Concerning resources:
    - Not all resources have a 1:1 mapping between files and the
      resources themselves. Case in point: one bitmap may contain
      several images which are intented to be used separately (a sprite
      sheet); furthermore, a single "sprite template" could reference
      many of these "sub bitmaps".
-   - A resource manager is a global thing, since resources may be
-     shared between different game states (and someone could use a
-     resource manager without using game states).
-   - It might not be a bad idea to have resources manually freed. They
-     are usually allocated and de-allocated at very specific moments
-     (loading a new level, for example); it's not like, say, memory,
-     which is allocated and free everywhere. The idea is: "resource
-     manager, please load MyFont.ttf, size 22 and associate with the
-     strinf 'NiceFont'." When no longer needed, we can say "resource
-     manager, free 'NiceFont' please." If anyone is still referencing
-     that font, that's their problem, the program will explode.
-   - To ease a manual freeing mechanism, we can have a regexp-based
-     freeing scheme. Like "free all resources matching '*-level_1-*',
-     please".
    - It would be possible to create some kind of "RAII proxy" to a
      resource manager. Adding resources to this "proxy" would add the
      resource to the resource manager. But the proxy remembers which
      resources it has added, so it cann free them when
-     destroyed. (Would need to be 'scope'.)
-   - A resource manager will free (say, call the free() method) of all
-     its resources when it gets destroyed. Perhaps it should be
-     'scope'.
-   - So, resources don't have to reference counted. Bye bye those
-     ref-counted Allegro wrappers.
-   - Question: one big resource manager for all resource types or one
-     resource manager per resource type (perhaps even user-defined
-     resources)? In the latter case, maybe a template or a mixin could
-     provide most of the implementation.
+     destroyed. (Would need to be 'scope'.) I don't know if this
+     really necessary. Better wait until there is some real code using
+     FewDee.
    - The resource manager would be, perhaps, the point where we chose
      between a real file system or an archive file
      system. Perhaps. Must think about this.
@@ -69,7 +47,8 @@ specify if the bitmap being loaded does already have the colors with
 premultiplied alpha or not. Not doing the premultiplication uppon
 loading (and having and editor that allows to edit the alpha channel
 independently) would enable those neat effects like glowing neon signs
-with a single image.
+with a single image. (Maybe I'll need to think on a nice way to
+represent colors in the API.)
 
 GUIsh what about z-order? Drawables have a "z" property; I can
 implement a picking visitor that takes it into account. Then, GUIsh
@@ -88,9 +67,6 @@ Sprite constructor taking arbitrary number of file names.
 Sprite.contains() -> by transparency? Multiple containment policies?
 
 Add means to remove objects/handlers from GUIsh.
-
-Add means to remove objects/handlers from Updater. If necessary, make
-the canned updaters compatible with this.
 
 Add means to remove objects/handlers from AbstractedInput.
 
@@ -126,13 +102,6 @@ re-creating, if possible) the display).
 
 Add Text vertical alignment.
 
-What if a state gets two events in the same "turn" and calls
-pushState() in both of them? (Practical example: the player presses
-"ESC" to get to the "in-game menu" state , and in the same "turn" he
-is killed by a bullet, which triggers a transition to the "game over"
-state.) Using Allegro events to manage the stack of states could be of
-any help?
-
 For Sprite: there is a handy al_get_parent_bitmap() function; this
 would allow us to keep subbitmaps internally and return the "real"
 bitmap for sorting purposes. Anyway, must implement a benchmark to
@@ -152,9 +121,6 @@ Make Sprites' AABB work for rotated sprite. Same for SRT.
 Consider making Sprite and Text "base classes" (they would become more
 like wrappers around Allegro objects), and create SpriteNode and
 TextNode classes for the scene graph.
-
-Consider using premultiplied alpha by default. Think on a nice way to
-represent colors in the API.
 
 Add more Command Triggers, including one to recognize sequences of
 keys (both with time-constraints, like in fighting games, and without,
