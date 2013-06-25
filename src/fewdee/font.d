@@ -4,21 +4,21 @@
  * Authors: Leandro Motta Barros
  */
 
-module fewdee.llr.font;
+module fewdee.font;
 
 import std.exception;
 import std.string;
 import allegro5.allegro_font;
 import fewdee.allegro_manager;
 import fewdee.engine;
-import fewdee.llr.low_level_resource;
+import fewdee.low_level_resource;
 
 
 /**
- * A low-level font resource. Encapsulates an $(D ALLEGRO_FONT*).
+ * A low-level font resource; a shallow wrapper on an $(D ALLEGRO_FONT*).
  *
  * Internally, Allegro creates a bitmap to store the font, so the bitmap
- * creation flags set in the $(D Engine) do matter here.
+ * creation flags set in the $(D Engine) $(I do) matter here.
  *
  * TODO: Maybe I should (temporarily) disable things like mip-maps when creating
  *       fonts. Since fonts are always drawn at their "natural" size, mip-maps

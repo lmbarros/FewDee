@@ -9,10 +9,10 @@ module fewdee.resource_manager;
 import std.regex;
 import allegro5.allegro;
 import fewdee.internal.singleton;
-import fewdee.llr.audio_sample;
-import fewdee.llr.audio_stream;
-import fewdee.llr.bitmap;
-import fewdee.llr.font;
+import fewdee.audio_sample;
+import fewdee.audio_stream;
+import fewdee.bitmap;
+import fewdee.font;
 
 
 /**
@@ -20,7 +20,7 @@ import fewdee.llr.font;
  * keys. Has methods allowing to add, query and remove resources.
  */
 private struct ResourceCollection(T)
-   if (is(T: fewdee.llr.low_level_resource.LowLevelResource))
+   if (is(T: fewdee.low_level_resource.LowLevelResource))
 {
    /**
     * Adds a given resource to the collection.
@@ -188,7 +188,7 @@ public class ResourceManager
 version (unittest)
 {
    private immutable fakeResourceBoilerplate = `
-      import fewdee.llr.low_level_resource;
+      import fewdee.low_level_resource;
       bool[string] destroyed;
 
       class FakeResource: LowLevelResource

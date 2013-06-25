@@ -5,7 +5,7 @@
  * @author Leandro Motta Barros
  */
 
-module fewdee.llr.low_level_resource;
+module fewdee.low_level_resource;
 
 /**
  * An abstract interface representing a low-level resource. Low-level resources
