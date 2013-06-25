@@ -1,23 +1,24 @@
 /**
- * A low-level Audio Sample resource.
+ * A low(ish)-level Audio Sample resource.
  *
  * Authors: Leandro Motta Barros
  */
 
-module fewdee.llr.audio_sample;
+module fewdee.audio_sample;
 
 import std.exception;
 import std.string;
 import allegro5.allegro_audio;
 import fewdee.allegro_manager;
 import fewdee.audio_manager;
-import fewdee.llr.low_level_resource;
+import fewdee.low_level_resource;
 
 
 /**
- * A low-level sound sample resource. Owns audio sample data.
+ * A low(ish)-level sound sample resource; encapsulates an $(D ALLEGRO_SAMPLE*)
+ * and do the necessary interactions with the $(D AudioManager).
  *
- * Encapsulates an $(D ALLEGRO_SAMPLE*).
+ * This is the object that owns audio sample data.
  */
 public class AudioSample: LowLevelResource
 {

@@ -4,26 +4,26 @@
  * Authors: Leandro Motta Barros
  */
 
-module fewdee.llr.bitmap;
+module fewdee.bitmap;
 
 import std.exception;
 import std.string;
 import allegro5.allegro;
 import fewdee.allegro_manager;
 import fewdee.engine;
-import fewdee.llr.low_level_resource;
+import fewdee.low_level_resource;
 
 
 /**
- * A low-level bitmap resource. Encapsulates an $(D ALLEGRO_BITMAP*).
+ * A low-level bitmap resource; encapsulates an $(D ALLEGRO_BITMAP*).
  *
  * Bitmaps are created using the flags set in the $(D Engine).
  */
 public class Bitmap: LowLevelResource
 {
    /**
-    * Creates a Bitmap with the given dimensions. Throws if the bitmap cannot be
-    * created.
+    * Creates a $(D Bitmap) with the given dimensions. Throws if the bitmap
+    * cannot be created.
     *
     * Parameters:
     *    width = The bitmap width, in pixels.

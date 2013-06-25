@@ -1,27 +1,26 @@
 /**
- * A low-level Audio Stream resource.
+ * A low(ish)-level Audio Stream resource.
  *
  * Authors: Leandro Motta Barros
  */
 
-module fewdee.llr.audio_stream;
+module fewdee.audio_stream;
 
 import std.exception;
 import std.string;
 import allegro5.allegro_audio;
 import fewdee.allegro_manager;
 import fewdee.audio_manager;
-import fewdee.llr.low_level_resource;
+import fewdee.low_level_resource;
 
 
 /**
- * A low-level audio stream resource. Encapsulates an $(D
- * ALLEGRO_AUDIO_STREAM*).
+ * A low(ish)-level audio stream resource; encapsulates an $(D
+ * ALLEGRO_AUDIO_STREAM*) and manages the necessary interactions with the $(D
+ * AudioManager).
  *
  * Unlike $(D AudioSample)s, $(D AudioStreams) don't need a separate "instance"
  * object. The same object manages the audio data and the playing state.
- *
- * TODO: Can this still be called low-level?
  */
 public class AudioStream: LowLevelResource
 {

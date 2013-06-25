@@ -12,8 +12,8 @@ module fewdee.audio_manager;
 import std.exception;
 import allegro5.allegro_audio;
 import fewdee.allegro_manager;
+import fewdee.audio_sample;
 import fewdee.resource_manager;
-import fewdee.llr.audio_sample;
 import fewdee.internal.singleton;
 
 
@@ -296,13 +296,8 @@ private class AudioManagerImpl
     *
     * Returns:
     *    A newly constructed $(D AudioSampleInstance).
-    *
-    * TODO: This shouldn't be public, but $(D
-    *    fewdee.llw.audio_sample.AudioSample) needs to call it. One more
-    *    argument to bring the "low level resources" to the $(D fewdee) root
-    *    package.
     */
-   public final AudioSampleInstance
+   package final AudioSampleInstance
    createAudioSampleInstance(ALLEGRO_SAMPLE* sample, bool autoDestroy)
    in
    {
@@ -324,28 +319,14 @@ private class AudioManagerImpl
       return AudioSampleInstance(key);
    }
 
-   /**
-    * Connects the given audio stream to the mixer.
-    *
-    * TODO: This shouldn't be public, but $(D
-    *    fewdee.llw.audio_sample.AudioStream) needs to call it. One more
-    *    argument to bring the "low level resources" to the $(D fewdee) root
-    *    package.
-    */
-   public final void addAudioStream(ALLEGRO_AUDIO_STREAM* stream)
+   /// Connects the given audio stream to the mixer.
+   package final void addAudioStream(ALLEGRO_AUDIO_STREAM* stream)
    {
       al_attach_audio_stream_to_mixer(stream, _mixer);
    }
 
-   /**
-    * Disconnects the given audio stream to the mixer.
-    *
-    * TODO: This shouldn't be public, but $(D
-    *    fewdee.llw.audio_sample.AudioStream) needs to call it. One more
-    *    argument to bring the "low level resources" to the $(D fewdee) root
-    *    package.
-    */
-   public final void removeAudioStream(ALLEGRO_AUDIO_STREAM* stream)
+   /// Disconnects the given audio stream to the mixer.
+   package final void removeAudioStream(ALLEGRO_AUDIO_STREAM* stream)
    {
       al_detach_audio_stream(stream);
    }
