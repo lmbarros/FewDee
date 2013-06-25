@@ -79,12 +79,8 @@ mixin template LowLockSingleton(WrappedClass)
       }
    }
 
-   /**
-    * Checks if this singleton's instance is instantiated or not. This used by
-    * the FewDee's core, to check if a singleton must be destroyed during engine
-    * shutdown.
-    */
-   package @property bool isInstantiated()
+   /// Checks if this singleton's instance is instantiated or not. This used by
+   private @property bool isInstantiated()
    {
       bool isIt;
 
