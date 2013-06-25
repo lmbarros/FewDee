@@ -132,13 +132,11 @@ private class EngineImpl
     */
    private final void stop()
    {
-      // TODO: calling destroyInstance() in an uninstantiated singleton is OK;
-      //       but must think well about the ordering of destruction.
       EventManager.destroyInstance();
       StateManager.destroyInstance();
+      ResourceManager.destroyInstance();
       AudioManager.destroyInstance();
       DisplayManager.destroyInstance();
-      ResourceManager.destroyInstance();
       AllegroManager.destroyInstance();
    }
 
