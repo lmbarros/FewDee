@@ -49,7 +49,8 @@ void main()
       ALLEGRO_EVENT_KEY_DOWN,
       delegate(in ref ALLEGRO_EVENT event)
       {
-         exitPlease = true;
+         if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+            exitPlease = true;
       });
 
    // Animate the flag sprite when the mouse button is pressed
