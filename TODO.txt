@@ -41,15 +41,6 @@ Concerning resources:
      between a real file system or an archive file
      system. Perhaps. Must think about this.
 
-Go back to premultiplied alpha. Now that I understand it, it makes
-much more sense. Maybe (this is longer term) I should have some way to
-specify if the bitmap being loaded does already have the colors with
-premultiplied alpha or not. Not doing the premultiplication uppon
-loading (and having and editor that allows to edit the alpha channel
-independently) would enable those neat effects like glowing neon signs
-with a single image. (Maybe I'll need to think on a nice way to
-represent colors in the API.)
-
 GUIsh what about z-order? Drawables have a "z" property; I can
 implement a picking visitor that takes it into account. Then, GUIsh
 should use this. Picking will pick Drawables only (and return a node

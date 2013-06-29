@@ -104,20 +104,10 @@ private class EngineImpl
       _newBitmapPixelFormat =
          ALLEGRO_PIXEL_FORMAT.ALLEGRO_PIXEL_FORMAT_ANY_WITH_ALPHA;
       _newBitmapFlags =
-         ALLEGRO_NO_PREMULTIPLIED_ALPHA // TODO: use pre-multiplied alpha!
-         | ALLEGRO_VIDEO_BITMAP
+         ALLEGRO_VIDEO_BITMAP
          | ALLEGRO_MIN_LINEAR
          | ALLEGRO_MAG_LINEAR
          | ALLEGRO_MIPMAP;
-
-      // Don't use pre-multiplied alpha by default
-      al_set_blender(ALLEGRO_BLEND_OPERATIONS.ALLEGRO_ADD,
-                     ALLEGRO_BLEND_MODE.ALLEGRO_ALPHA,
-                     ALLEGRO_BLEND_MODE.ALLEGRO_INVERSE_ALPHA);
-
-      al_set_new_bitmap_flags(ALLEGRO_NO_PREMULTIPLIED_ALPHA
-                              | ALLEGRO_MIN_LINEAR
-                              | ALLEGRO_MAG_LINEAR);
    }
 
    /**

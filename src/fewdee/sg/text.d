@@ -54,7 +54,7 @@ class Text: Drawable, Positionable, Colorable
    /// Draws the text to the current target bitmap.
    public override void draw()
    {
-      al_draw_text(font_, color, x, y, alignment_, text_.ptr);
+      al_draw_text(font_, rgba, x, y, alignment_, text_.ptr);
    }
 
 

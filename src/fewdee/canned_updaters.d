@@ -67,26 +67,59 @@ UpdaterFuncID addPositionUpdater(Updater updater, Positionable target,
 
 
 /**
- * Adds to a given $(D Updater) an updater function that will change the alpha
- * (opacity) of a given object.
+ * Adds to a given $(D Updater) an updater function that will change the opacity
+ * of a given object, without changing the "base color".
  *
  * D's uniform function call syntax (UFCS) allows to call this as if it was a
  * method of Updater.
  *
- * Notice that this works just like a color interpolator -- except that it
- * touches only the alpha channel. A color interpolator and an alpha
- * interpolator would "fight" with each other if active at the same time on the
- * same target.
- *
- * TODO: So, it would probably make sense to implement a $(D addRGBUpdater())
- *    function.
- *
  * Parameters:
  *    updater = The $(D Updater) to which the updater function will be added.
  *    target = The object whose alpha will be updated.
- *    destAlpha = The desired target alpha.
+ *    destOpacity = The desired target opacity.
  *    duration = The time, in seconds, it will take to go from the current to
  *       the target alpha.
+ *    maker = A function that will be used to create the necessary
+ *       interpolators. You'll typically call $(D
+ *       fewdee.interpolators.interpolatorMaker()) here.
+ *
+ * See_also: addBaseColorUpdater
+ *
+ * Returns:
+ *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
+ *    remove()) method in order to stop the canned updater before it finishes.
+ */
+public UpdaterFuncID addOpacityUpdater(Updater updater, Colorable target,
+                                       float destOpacity, double duration,
+                                       GenericInterpolatorMakerDelegate_t maker)
+{
+   auto t = 0.0;
+   auto opacityInterpolator = maker(target.opacity, destOpacity, duration);
+
+   return updater.add(
+      delegate(dt)
+      {
+         t += dt;
+         immutable newOpacity = opacityInterpolator(t);
+         target.opacity = newOpacity;
+         return t < duration;
+      });
+}
+
+
+/**
+ * Adds to a given $(D Updater) an updater function that will change the "base
+ * color" of a given object, without touching its opacity.
+ *
+ * D's uniform function call syntax (UFCS) allows to call this as if it was a
+ * method of $(D Updater).
+ *
+ * Parameters:
+ *    updater = The $(D Updater) to which the updater function will be added.
+ *    target = The object whose color will be updated.
+ *    destBaseColor = The desired target base color (as its RGB components).
+ *    duration = The time, in seconds, it will take to go from the current to
+ *       the target base color.
  *    maker = A function that will be used to create the necessary
  *       interpolators. You'll typically call $(D
  *       fewdee.interpolators.interpolatorMaker()) here.
@@ -94,29 +127,29 @@ UpdaterFuncID addPositionUpdater(Updater updater, Positionable target,
  * Returns:
  *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
  *    remove()) method in order to stop the canned updater before it finishes.
+ *
+ * See_Also: addOpacityUpdater
  */
-public UpdaterFuncID addAlphaUpdater(Updater updater, Colorable target,
-                                     float destAlpha, double duration,
-                                     GenericInterpolatorMakerDelegate_t maker)
+public
+UpdaterFuncID addBaseColorUpdater(Updater updater, Colorable target,
+                                  in float[3] destBaseColor, double duration,
+                                  GenericInterpolatorMakerDelegate_t maker)
 {
    auto t = 0.0;
 
-   float ir, ig, ib, ia;
-   al_unmap_rgba_f(target.color, &ir, &ig, &ib, &ia);
-
-   auto alphaInterpolator = maker(ia, destAlpha, duration);
+   immutable float[3] rgb = target.baseColor;
+   auto rInterpolator = maker(rgb[0], destBaseColor[0], duration);
+   auto gInterpolator = maker(rgb[1], destBaseColor[1], duration);
+   auto bInterpolator = maker(rgb[2], destBaseColor[2], duration);
 
    return updater.add(
       delegate(dt)
       {
          t += dt;
-
-         float r, g, b, a;
-         al_unmap_rgba_f(target.color, &r, &g, &b, &a);
-
-         immutable newColor = al_map_rgba_f(r, g, b, alphaInterpolator(t));
-
-         target.color = newColor;
+         immutable float[3] newBaseColor = [ rInterpolator(t),
+                                             gInterpolator(t),
+                                             bInterpolator(t) ];
+         target.baseColor = newBaseColor;
 
          return t < duration;
       });
@@ -125,20 +158,17 @@ public UpdaterFuncID addAlphaUpdater(Updater updater, Colorable target,
 
 /**
  * Adds to a given $(D Updater) an updater function that will change the color
- * of a given object.
+ * (the "real" RGBA, premultiplied alpha color) of a given object.
  *
  * D's uniform function call syntax (UFCS) allows to call this as if it was a
  * method of $(D Updater).
  *
- * A color updater can change the alpha (opacity) of an object, but if you want
- * to use only the alpha channel, using an alpha interpolator is simpler.
- *
  * Parameters:
  *    updater = The $(D Updater) to which the updater function will be added.
  *    target = The object whose color will be updated.
- *    destColor = The desired target color.
+ *    destRGBA = The desired target RGBA color.
  *    duration = The time, in seconds, it will take to go from the current to
- *       the target color.
+ *       the target base color.
  *    maker = A function that will be used to create the necessary
  *       interpolators. You'll typically call $(D
  *       fewdee.interpolators.interpolatorMaker()) here.
@@ -146,21 +176,17 @@ public UpdaterFuncID addAlphaUpdater(Updater updater, Colorable target,
  * Returns:
  *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
  *    remove()) method in order to stop the canned updater before it finishes.
- *
- * See_Also: addAlphaUpdater
  */
-public
-UpdaterFuncID addColorUpdater(Updater updater, Colorable target,
-                              in ref ALLEGRO_COLOR destColor, double duration,
-                              GenericInterpolatorMakerDelegate_t maker)
+public UpdaterFuncID addRGBAUpdater(Updater updater, Colorable target,
+                                    in ALLEGRO_COLOR destRGBA, double duration,
+                                    GenericInterpolatorMakerDelegate_t maker)
 {
    auto t = 0.0;
-
    float ir, ig, ib, ia;
-   al_unmap_rgba_f(target.color, &ir, &ig, &ib, &ia);
+   al_unmap_rgba_f(target.rgba, &ir, &ig, &ib, &ia);
 
    float fr, fg, fb, fa;
-   al_unmap_rgba_f(destColor, &fr, &fg, &fb, &fa);
+   al_unmap_rgba_f(destRGBA, &fr, &fg, &fb, &fa);
 
    auto rInterpolator = maker(ir, fr, duration);
    auto gInterpolator = maker(ig, fg, duration);
@@ -175,7 +201,7 @@ UpdaterFuncID addColorUpdater(Updater updater, Colorable target,
                                             gInterpolator(t),
                                             bInterpolator(t),
                                             aInterpolator(t));
-         target.color = newColor;
+         target.rgba = newColor;
 
          return t < duration;
       });

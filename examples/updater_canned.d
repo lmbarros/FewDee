@@ -57,8 +57,9 @@ void main()
    // value garanteed to never conflict with a real updater ID. (Notice that it
    // is safe to try to remove an updater function that is already finished.)
    UpdaterFuncID currentPositionUpdater = InvalidUpdaterFuncID;
-   UpdaterFuncID currentAlphaUpdater = InvalidUpdaterFuncID;
-   UpdaterFuncID currentColorUpdater = InvalidUpdaterFuncID;
+   UpdaterFuncID currentOpacityUpdater = InvalidUpdaterFuncID;
+   UpdaterFuncID currentBaseColorUpdater = InvalidUpdaterFuncID;
+   UpdaterFuncID currentRGBAUpdater = InvalidUpdaterFuncID;
    UpdaterFuncID currentScaleUpdater = InvalidUpdaterFuncID;
    UpdaterFuncID currentRotationUpdater = InvalidUpdaterFuncID;
 
@@ -139,15 +140,15 @@ void main()
                break;
             }
 
-            // Alpha updaters
+            // Opacity updaters
             case ALLEGRO_KEY_2:
             {
-               // Now we are using alpha canned interpolators, which
+               // Now we are using opacity canned interpolators, which
                // interpolates the translucency of an object. This works as in
                // the case of the position canned updaters, but we need to pass
                // just one number as the target value (1.0, in this case).
-               updater.remove(currentAlphaUpdater);
-               currentAlphaUpdater = updater.addAlphaUpdater(
+               updater.remove(currentOpacityUpdater);
+               currentOpacityUpdater = updater.addOpacityUpdater(
                   sprite, 1.0, 2.0,
                   interpolatorMaker!"t^2]");
                break;
@@ -155,8 +156,8 @@ void main()
 
             case ALLEGRO_KEY_W:
             {
-               updater.remove(currentAlphaUpdater);
-               currentAlphaUpdater = updater.addAlphaUpdater(
+               updater.remove(currentOpacityUpdater);
+               currentOpacityUpdater = updater.addOpacityUpdater(
                   sprite, 0.66, 2.0,
                   interpolatorMaker!"[circle");
                break;
@@ -164,8 +165,8 @@ void main()
 
             case ALLEGRO_KEY_S:
             {
-               updater.remove(currentAlphaUpdater);
-               currentAlphaUpdater = updater.addAlphaUpdater(
+               updater.remove(currentOpacityUpdater);
+               currentOpacityUpdater = updater.addOpacityUpdater(
                   sprite, 0.33, 2.0,
                   interpolatorMaker!"t^5]");
                break;
@@ -173,71 +174,115 @@ void main()
 
             case ALLEGRO_KEY_X:
             {
-               updater.remove(currentAlphaUpdater);
-               currentAlphaUpdater = updater.addAlphaUpdater(
+               updater.remove(currentOpacityUpdater);
+               currentOpacityUpdater = updater.addOpacityUpdater(
                   sprite, 0.0, 2.0,
                   interpolatorMaker!"[exp]");
                break;
             }
 
-            // Color updaters
+            // Base Color updaters
             case ALLEGRO_KEY_3:
             {
-               // Nothing really surprising when using color canned
+               // Nothing really surprising when using base color canned
                // interpolators. The only different thing is that we need to
-               // pass a color as the target value. Which makes sense, right?
-               immutable color =
-                  al_map_rgba_f(1.0, 1.0, 1.0, 1.0);
+               // pass the RGB color components as the target value. Which makes
+               // sense, right?
+               immutable float[3] baseColor = [ 1.0, 1.0, 1.0 ];
 
-               updater.remove(currentColorUpdater);
+               updater.remove(currentBaseColorUpdater);
 
-               currentColorUpdater = updater.addColorUpdater(
-                  sprite, color, 2.0,
+               currentBaseColorUpdater = updater.addBaseColorUpdater(
+                  sprite, baseColor, 2.0,
                   interpolatorMaker!"[t^3");
                break;
             }
 
             case ALLEGRO_KEY_E:
             {
-               immutable color =
-                  al_map_rgba_f(1.0, 0.0, 0.0, 0.1);
+               immutable float[3] baseColor = [ 1.0, 0.0, 0.0 ];
 
-               updater.remove(currentColorUpdater);
+               updater.remove(currentBaseColorUpdater);
 
-               currentColorUpdater = updater.addColorUpdater(
-                  sprite, color, 2.0,
+               currentBaseColorUpdater = updater.addBaseColorUpdater(
+                  sprite, baseColor, 2.0,
                   interpolatorMaker!"sin]");
                break;
             }
 
             case ALLEGRO_KEY_D:
             {
-               immutable color =
-                  al_map_rgba_f(0.2, 0.2, 1.0, 1.0);
+               immutable float[3] baseColor = [ 0.2, 0.2, 1.0 ];
 
-               updater.remove(currentColorUpdater);
+               updater.remove(currentBaseColorUpdater);
 
-               currentColorUpdater = updater.addColorUpdater(
-                  sprite, color, 2.0,
+               currentBaseColorUpdater = updater.addBaseColorUpdater(
+                  sprite, baseColor, 2.0,
                   interpolatorMaker!"[t^4]");
                break;
             }
 
             case ALLEGRO_KEY_C:
             {
-               immutable color =
-                  al_map_rgba_f(0.1, 0.9, 0.3, 0.9);
+               immutable float[3] baseColor = [ 0.1, 0.9, 0.3 ];
 
-               updater.remove(currentColorUpdater);
+               updater.remove(currentBaseColorUpdater);
 
-               currentColorUpdater = updater.addColorUpdater(
-                  sprite, color, 2.0,
+               currentBaseColorUpdater = updater.addBaseColorUpdater(
+                  sprite, baseColor, 2.0,
                   interpolatorMaker!"[exp");
                break;
             }
 
-            // Scale updaters
+            // RGBA updaters
             case ALLEGRO_KEY_4:
+            {
+               // Again, nothing really surprising when using RGBA canned
+               // interpolators. Just pass an 'ALLEGRO_COLOR' as parameter.
+               immutable rgba = al_map_rgba_f(1.0, 1.0, 1.0, 1.0);
+
+               updater.remove(currentRGBAUpdater);
+
+               currentRGBAUpdater = updater.addRGBAUpdater(
+                  sprite, rgba, 2.0, interpolatorMaker!"[t^5]");
+               break;
+            }
+
+            case ALLEGRO_KEY_R:
+            {
+               immutable rgba = al_map_rgba_f(0.5, 0.5, 0.0, 0.5);
+
+               updater.remove(currentRGBAUpdater);
+
+               currentRGBAUpdater = updater.addRGBAUpdater(
+                  sprite, rgba, 2.0, interpolatorMaker!"exp]");
+               break;
+            }
+
+            case ALLEGRO_KEY_F:
+            {
+               immutable rgba = al_map_rgba_f(0.25, 0.25, 0.25, 0.5);
+
+               updater.remove(currentRGBAUpdater);
+
+               currentRGBAUpdater = updater.addRGBAUpdater(
+                  sprite, rgba, 2.0, interpolatorMaker!"[sin");
+               break;
+            }
+
+            case ALLEGRO_KEY_V:
+            {
+               immutable rgba = al_map_rgba_f(0.3, 0.0, 0.3, 0.0);
+
+               updater.remove(currentRGBAUpdater);
+
+               currentRGBAUpdater = updater.addRGBAUpdater(
+                  sprite, rgba, 2.0, interpolatorMaker!"[t^3]");
+               break;
+            }
+
+            // Scale updaters
+            case ALLEGRO_KEY_5:
             {
                // Now we are updating the object scale. We pass two numbers as
                // target (1.0, 1.0), which represent the scale on both axes.
@@ -248,7 +293,7 @@ void main()
                break;
             }
 
-            case ALLEGRO_KEY_R:
+            case ALLEGRO_KEY_T:
             {
                updater.remove(currentScaleUpdater);
                currentScaleUpdater = updater.addScaleUpdater(
@@ -257,7 +302,7 @@ void main()
                break;
             }
 
-            case ALLEGRO_KEY_F:
+            case ALLEGRO_KEY_G:
             {
                updater.remove(currentScaleUpdater);
                currentScaleUpdater = updater.addScaleUpdater(
@@ -266,7 +311,7 @@ void main()
                break;
             }
 
-            case ALLEGRO_KEY_V:
+            case ALLEGRO_KEY_B:
             {
                updater.remove(currentScaleUpdater);
                currentScaleUpdater = updater.addScaleUpdater(
@@ -276,7 +321,7 @@ void main()
             }
 
             // Rotation updaters
-            case ALLEGRO_KEY_5:
+            case ALLEGRO_KEY_6:
             {
                // And here we begin to use rotation canned updaters. A single
                // target value is passed (the rotation angle, in radians;
@@ -289,7 +334,7 @@ void main()
                break;
             }
 
-            case ALLEGRO_KEY_T:
+            case ALLEGRO_KEY_Y:
             {
                updater.remove(currentRotationUpdater);
                currentRotationUpdater = updater.addRotationUpdater(
@@ -298,7 +343,7 @@ void main()
                break;
             }
 
-            case ALLEGRO_KEY_G:
+            case ALLEGRO_KEY_H:
             {
                updater.remove(currentRotationUpdater);
                currentRotationUpdater = updater.addRotationUpdater(
@@ -307,7 +352,7 @@ void main()
                break;
             }
 
-            case ALLEGRO_KEY_B:
+            case ALLEGRO_KEY_N:
             {
                updater.remove(currentRotationUpdater);
                currentRotationUpdater = updater.addRotationUpdater(

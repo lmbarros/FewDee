@@ -110,7 +110,7 @@ class Sprite: Drawable, Positionable, Rotatable, Colorable, Scalable
       // eventually reach the one we are using.)
       al_draw_tinted_scaled_rotated_bitmap(
          bitmaps_[currentIndex_],
-         color,
+         rgba,
          centerX_,
          centerY_,
          x,

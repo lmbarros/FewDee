@@ -9,14 +9,40 @@ module fewdee.colorable;
 import allegro5.allegro;
 
 
-/// Interface to be implemented by everything that can be colored.
+/**
+ * Interface to be implemented by everything that can be colored.
+ *
+ * Colors have two simultaneous representations. First, the are represented as a
+ * RGBA quartet (an $(D ALLEGRO_COLOR)), by default interpreted as a
+ * "premultiplied alpha color" (this is the color that is really used
+ * internally when drawing). Second, there is a (arguably more intuitive) "base
+ * color" plus opacity representation, which mimics the conventional alpha
+ * blending. As much as possible, when setting one of the representations, the
+ * other is updated accordingly. But there are cases in which the conversion is
+ * not possible (case in point: when the RGBA color represents an "additive
+ * blending color" -- alpha equals to zero, RGB components different than
+ * zero). So, if you mix both representations, you better know what you are
+ * doing.
+ */
 interface Colorable
 {
-   /// Returns the color.
-   public @property ALLEGRO_COLOR color() const;
+   /// Returns the low-level RGBA color.
+   public @property ALLEGRO_COLOR rgba() const;
 
-   /// Sets the color.
-   public @property void color(in ALLEGRO_COLOR color);
+   /// Sets low-level RGBA color.
+   public @property void rgba(in ALLEGRO_COLOR color);
+
+   /// Returns the base color.
+   public @property float[3] baseColor() const;
+
+   /// Sets the base color.
+   public @property void baseColor(in float[3] baseColor);
+
+   /// Returns the opacity.
+   public @property float opacity() const;
+
+   /// Sets the opacity.
+   public @property void opacity(in float opacity);
 }
 
 
@@ -27,14 +53,22 @@ interface Colorable
  */
 mixin template ColorableDefaultImplementation(string postSet = "")
 {
-   public @property ALLEGRO_COLOR color() const
+   public @property ALLEGRO_COLOR rgba() const
    {
-      return _color;
+      return _rgba;
    }
 
-   public @property void color(in ALLEGRO_COLOR color)
+   public @property void rgba(in ALLEGRO_COLOR color)
    {
-      this._color = color;
+      _rgba = color;
+
+      float r, g, b, a;
+      al_unmap_rgba_f(color, &r, &g, &b, &a);
+      _opacity = a;
+      if (a > 0)
+         _baseColor = [ r/a, g/a, b/a ];
+      else
+         _baseColor = [ 0, 0, 0 ];
 
       static if (postSet != "")
       {
@@ -42,7 +76,53 @@ mixin template ColorableDefaultImplementation(string postSet = "")
       }
    }
 
-   private ALLEGRO_COLOR _color = { 1.0, 1.0, 1.0, 1.0 };
+   public @property float[3] baseColor() const
+   {
+      return _baseColor;
+   }
+
+   public @property void baseColor(in float[3] baseColor)
+   {
+      _baseColor = baseColor;
+      recomputeRGBA();
+
+      _rgba = al_map_rgba_f(_baseColor[0] * _opacity,
+                            _baseColor[1] * _opacity,
+                            _baseColor[2] * _opacity,
+                            _opacity);
+      static if (postSet != "")
+      {
+         mixin(postSet);
+      }
+   }
+
+   public @property float opacity() const
+   {
+      return _opacity;
+   }
+
+   public @property void opacity(in float opacity)
+   {
+      _opacity = opacity;
+      recomputeRGBA();
+
+      static if (postSet != "")
+      {
+         mixin(postSet);
+      }
+   }
+
+   private final void recomputeRGBA()
+   {
+      _rgba = al_map_rgba_f(_baseColor[0] * _opacity,
+                            _baseColor[1] * _opacity,
+                            _baseColor[2] * _opacity,
+                            _opacity);
+   }
+
+   private ALLEGRO_COLOR _rgba = { 1.0, 1.0, 1.0, 1.0 };
+   private float[3] _baseColor = [ 1.0, 1.0, 1.0 ];
+   private float _opacity = 1.0;
 }
 
 

@@ -30,14 +30,14 @@ void main()
    sprite.y = 200;
    sprite.scaleX = 2.0;
    sprite.scaleY = 3.0;
-   sprite.color = al_map_rgba_f(1.0, 1.0, 1.0, 0.2);
+   sprite.rgba = al_map_rgba_f(0.2, 0.2, 0.2, 0.2);
 
    //Create a text
    auto text = new Text(ResourceManager.fonts["font"], "Hi! Âçënts, tóô!");
    text.alignment = Text.Alignment.RIGHT;
    text.x = 400;
    text.y = 25;
-   text.color = al_map_rgba_f(0.2, 0.8, 0.2, 0.5);
+   text.rgba = al_map_rgba_f(0.1, 0.4, 0.1, 0.5);
 
    // When this is set to 'true', we'll exit the main loop.
    bool exitPlease = false;
