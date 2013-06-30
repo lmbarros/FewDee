@@ -63,11 +63,19 @@ struct Color
 
       float r, g, b, a;
       al_unmap_rgba_f(rgba, &r, &g, &b, &a);
-      _opacity = a;
+      _opacity = cast(ubyte)(a * 255);
       if (a > 0)
-         _baseColor = [ r/a, g/a, b/a ];
+      {
+         _baseColor = [ cast(ubyte)(r / a * 255),
+                        cast(ubyte)(g / a * 255),
+                        cast(ubyte)(b / a * 255) ];
+      }
       else
-         _baseColor = [ r, g, b ];
+      {
+         _baseColor = [ cast(ubyte)(r * 255),
+                        cast(ubyte)(g * 255),
+                        cast(ubyte)(b * 255) ];
+      }
    }
 
    /**
@@ -76,26 +84,30 @@ struct Color
     */
    public final @property float[3] baseColor() const
    {
-      return _baseColor;
+      return [ _baseColor[0] / 255.0,
+               _baseColor[1] / 255.0,
+               _baseColor[2] / 255.0 ];
    }
 
    /// Ditto.
    public final @property void baseColor(in float[3] baseColor)
    {
-      _baseColor = baseColor;
+      _baseColor = [ cast(ubyte)(baseColor[0] * 255),
+                     cast(ubyte)(baseColor[1] * 255),
+                     cast(ubyte)(baseColor[2] * 255) ];
       recomputeRGBA();
    }
 
    /// The opacity, as if conventional alpha blending is used.
    public final @property float opacity() const
    {
-      return _opacity;
+      return _opacity / 255.0;
    }
 
    /// Ditto.
    public final @property void opacity(in float opacity)
    {
-      _opacity = opacity;
+      _opacity = cast(ubyte)(opacity * 255);
       recomputeRGBA();
    }
 
@@ -105,10 +117,11 @@ struct Color
     */
    private final void recomputeRGBA()
    {
-      _rgba = al_map_rgba_f(_baseColor[0] * _opacity,
-                            _baseColor[1] * _opacity,
-                            _baseColor[2] * _opacity,
-                            _opacity);
+      immutable opacity = _opacity / 255.0;
+      _rgba = al_map_rgba_f((_baseColor[0] / 255.0) * opacity,
+                            (_baseColor[1] / 255.0) * opacity,
+                            (_baseColor[2] /255.0) * opacity,
+                            opacity);
    }
 
    /// The premultiplied alpha color; the "main" color representation.
@@ -118,10 +131,10 @@ struct Color
     * The "base color", used for the "conventional alpha blending"
     * representation.
     */
-   private float[3] _baseColor = [ 1.0, 1.0, 1.0 ];
+   private ubyte[3] _baseColor = [ 255, 255, 255 ];
 
    /// The opacity, used for the "conventional alpha blending" representation.
-   private float _opacity = 1.0;
+   private ubyte _opacity = 255;
 
    alias rgba this;
 }
@@ -144,6 +157,11 @@ static assert(is(typeof(ALLEGRO_COLOR.a) == float));
 // Unit tests
 //
 
+version (unittest)
+{
+   enum epsilon = 0.035f;
+}
+
 // Set 'rgba', read 'baseColor' and 'opacity'
 unittest
 {
@@ -152,26 +170,26 @@ unittest
    // A totally opaque color
    Color c1;
    c1 = al_map_rgba_f(1.0, 0.5, 0.25, 1.0);
-   assertClose(c1.baseColor[0], 1.0f);
-   assertClose(c1.baseColor[1], 0.5f);
-   assertClose(c1.baseColor[2], 0.25f);
-   assertClose(c1.opacity, 1.0f);
+   assertClose(c1.baseColor[0], 1.0f, epsilon);
+   assertClose(c1.baseColor[1], 0.5f, epsilon);
+   assertClose(c1.baseColor[2], 0.25f, epsilon);
+   assertClose(c1.opacity, 1.0f, epsilon);
 
    // A 50% translucent color
    Color c2;
    c2 = al_map_rgba_f(0.5, 0.25, 0.125, 0.5);
-   assertClose(c2.baseColor[0], 1.0f);
-   assertClose(c2.baseColor[1], 0.5f);
-   assertClose(c2.baseColor[2], 0.25f);
-   assertClose(c2.opacity, 0.5f);
+   assertClose(c2.baseColor[0], 1.0f, epsilon);
+   assertClose(c2.baseColor[1], 0.5f, epsilon);
+   assertClose(c2.baseColor[2], 0.25f, epsilon);
+   assertClose(c2.opacity, 0.5f, epsilon);
 
    // A 10% translucent color
    Color c3;
    c3 = al_map_rgba_f(0.1, 0.05, 0.025, 0.1);
-   assertClose(c3.baseColor[0], 1.0f);
-   assertClose(c3.baseColor[1], 0.5f);
-   assertClose(c3.baseColor[2], 0.25f);
-   assertClose(c3.opacity, 0.1f);
+   assertClose(c3.baseColor[0], 1.0f, epsilon);
+   assertClose(c3.baseColor[1], 0.5f, epsilon);
+   assertClose(c3.baseColor[2], 0.25f, epsilon);
+   assertClose(c3.opacity, 0.1f, epsilon);
 }
 
 
@@ -185,56 +203,56 @@ unittest
    // A totally opaque color
    Color c1;
    c1 = al_map_rgba_f(1.0, 0.5, 0.25, 1.0); // as in the previous test
-   assertClose(c1.baseColor[0], 1.0f);
-   assertClose(c1.baseColor[1], 0.5f);
-   assertClose(c1.baseColor[2], 0.25f);
-   assertClose(c1.opacity, 1.0f);
+   assertClose(c1.baseColor[0], 1.0f, epsilon);
+   assertClose(c1.baseColor[1], 0.5f, epsilon);
+   assertClose(c1.baseColor[2], 0.25f, epsilon);
+   assertClose(c1.opacity, 1.0f, epsilon);
 
    c1.baseColor = [ 0.5, 0.25, 1.0 ]; // then, change base color
 
    ALLEGRO_COLOR ac1 = c1.rgba;
    al_unmap_rgba_f(ac1, &r, &g, &b, &a);
 
-   assertClose(r, 0.5f);
-   assertClose(g, 0.25f);
-   assertClose(b, 1.0f);
-   assertClose(a, 1.0f);
+   assertClose(r, 0.5f, epsilon);
+   assertClose(g, 0.25f, epsilon);
+   assertClose(b, 1.0f, epsilon);
+   assertClose(a, 1.0f, epsilon);
 
    // A 50% translucent color
    Color c2;
    c2 = al_map_rgba_f(0.5, 0.25, 0.125, 0.5); // as in the previous test
-   assertClose(c2.baseColor[0], 1.0f);
-   assertClose(c2.baseColor[1], 0.5f);
-   assertClose(c2.baseColor[2], 0.25f);
-   assertClose(c2.opacity, 0.5f);
+   assertClose(c2.baseColor[0], 1.0f, epsilon);
+   assertClose(c2.baseColor[1], 0.5f, epsilon);
+   assertClose(c2.baseColor[2], 0.25f, epsilon);
+   assertClose(c2.opacity, 0.5f, epsilon);
 
    c2.baseColor = [ 0.5, 0.25, 1.0 ]; // then, change base color
 
    ALLEGRO_COLOR ac2 = c2.rgba;
    al_unmap_rgba_f(ac2, &r, &g, &b, &a);
 
-   assertClose(r, 0.25f);
-   assertClose(g, 0.125f);
-   assertClose(b, 0.5f);
-   assertClose(a, 0.5f);
+   assertClose(r, 0.25f, epsilon);
+   assertClose(g, 0.125f, epsilon);
+   assertClose(b, 0.5f, epsilon);
+   assertClose(a, 0.5f, epsilon);
 
    // A 10% translucent color
    Color c3;
    c3 = al_map_rgba_f(0.1, 0.05, 0.025, 0.1); // as in the previous test
-   assertClose(c3.baseColor[0], 1.0f);
-   assertClose(c3.baseColor[1], 0.5f);
-   assertClose(c3.baseColor[2], 0.25f);
-   assertClose(c3.opacity, 0.1f);
+   assertClose(c3.baseColor[0], 1.0f, epsilon);
+   assertClose(c3.baseColor[1], 0.5f, epsilon);
+   assertClose(c3.baseColor[2], 0.25f, epsilon);
+   assertClose(c3.opacity, 0.1f, epsilon);
 
    c3.baseColor = [ 0.5, 0.25, 1.0 ]; // then, change base color
 
    ALLEGRO_COLOR ac3 = c3.rgba;
    al_unmap_rgba_f(ac3, &r, &g, &b, &a);
 
-   assertClose(r, 0.05f);
-   assertClose(g, 0.025f);
-   assertClose(b, 0.1f);
-   assertClose(a, 0.1f);
+   assertClose(r, 0.05f, epsilon);
+   assertClose(g, 0.025f, epsilon);
+   assertClose(b, 0.1f, epsilon);
+   assertClose(a, 0.1f, epsilon);
 }
 
 
@@ -248,10 +266,10 @@ unittest
    // Start with a totally opaque color
    Color c1;
    c1 = al_map_rgba_f(1.0, 0.5, 0.25, 1.0);
-   assertClose(c1.baseColor[0], 1.0f);
-   assertClose(c1.baseColor[1], 0.5f);
-   assertClose(c1.baseColor[2], 0.25f);
-   assertClose(c1.opacity, 1.0f);
+   assertClose(c1.baseColor[0], 1.0f, epsilon);
+   assertClose(c1.baseColor[1], 0.5f, epsilon);
+   assertClose(c1.baseColor[2], 0.25f, epsilon);
+   assertClose(c1.opacity, 1.0f, epsilon);
 
    // Change opacity to 10%, read and check RGBA
    c1.opacity = 0.1;
@@ -259,10 +277,10 @@ unittest
    ALLEGRO_COLOR ac = c1.rgba;
    al_unmap_rgba_f(ac, &r, &g, &b, &a);
 
-   assertClose(r, 0.1f);
-   assertClose(g, 0.05f);
-   assertClose(b, 0.025f);
-   assertClose(a, 0.1f);
+   assertClose(r, 0.1f, epsilon);
+   assertClose(g, 0.05f, epsilon);
+   assertClose(b, 0.025f, epsilon);
+   assertClose(a, 0.1f, epsilon);
 
    // Change opacity to 50%, read and check RGBA
    c1.opacity = 0.5;
@@ -270,10 +288,10 @@ unittest
    ac = c1.rgba;
    al_unmap_rgba_f(ac, &r, &g, &b, &a);
 
-   assertClose(r, 0.5f);
-   assertClose(g, 0.25f);
-   assertClose(b, 0.125f);
-   assertClose(a, 0.5f);
+   assertClose(r, 0.5f, epsilon);
+   assertClose(g, 0.25f, epsilon);
+   assertClose(b, 0.125f, epsilon);
+   assertClose(a, 0.5f, epsilon);
 
    // Change opacity back to 100%, read and check RGBA
    c1.opacity = 1.0;
@@ -281,10 +299,10 @@ unittest
    ac = c1.rgba;
    al_unmap_rgba_f(ac, &r, &g, &b, &a);
 
-   assertClose(r, 1.0f);
-   assertClose(g, 0.5f);
-   assertClose(b, 0.25f);
-   assertClose(a, 1.0f);
+   assertClose(r, 1.0f, epsilon);
+   assertClose(g, 0.5f, epsilon);
+   assertClose(b, 0.25f, epsilon);
+   assertClose(a, 1.0f, epsilon);
 
    // Change opacity to 0%, read and check RGBA
    c1.opacity = 0.0;
@@ -292,10 +310,10 @@ unittest
    ac = c1.rgba;
    al_unmap_rgba_f(ac, &r, &g, &b, &a);
 
-   assertClose(r, 0.0f);
-   assertClose(g, 0.0f);
-   assertClose(b, 0.0f);
-   assertClose(a, 0.0f);
+   assertClose(r, 0.0f, epsilon);
+   assertClose(g, 0.0f, epsilon);
+   assertClose(b, 0.0f, epsilon);
+   assertClose(a, 0.0f, epsilon);
 
    // Once more, after setting opacity to 0.0, change opacity back to 100%, read
    // and check RGBA. 'Color' must be able to return to the old color.
@@ -304,8 +322,8 @@ unittest
    ac = c1.rgba;
    al_unmap_rgba_f(ac, &r, &g, &b, &a);
 
-   assertClose(r, 1.0f);
-   assertClose(g, 0.5f);
-   assertClose(b, 0.25f);
-   assertClose(a, 1.0f);
+   assertClose(r, 1.0f, epsilon);
+   assertClose(g, 0.5f, epsilon);
+   assertClose(b, 0.25f, epsilon);
+   assertClose(a, 1.0f, epsilon);
 }
