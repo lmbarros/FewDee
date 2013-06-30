@@ -84,11 +84,6 @@ struct Color
    {
       _baseColor = baseColor;
       recomputeRGBA();
-
-      _rgba = al_map_rgba_f(_baseColor[0] * _opacity,
-                            _baseColor[1] * _opacity,
-                            _baseColor[2] * _opacity,
-                            _opacity);
    }
 
    /// The opacity , as if conventional alpha blending is used.
