@@ -67,7 +67,7 @@ struct Color
       if (a > 0)
          _baseColor = [ r/a, g/a, b/a ];
       else
-         _baseColor = [ 0, 0, 0 ];
+         _baseColor = [ r, g, b ];
    }
 
    /**
