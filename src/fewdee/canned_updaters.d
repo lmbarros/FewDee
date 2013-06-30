@@ -94,14 +94,15 @@ public UpdaterFuncID addOpacityUpdater(Updater updater, Colorable target,
                                        GenericInterpolatorMakerDelegate_t maker)
 {
    auto t = 0.0;
-   auto opacityInterpolator = maker(target.opacity, destOpacity, duration);
+   auto opacityInterpolator =
+      maker(target.color.opacity, destOpacity, duration);
 
    return updater.add(
       delegate(dt)
       {
          t += dt;
          immutable newOpacity = opacityInterpolator(t);
-         target.opacity = newOpacity;
+         target.color.opacity = newOpacity;
          return t < duration;
       });
 }
@@ -137,7 +138,7 @@ UpdaterFuncID addBaseColorUpdater(Updater updater, Colorable target,
 {
    auto t = 0.0;
 
-   immutable float[3] rgb = target.baseColor;
+   immutable float[3] rgb = target.color.baseColor;
    auto rInterpolator = maker(rgb[0], destBaseColor[0], duration);
    auto gInterpolator = maker(rgb[1], destBaseColor[1], duration);
    auto bInterpolator = maker(rgb[2], destBaseColor[2], duration);
@@ -149,7 +150,7 @@ UpdaterFuncID addBaseColorUpdater(Updater updater, Colorable target,
          immutable float[3] newBaseColor = [ rInterpolator(t),
                                              gInterpolator(t),
                                              bInterpolator(t) ];
-         target.baseColor = newBaseColor;
+         target.color.baseColor = newBaseColor;
 
          return t < duration;
       });
@@ -183,7 +184,7 @@ public UpdaterFuncID addRGBAUpdater(Updater updater, Colorable target,
 {
    auto t = 0.0;
    float ir, ig, ib, ia;
-   al_unmap_rgba_f(target.rgba, &ir, &ig, &ib, &ia);
+   al_unmap_rgba_f(target.color.rgba, &ir, &ig, &ib, &ia);
 
    float fr, fg, fb, fa;
    al_unmap_rgba_f(destRGBA, &fr, &fg, &fb, &fa);
@@ -201,7 +202,7 @@ public UpdaterFuncID addRGBAUpdater(Updater updater, Colorable target,
                                             gInterpolator(t),
                                             bInterpolator(t),
                                             aInterpolator(t));
-         target.rgba = newColor;
+         target.color.rgba = newColor;
 
          return t < duration;
       });

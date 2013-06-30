@@ -1,0 +1,89 @@
+#+STARTUP: overview hidestars odd
+
+* Basics
+  In *conventional alpha blending*, RGB defines color, alpha defines
+  its opacity. They are independent. A color can be totally
+  transparent and still be a color. This has no parallel with the real
+  world (Shawn compares this with an invisibility cloak, which is red,
+  even though it is invisible :-) )
+
+  Blending a translucent image (src) over a background (dst), goes
+  like this:
+
+     blend(src, dst) = src.rgb * src.a + (dst.rgb * (1 - src.a))
+
+  In *premultiplied alpha*, RGB defines how much color is added to the
+  scene, which alpha defines how much the background will be
+  obscured. This is more like real world: sunglasses, for example, let
+  some light pass (this is the alpha) and also add a rose-ish tint
+  (this is the RGB).
+
+  When representing colors, the RGB components must be multiplied by
+  the alpha channel. Solid colors are represented as before: solid
+  red, for instance, is still [1, 0, 0, 1]. But half-translucent red
+  is now [0.5, 0, 0, 0.5]. And there is only one representation of
+  full transparency: [0, 0, 0, 0]. (BTW, notice that, unlike what the
+  name suggests) what is multiplied is not the alpha)
+
+  Blending would go like this:
+
+     blend(src, dst) = src.rgb + (dst.rgb * (1 - src.a))
+
+* Advantages
+*** Better alpha cutouts (AKA "images with transparent parts")
+    Blending alpha cutouts to a some background can produce artifacts,
+    like dark borders. With premultiplied alpha blending, this works
+    much better.
+*** Image composition
+    As explained in [[http://blogs.msdn.com/b/shawnhar/archive/2009/11/07/premultiplied-alpha-and-image-composition.aspx][another post]] by Shawn Hargreaves, conventional
+    alpha blending is not associative, which means that you cannot
+    "pre-compute" overlays by composing multiple translucent layers
+    and later blend this pre-computed overlay into your screen. With
+    premultiplied alpha blending, you can.
+*** Conventional and additive blending in one pass
+    If parts of your image have alpha equals to zero, but nonzero RGB,
+    what you have is additive blending (good for fire particles and
+    glowing neons).
+
+* Disadvantages
+  Krzysztof Narkowicz [[http://kriscg.blogspot.com.br/2009/11/premultiplied-alpha.html][blogged about]] some disadvantages of
+  premultiplied alpha. As I understand, these are not problems for
+  FewDee. But there is one more point. One that maybe cannot be called
+  a disadvantage, but that /does/ affect FewDee.
+
+  Suppose we have a drawable object with a color property. Suppose it
+  is solid blue [0, 0, 1, 0]. But then, we want to make it completely
+  transluscent, so we use an Updater to interpolate its color to [0,
+  0, 0, 0] (which is the only representation of full transparency
+  under premultiplied alpha).
+
+  So far, so good. But what if shortly afterwards we need to make
+  return to its original color? The color is now [0, 0, 0, 0]. There
+  is no more any information about the original color. The original
+  blue must be stored somewhere if we want to be able to return to it.
+
+  The solution is simple enough: just keep the original color stored
+  somewhere. But I want to support really easy control over opacity
+  and this means that the user shouldn't have to do any bookkeeping.
+
+* Colors in FewDee: premultiplied alpha with a twist
+  Premultiplied alpha is great for various reasons, but for supporting
+  really simple opacity control, conventional alpha blending is
+  better. So, what does FewDee use?
+
+  FewDee uses =Color= objects to represent colors. A =Color=
+  encapsulates an =ALLEGRO_COLOR= (with premultiplied alpha), but also
+  provides an interface to set and read data in conventional alpha
+  blending style. Internally, in addition to the =ALLEGRO_COLOR=, a
+  =Color= stores the "base RGB color" and the opacity.
+
+  As much as possible, both representations are kept in-sync as they
+  are updated. However, conversions are not perfect, especially when
+  the =ALLEGRO_COLOR= part represents an "additive blending color"
+  (alpha equals zero). Be sure to know what you are doing if you want
+  to mix both representations.
+
+* Resources
+  This came mostly from a post in [[http://blogs.msdn.com/b/shawnhar/archive/2009/11/06/premultiplied-alpha.aspx][Shawn Hargreaves's Blog]]. The classic
+  [[http://home.comcast.net/~tom_forsyth/blog.wiki.html%23%5B%5BPremultiplied%2520alpha%5D%5D][Tom Forsyth's post]] was also used. Other resources are linked above,
+  close to the topics they cover.
