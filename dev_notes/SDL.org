@@ -1,0 +1,48 @@
+#+STARTUP: overview hidestars odd
+
+If SDL 2 were complete by the time I started working on FewDee, it
+would probably my choice for the "backend". As of now, I don't regret
+to have chosen Allegro at all, but I know that SDL is a strong
+alternative. So someday, I may chose to use SDL as the backend (or as
+an alternative backend), and therefore it is interesting to see how
+SDL 2 and Allegro 5 differ, and to what extent they are similar.
+
+* Multiple Windows
+  - Both support multiple windows (or multiple screens, in a
+    multi-head setup). SDL calls each one a "screen"; Allegro,
+    "display".
+
+* Hardware and Software Bitmaps
+  - Both have the concept of images stored in either GPU (hardware) or
+    CPU memory (software). In Allegro, there is a single class:
+    Bitmap; when it has a the ALLEGRO_MEMORY_BITMAP flag enabled, it
+    is in "CPU memory"; otherwise, it is in "GPU memory". SDL 2 has
+    two different classes: Surface (for "software bitmaps") and
+    Texture (for "hardware bitmaps").
+
+* Conversions Between Hardware and Software Bitmaps
+  - Allegro seems to allow the use of both bitmap types
+    interchangeably (with different performance levels). SDL 2 has a
+    SDL_CreateTextureFromSurface() function to convert from Surface to
+    Texture; the opposite conversion doesn't seem to exist.
+
+* Blit
+   - SDL_RenderCopy() blits part of a Texture to the current render
+     target, possibly with scaling; SDL_RenderCopyEx() additionally
+     allows to rotate and flip the Texture. SDL_BlitSurface() allow to
+     blit a Surface to another one (with scaling only). All SDL
+     bliting respects the current;y set blending mode, it
+     seems. Allegro seems to allow both types of bitmap to be written
+     to each other freely (though there are certainly performance
+     trade-offs).
+
+* Sub-bitmaps
+   - Allegro allows to create explicit sub-bitmaps; SDL doesn't have
+     this concept, but all blitting functions take a "source
+     rectangle" parameter, that allow to draw just a part of the
+     source image.
+
+* Coordinates
+  - SDL 2 seems to use integer coordinates everywhere (via SDL_Rect,
+    sometimes). Allegro uses float coodinates. This is an important
+    difference!
