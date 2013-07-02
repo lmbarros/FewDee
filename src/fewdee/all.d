@@ -34,7 +34,6 @@ public import fewdee.game_state;
 public import fewdee.interpolators;
 public import fewdee.low_level_event_handler;
 public import fewdee.low_level_resource;
-public import fewdee.positionable;
 public import fewdee.resource_manager;
 public import fewdee.state_manager;
 public import fewdee.updater;

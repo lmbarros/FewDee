@@ -8,16 +8,14 @@ module fewdee.sg.sprite;
 
 import allegro5.allegro;
 import std.conv;
-import fewdee.colorable;
 import fewdee.aabb;
-import fewdee.positionable;
-import fewdee.rotatable;
-import fewdee.scalable;
+import fewdee.color;
 import fewdee.sg.drawable;
+import fewdee.internal.default_implementations;
 
 
 /// A collection of same-sized bitmaps and a few additional bits.
-class Sprite: Drawable, Positionable, Rotatable, Colorable, Scalable
+class Sprite: Drawable
 {
    mixin ColorableDefaultImplementation;
    mixin PositionableDefaultImplementation!"isAABBDirty_ = true;";

@@ -9,13 +9,13 @@ module fewdee.sg.text;
 import allegro5.allegro;
 import allegro5.allegro_font;
 import fewdee.aabb;
-import fewdee.colorable;
-import fewdee.positionable;
+import fewdee.color;
 import fewdee.sg.drawable;
+import fewdee.internal.default_implementations;
 
 
 /// A scene graph Drawable that displays text.
-class Text: Drawable, Positionable, Colorable
+class Text: Drawable
 {
    mixin PositionableDefaultImplementation!"isAABBDirty_ = true;";
    mixin ColorableDefaultImplementation;

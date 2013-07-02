@@ -15,12 +15,9 @@
 module fewdee.canned_updaters;
 
 import allegro5.allegro;
-import fewdee.colorable;
 import fewdee.interpolators;
-import fewdee.positionable;
-import fewdee.rotatable;
-import fewdee.scalable;
 import fewdee.updater;
+import fewdee.internal.traits;
 
 
 /**
@@ -45,10 +42,11 @@ import fewdee.updater;
  *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
  *    remove()) method in order to stop the canned updater before it finishes.
  */
-public
-UpdaterFuncID addPositionUpdater(Updater updater, Positionable target,
+public UpdaterFuncID
+addPositionUpdater(Positionable)(Updater updater, Positionable target,
                                  float destX, float destY, double duration,
                                  GenericInterpolatorMakerDelegate_t maker)
+   if (isPositionable!Positionable)
 {
    auto t = 0.0;
 
@@ -83,15 +81,17 @@ UpdaterFuncID addPositionUpdater(Updater updater, Positionable target,
  *       interpolators. You'll typically call $(D
  *       fewdee.interpolators.interpolatorMaker()) here.
  *
- * See_also: addBaseColorUpdater
+ * See_also: addBaseColorUpdater, addRGBAUpdater
  *
  * Returns:
  *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
  *    remove()) method in order to stop the canned updater before it finishes.
  */
-public UpdaterFuncID addOpacityUpdater(Updater updater, Colorable target,
-                                       float destOpacity, double duration,
-                                       GenericInterpolatorMakerDelegate_t maker)
+public UpdaterFuncID
+addOpacityUpdater(Colorable)(Updater updater, Colorable target,
+                             float destOpacity, double duration,
+                             GenericInterpolatorMakerDelegate_t maker)
+   if (isColorable!Colorable)
 {
    auto t = 0.0;
    auto opacityInterpolator =
@@ -129,12 +129,13 @@ public UpdaterFuncID addOpacityUpdater(Updater updater, Colorable target,
  *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
  *    remove()) method in order to stop the canned updater before it finishes.
  *
- * See_Also: addOpacityUpdater
+ * See_Also: addOpacityUpdater, addRGBAUpdater
  */
-public
-UpdaterFuncID addBaseColorUpdater(Updater updater, Colorable target,
-                                  in float[3] destBaseColor, double duration,
-                                  GenericInterpolatorMakerDelegate_t maker)
+public UpdaterFuncID
+addBaseColorUpdater(Colorable)(Updater updater, Colorable target,
+                               in float[3] destBaseColor, double duration,
+                               GenericInterpolatorMakerDelegate_t maker)
+   if (isColorable!Colorable)
 {
    auto t = 0.0;
 
@@ -178,9 +179,11 @@ UpdaterFuncID addBaseColorUpdater(Updater updater, Colorable target,
  *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
  *    remove()) method in order to stop the canned updater before it finishes.
  */
-public UpdaterFuncID addRGBAUpdater(Updater updater, Colorable target,
-                                    in ALLEGRO_COLOR destRGBA, double duration,
-                                    GenericInterpolatorMakerDelegate_t maker)
+public UpdaterFuncID
+addRGBAUpdater(Colorable)(Updater updater, Colorable target,
+                          in ALLEGRO_COLOR destRGBA, double duration,
+                          GenericInterpolatorMakerDelegate_t maker)
+   if (isColorable!Colorable)
 {
    auto t = 0.0;
    float ir, ig, ib, ia;
@@ -232,9 +235,10 @@ public UpdaterFuncID addRGBAUpdater(Updater updater, Colorable target,
  *    remove()) method in order to stop the canned updater before it finishes.
  */
 public UpdaterFuncID
-addScaleUpdater(Updater updater, Scalable target,
-                float destScaleX, float destScaleY, double duration,
-                GenericInterpolatorMakerDelegate_t maker)
+addScaleUpdater(Scalable)(Updater updater, Scalable target,
+                          float destScaleX, float destScaleY, double duration,
+                          GenericInterpolatorMakerDelegate_t maker)
+   if (isScalable!Scalable)
 {
    auto t = 0.0;
 
@@ -273,10 +277,11 @@ addScaleUpdater(Updater updater, Scalable target,
  *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
  *    remove()) method in order to stop the canned updater before it finishes.
  */
-public
-UpdaterFuncID addRotationUpdater(Updater updater, Rotatable target,
-                                 float destRotation, double duration,
-                                 GenericInterpolatorMakerDelegate_t maker)
+public UpdaterFuncID
+addRotationUpdater(Rotatable)(Updater updater, Rotatable target,
+                              float destRotation, double duration,
+                              GenericInterpolatorMakerDelegate_t maker)
+   if (isRotatable!Rotatable)
 {
    auto t = 0.0;
 
