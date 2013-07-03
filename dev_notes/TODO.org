@@ -41,6 +41,12 @@
    - Some people were using =fewdee/_.d=. But it seems that
      =fewdee/package.d= will be the standard.
 
+* Consider making the canned updaters more generic
+  - [2013-07-02 Tue 21:59] C'mon... most of them have the same overall
+    structure. Change the attribute, there we got a new updater. I am
+    thinking about something like this:
+    =addGenericUpdater!"opacity"()=. Maybe most of the others could be
+    just aliases.
 * TODOish notes concerning resources
    - Not all resources have a 1:1 mapping between files and the
      resources themselves. Case in point: one bitmap may contain
