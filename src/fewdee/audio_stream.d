@@ -85,6 +85,24 @@ public class AudioStream: LowLevelResource
    }
 
    /**
+    * The playback mode (play once, loop...) for this $(D AudioStream).
+    *
+    * For reference, here are the possible values as of Allegro 5.0.7: $(D
+    * ALLEGRO_PLAYMODE_ONCE), $(D ALLEGRO_PLAYMODE_LOOP) and $(D
+    * ALLEGRO_PLAYMODE_BIDIR).
+    */
+   public final @property ALLEGRO_PLAYMODE playMode()
+   {
+      return al_get_audio_stream_playmode(_stream);
+   }
+
+   /// Ditto
+   public final @property void playMode(ALLEGRO_PLAYMODE playMode)
+   {
+      al_set_audio_stream_playmode(_stream, playMode);
+   }
+
+   /**
     * The audio stream playing position, in seconds.
     *
     * This assumes a relative playing speed of $(D 1.0).
