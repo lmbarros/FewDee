@@ -180,9 +180,9 @@ public class AudioStream: LowLevelResource
    }
 
    /// Ditto.
-   public final @property void balance(float speed)
+   public final @property void balance(float balance)
    {
-      al_set_audio_stream_pan(_stream, speed);
+      al_set_audio_stream_pan(_stream, balance);
    }
 
    /**
