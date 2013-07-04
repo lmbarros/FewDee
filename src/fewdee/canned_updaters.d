@@ -73,10 +73,10 @@ addPositionUpdater(Positionable)(Updater updater, Positionable target,
  *
  * Parameters:
  *    updater = The $(D Updater) to which the updater function will be added.
- *    target = The object whose alpha will be updated.
+ *    target = The object whose opacity will be updated.
  *    destOpacity = The desired target opacity.
  *    duration = The time, in seconds, it will take to go from the current to
- *       the target alpha.
+ *       the target opacity.
  *    maker = A function that will be used to create the necessary
  *       interpolators. You'll typically call $(D
  *       fewdee.interpolators.interpolatorMaker()) here.
@@ -170,7 +170,7 @@ addBaseColorUpdater(Colorable)(Updater updater, Colorable target,
  *    target = The object whose color will be updated.
  *    destRGBA = The desired target RGBA color.
  *    duration = The time, in seconds, it will take to go from the current to
- *       the target base color.
+ *       the target RGBA color.
  *    maker = A function that will be used to create the necessary
  *       interpolators. You'll typically call $(D
  *       fewdee.interpolators.interpolatorMaker()) here.
@@ -268,7 +268,7 @@ addScaleUpdater(Scalable)(Updater updater, Scalable target,
  *    target = The object whose rotation will be updated.
  *    destAlpha = The desired target rotation, in radians.
  *    duration = The time, in seconds, it will take to go from the current to
- *       the target scale.
+ *       the target rotation.
  *    maker = A function that will be used to create the necessary
  *       interpolators. You'll typically call $(D
  *       fewdee.interpolators.interpolatorMaker()) here.
