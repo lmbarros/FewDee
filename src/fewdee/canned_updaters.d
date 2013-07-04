@@ -295,3 +295,126 @@ addRotationUpdater(Rotatable)(Updater updater, Rotatable target,
          return t < duration;
       });
 }
+
+
+/**
+ * Adds to a given $(D Updater), an updater function that will change the
+ * gain of a given object.
+ *
+ * D's uniform function call syntax (UFCS) allows to call this as if it was a
+ * method of $(D Updater).
+ *
+ * Parameters:
+ *    updater = The $(D Updater) to which the updater function will be added.
+ *    target = The object whose gain will be updated.
+ *    destGain = The desired target gain.
+ *    duration = The time, in seconds, it will take to go from the current to
+ *       the target gain.
+ *    maker = A function that will be used to create the necessary
+ *       interpolators. You'll typically call $(D
+ *       fewdee.interpolators.interpolatorMaker()) here.
+ *
+ * Returns:
+ *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
+ *    remove()) method in order to stop the canned updater before it finishes.
+ */
+public UpdaterFuncID
+addGainUpdater(Gainable)(Updater updater, Gainable target,
+                         float destGain, double duration,
+                         GenericInterpolatorMakerDelegate_t maker)
+   if (isGainable!Gainable)
+{
+   auto t = 0.0;
+
+   auto gainInterpolator = maker(target.gain, destGain, duration);
+
+   return updater.add(
+      delegate(dt)
+      {
+         t += dt;
+         target.gain = gainInterpolator(t);
+         return t < duration;
+      });
+}
+
+
+/**
+ * Adds to a given $(D Updater), an updater function that will change the
+ * speed of a given object.
+ *
+ * D's uniform function call syntax (UFCS) allows to call this as if it was a
+ * method of $(D Updater).
+ *
+ * Parameters:
+ *    updater = The $(D Updater) to which the updater function will be added.
+ *    target = The object whose speed will be updated.
+ *    destSpeed = The desired target speed.
+ *    duration = The time, in seconds, it will take to go from the current to
+ *       the target speed.
+ *    maker = A function that will be used to create the necessary
+ *       interpolators. You'll typically call $(D
+ *       fewdee.interpolators.interpolatorMaker()) here.
+ *
+ * Returns:
+ *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
+ *    remove()) method in order to stop the canned updater before it finishes.
+ */
+public UpdaterFuncID
+addSpeedUpdater(Speedable)(Updater updater, Speedable target,
+                           float destSpeed, double duration,
+                           GenericInterpolatorMakerDelegate_t maker)
+   if (isSpeedable!Speedable)
+{
+   auto t = 0.0;
+
+   auto speedInterpolator = maker(target.speed, destSpeed, duration);
+
+   return updater.add(
+      delegate(dt)
+      {
+         t += dt;
+         target.speed = speedInterpolator(t);
+         return t < duration;
+      });
+}
+
+
+/**
+ * Adds to a given $(D Updater), an updater function that will change the
+ * balance of a given object.
+ *
+ * D's uniform function call syntax (UFCS) allows to call this as if it was a
+ * method of $(D Updater).
+ *
+ * Parameters:
+ *    updater = The $(D Updater) to which the updater function will be added.
+ *    target = The object whose balance will be updated.
+ *    destBalance = The desired target balance.
+ *    duration = The time, in seconds, it will take to go from the current to
+ *       the target balance.
+ *    maker = A function that will be used to create the necessary
+ *       interpolators. You'll typically call $(D
+ *       fewdee.interpolators.interpolatorMaker()) here.
+ *
+ * Returns:
+ *    An "updater function ID", that can be passed to the $(D Updater)'s $(D
+ *    remove()) method in order to stop the canned updater before it finishes.
+ */
+public UpdaterFuncID
+addBalanceUpdater(Balanceable)(Updater updater, Balanceable target,
+                               float destBalance, double duration,
+                               GenericInterpolatorMakerDelegate_t maker)
+   if (isBalanceable!Balanceable)
+{
+   auto t = 0.0;
+
+   auto balanceInterpolator = maker(target.balance, destBalance, duration);
+
+   return updater.add(
+      delegate(dt)
+      {
+         t += dt;
+         target.balance = balanceInterpolator(t);
+         return t < duration;
+      });
+}

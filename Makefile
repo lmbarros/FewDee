@@ -20,11 +20,12 @@ FEWDEE_SOURCES=src/allegro5/*.d src/allegro5/internal/*.d \
 
 
 # All
-all: fewdee.a fewdeedemo.example display_manager_info.example states_simple.example \
-     interpolators_graphs.example updater_simple.example updater_canned.example \
-     sg_solar_system.example sg_parallax_scrolling.example \
-     abstracted_input_simple.example audio_sample_simple.example \
-     audio_stream_simple.example
+all: fewdee.a fewdeedemo.example display_manager_info.example \
+     states_simple.example interpolators_graphs.example \
+     updater_simple.example updater_canned.example \
+     updater_canned_audio.example sg_solar_system.example \
+     sg_parallax_scrolling.example abstracted_input_simple.example \
+     audio_sample_simple.example audio_stream_simple.example
 
 
 # The library
@@ -38,6 +39,7 @@ display_manager_info.example: examples/display_manager_info.d fewdee.a
 states_simple.example: examples/states_simple.d fewdee.a
 updater_simple.example: examples/updater_simple.d fewdee.a
 updater_canned.example: examples/updater_canned.d fewdee.a
+updater_canned_audio.example: examples/updater_canned_audio.d fewdee.a
 sg_solar_system.example: examples/sg_solar_system.d fewdee.a
 sg_parallax_scrolling.example: examples/sg_parallax_scrolling.d fewdee.a
 interpolators_graphs.example: examples/interpolators_graphs.d fewdee.a

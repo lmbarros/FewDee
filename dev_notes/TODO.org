@@ -1,5 +1,10 @@
 #+STARTUP: overview hidestars odd
 
+* Bugs
+*** =updater_canned_audio.example= freezes sometimes
+    - [2013-07-03 Wed 20:53] I don't know exactly how to reproduce,
+      but it seems to have something to do with varying the playing
+      speed while the audio stream loops.
 * Use =~this()= instead of =free()= to release "low-level resources"
   - If we use the destructor to free low-level resources, then we can
     just create =scope= resources when needed (specially in examples,
@@ -10,9 +15,6 @@
     being called when =destroy()= was called on the resources (at
     least, that's what was seemingly happening with the =FakeResource=
     used in some unit tests.
-
-* Create canned updaters for audio
-  - For effects like fade in and fade out, at least.
 
 * Smarter sound initialization
   - If the sound cannot be initialized, the audio examples

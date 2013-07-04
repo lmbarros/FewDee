@@ -88,3 +88,60 @@ template isScalable(T)
       enum isScalable = false;
    }
 }
+
+
+/**
+ * Detects whether $(D T) has a $(D gain) property of type $(D float).
+ *
+ * These are the types considered "gainable" (a terrible name, by the way), with
+ * which some of the canned updaters are designed to work with.
+ */
+template isGainable(T)
+{
+   static if (hasMember!(T, "gain") && isAssignable!(typeof(T.gain), float))
+   {
+      enum isGainable = true;
+   }
+   else
+   {
+      enum isGainable = false;
+   }
+}
+
+
+/**
+ * Detects whether $(D T) has a $(D speed) property of type $(D float).
+ *
+ * These are the types considered "speedable" (a terrible name, by the way),
+ * with which some of the canned updaters are designed to work with.
+ */
+template isSpeedable(T)
+{
+   static if (hasMember!(T, "speed") && isAssignable!(typeof(T.gain), float))
+   {
+      enum isSpeedable = true;
+   }
+   else
+   {
+      enum isSpeedable = false;
+   }
+}
+
+
+/**
+ * Detects whether $(D T) has a $(D balance) property of type $(D float).
+ *
+ * These are the types considered "balanceable" (a terrible name, by the way),
+ * with which some of the canned updaters are designed to work with.
+ */
+template isBalanceable(T)
+{
+   static if (hasMember!(T, "balance") && isAssignable!(typeof(T.gain), float))
+   {
+      enum isBalanceable = true;
+   }
+   else
+   {
+      enum isBalanceable = false;
+   }
+}
