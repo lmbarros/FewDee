@@ -6,6 +6,12 @@
       but it seems to have something to do with varying the playing
       speed while the audio stream loops.
 * Assorted TODOs
+*** Use a better building system
+    - [2013-07-05 Fri 18:29] Right now, Scons probably has the best D
+      support. A few days ago, someone said that was going to release
+      much improved CMake support in the next couple of weeks.
+*** Generate nice docs
+    - [2013-07-05 Fri 18:39] CandyDoc?
 *** Use =~this()= instead of =free()= to release "low-level resources"
     - If we use the destructor to free low-level resources, then we
       can just create =scope= resources when needed (specially in
