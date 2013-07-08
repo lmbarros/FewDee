@@ -12,7 +12,7 @@ void main()
    // Start the engine and "accessories"
    scope crank = new fewdee.engine.Crank();
    scope updater = new TickBasedUpdater();
-   scope guish = new GUIshEventGenerator();
+   scope neg = new NodeEventsGenerator();
 
    // Load the resources
    ResourceManager.bitmaps.add("bmp1", new Bitmap("data/flag_1.png"));
@@ -70,50 +70,50 @@ void main()
             });
       });
 
-   // Print stuff to the console as GUIsh events are generated
-   guish.addHandler(
+   // Print stuff to the console as node events are generated
+   neg.addHandler(
       sprite, EventType.MOUSE_ENTER,
       delegate(in ref ALLEGRO_EVENT event, Node node)
       {
          writeln("Mouse enter!");
       });
 
-   guish.addHandler(
+   neg.addHandler(
       sprite, EventType.MOUSE_LEAVE,
       delegate(in ref ALLEGRO_EVENT event, Node node)
       {
          writeln("Mouse leave!");
       });
 
-   guish.addHandler(
+   neg.addHandler(
       sprite, EventType.MOUSE_MOVE,
       delegate(in ref ALLEGRO_EVENT event, Node node)
       {
          writeln("Mouse move!");
       });
 
-   guish.addHandler(
+   neg.addHandler(
       sprite, EventType.MOUSE_UP,
       delegate(in ref ALLEGRO_EVENT event, Node node)
       {
          writeln("Mouse up!");
       });
 
-   guish.addHandler(
+   neg.addHandler(
       sprite, EventType.MOUSE_DOWN,
       delegate(in ref ALLEGRO_EVENT event, Node node)
       {
          writeln("Mouse down!");
       });
 
-   guish.addHandler(
+   neg.addHandler(
       sprite, EventType.CLICK,
       delegate(in ref ALLEGRO_EVENT event, Node node)
       {
          writeln("Click!");
       });
 
-   guish.addHandler(
+   neg.addHandler(
       sprite, EventType.DOUBLE_CLICK,
       delegate(in ref ALLEGRO_EVENT event, Node node)
       {

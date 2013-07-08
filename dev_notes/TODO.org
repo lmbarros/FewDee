@@ -74,19 +74,19 @@
      between a real file system or an archive file
      system. Perhaps. Must think about this.
 
-* GUIsh TODOs
+* Node Events TODOs
 *** Z-order
     - Drawables have a "z" property; I can implement a picking visitor
-      that takes it into account. Then, GUIsh should use this. Picking
+      that takes it into account. Then, node_events should use this. Picking
       will pick Drawables only (and return a node path!).
 *** Make any node registerable
-    - OSGUIsh can work with any node; GUIsh should allow that, too:
+    - OSGUIsh can work with any node; node_events should allow that, too:
       any node should be registerable; will need to walk up the picked
       node path until finding a registered node (or not).
 *** Allow hierarchy of objects
     - Allow hierarchy of objects. (Will need to make AABBs much better
       on the way.)
-*** Add means to remove objects/handlers from GUIsh.
+*** Add means to remove objects/handlers from node_events.
 
 * Sprite TODOs
 *** Sprite constructor taking arbitrary number of file names

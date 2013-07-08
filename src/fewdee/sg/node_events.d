@@ -4,7 +4,7 @@
  * Authors: Leandro Motta Barros
  */
 
-module fewdee.sg.guish;
+module fewdee.sg.node_events;
 
 import allegro5.allegro;
 import std.conv;
@@ -14,7 +14,7 @@ import fewdee.sg.node;
 
 
 /// The possible types of GUI-like events.
-enum EventType
+public enum EventType
 {
    /**
     * Mouse has moved on the registered object (either because the mouse pointer
@@ -68,20 +68,20 @@ enum EventType
 
 
 /**
- * Generates GUI-like events for registered Nodes.
+ * The type of callbacks called when node events happen. What exactly is
+ * passed in the $(D event) parameter depends on what event is being handled;
+ * for more information, please see the documentation of $(D EventType). The
+ * $(D node) parameter gets the node on which the event was generated (for
+ * example, the node clicked).
  */
-class GUIshEventGenerator: LowLevelEventHandler
-{
-   /**
-    * The type of callbacks called when GUIsh events happen. What exactly is
-    * passed in the "event" parameter depends on what event is being handled;
-    * for more information, please see the documentation of EventType. The
-    * "node" parameter gets the node on which the event was generated (for
-    * example, the node clicked).
-    */
-   public alias void delegate(ref in ALLEGRO_EVENT event, Node node)
-      EventCallback_t;
+public alias void delegate(ref in ALLEGRO_EVENT event, Node node)
+   NodeEventCallback_t;
 
+
+
+/// Generates GUI-like events for registered $(D Node)s.
+class NodeEventsGenerator: LowLevelEventHandler
+{
    /// Handles incoming events.
    public override void handleEvent(in ref ALLEGRO_EVENT event)
    {
@@ -104,7 +104,6 @@ class GUIshEventGenerator: LowLevelEventHandler
       }
    }
 
-
    /**
     * Adds a callback for a GUI-like event.
     *
@@ -113,28 +112,27 @@ class GUIshEventGenerator: LowLevelEventHandler
     *   event = The desired event type.
     *   callback = The callback to run.
     */
-   public void addHandler(Node obj, EventType event, EventCallback_t callback)
+   public final void addHandler(
+      Node obj, EventType event, NodeEventCallback_t callback)
    {
-      eventCallbacks_[obj][event] ~= callback;
+      _eventCallbacks[obj][event] ~= callback;
    }
-
 
    /// A point on the screen.
    private struct point { float x; float y; };
 
-
    /**
-    * Updates prevNodeUnderMouse_, prevPositionUnderMouse_, nodeUnderMouse_
-    * and positionUnderMouse_.
+    * Updates $(D _prevNodeUnderMouse), $(D _prevPositionUnderMouse), $(D
+    * _nodeUnderMouse) and $(D _positionUnderMouse).
     *
     * Parameters:
-    *    mouseX = The mouse coordinate along the x axis.
-    *    mouseY = The mouse coordinate along the y axis.
+    *    mouseX = The mouse coordinate along the $(I x) axis.
+    *    mouseY = The mouse coordinate along the $(I y) axis.
     */
-   private void updatePickingData(float mouseX, float mouseY)
+   private final void updatePickingData(float mouseX, float mouseY)
    {
       Node currentNodeUnderMouse = null;
-      foreach(obj, dummy; eventCallbacks_)
+      foreach (obj, dummy; _eventCallbacks)
       {
          if (obj.contains(mouseX, mouseY))
          {
@@ -151,25 +149,23 @@ class GUIshEventGenerator: LowLevelEventHandler
             mouseY - currentNodeUnderMouse.aabb.top);
       }
 
-      prevNodeUnderMouse_ = nodeUnderMouse_;
-      prevPositionUnderMouse_ = positionUnderMouse_;
+      _prevNodeUnderMouse = _nodeUnderMouse;
+      _prevPositionUnderMouse = _positionUnderMouse;
 
-      nodeUnderMouse_ = currentNodeUnderMouse;
-      positionUnderMouse_ = currentPositionUnderMouse;
+      _nodeUnderMouse = currentNodeUnderMouse;
+      _positionUnderMouse = currentPositionUnderMouse;
    }
-
 
    /**
     * Calls all event callbacks of a given event type registered for a given
     * node.
     */
-   private void callEventCallbacks(Node node, EventType eventType,
-                                   in ref ALLEGRO_EVENT event)
+   private final void callEventCallbacks(Node node, EventType eventType,
+                                         in ref ALLEGRO_EVENT event)
    {
-      foreach(callback; eventCallbacks_[node][eventType])
+      foreach (callback; _eventCallbacks[node][eventType])
          callback(event, node);
    }
-
 
    /**
     * Handles tick events, so that the GUI-like events can be properly
@@ -177,13 +173,14 @@ class GUIshEventGenerator: LowLevelEventHandler
     *
     * One could think that handling most of these events in a "mouse axis" event
     * would work just as well and be more efficient. The truth is, it wouldn't
-    * work just as well. Mouse enter, mouse leave and mouse move events in GUIsh
-    * are "relative": if a moving node crosses a static mouse pointer, the
-    * events shall be generated. This is by design.
+    * work just as well. Mouse enter, mouse leave and mouse move events are
+    * "relative": if a moving node crosses a static mouse pointer, the events
+    * shall be generated, even the mouse cursor itself is static. This is by
+    * design.
     */
-   private void handleTickEvent(in ref ALLEGRO_EVENT event)
+   private final void handleTickEvent(in ref ALLEGRO_EVENT event)
    {
-      time_ += event.user.deltaTime;
+      _time += event.user.deltaTime;
 
       ALLEGRO_MOUSE_STATE mouseState;
       al_get_mouse_state(&mouseState);
@@ -191,30 +188,29 @@ class GUIshEventGenerator: LowLevelEventHandler
       updatePickingData(mouseState.x, mouseState.y);
 
       // Trigger the events
-      if (nodeUnderMouse_ == prevNodeUnderMouse_)
+      if (_nodeUnderMouse == _prevNodeUnderMouse)
       {
-         if (prevNodeUnderMouse_ !is null
-             && positionUnderMouse_ != prevPositionUnderMouse_)
+         if (_prevNodeUnderMouse !is null
+             && _positionUnderMouse != _prevPositionUnderMouse)
          {
-            callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_MOVE, event);
+            callEventCallbacks(_nodeUnderMouse, EventType.MOUSE_MOVE, event);
          }
       }
-      else // nodeUnderMouse != prevNodeUnderMouse_
+      else // nodeUnderMouse != _prevNodeUnderMouse
       {
-         if (prevNodeUnderMouse_ !is null)
+         if (_prevNodeUnderMouse !is null)
          {
-            callEventCallbacks(prevNodeUnderMouse_, EventType.MOUSE_LEAVE,
+            callEventCallbacks(_prevNodeUnderMouse, EventType.MOUSE_LEAVE,
                                event);
          }
 
-         if (nodeUnderMouse_ !is null)
-            callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_ENTER, event);
+         if (_nodeUnderMouse !is null)
+            callEventCallbacks(_nodeUnderMouse, EventType.MOUSE_ENTER, event);
       }
    }
 
-
    /// Handles a "mouse button down" event.
-   private void handleMouseButtonDownEvent(in ref ALLEGRO_EVENT event)
+   private final void handleMouseButtonDownEvent(in ref ALLEGRO_EVENT event)
    in
    {
       assert(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN);
@@ -222,16 +218,15 @@ class GUIshEventGenerator: LowLevelEventHandler
    body
    {
       // Trigger a "MouseDown" signal.
-      if (nodeUnderMouse_ !is null)
-         callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_DOWN, event);
+      if (_nodeUnderMouse !is null)
+         callEventCallbacks(_nodeUnderMouse, EventType.MOUSE_DOWN, event);
 
       // Do the bookkeeping for "Click" and "DoubleClick"
-      nodeThatGotMouseDown_[event.mouse.button] = nodeUnderMouse_;
+      _nodeThatGotMouseDown[event.mouse.button] = _nodeUnderMouse;
    }
 
-
    /// Handles a "mouse button up" event.
-   private void handleMouseButtonUpEvent(in ref ALLEGRO_EVENT event)
+   private final void handleMouseButtonUpEvent(in ref ALLEGRO_EVENT event)
    in
    {
       assert(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP);
@@ -240,57 +235,58 @@ class GUIshEventGenerator: LowLevelEventHandler
    {
       enum DOUBLE_CLICK_INTERVAL = 0.3;
 
-      if (nodeUnderMouse_ !is null)
+      if (_nodeUnderMouse !is null)
       {
          immutable button = event.mouse.button;
 
-         callEventCallbacks(nodeUnderMouse_, EventType.MOUSE_UP, event);
+         callEventCallbacks(_nodeUnderMouse, EventType.MOUSE_UP, event);
 
          // Now, the trickier ones: "Click" and "DoubleClick"
-         if (nodeUnderMouse_ == nodeThatGotMouseDown_[button])
+         if (_nodeUnderMouse == _nodeThatGotMouseDown[button])
          {
-            callEventCallbacks(nodeUnderMouse_, EventType.CLICK, event);
+            callEventCallbacks(_nodeUnderMouse, EventType.CLICK, event);
 
-            if (time_ - timeOfLastClick_[button] < DOUBLE_CLICK_INTERVAL
-                && nodeUnderMouse_ == nodeThatGotClick_[button])
+            if (_time - _timeOfLastClick[button] < DOUBLE_CLICK_INTERVAL
+                && _nodeUnderMouse == _nodeThatGotClick[button])
             {
-               callEventCallbacks(nodeUnderMouse_, EventType.DOUBLE_CLICK,
+               callEventCallbacks(_nodeUnderMouse, EventType.DOUBLE_CLICK,
                                   event);
             }
 
-            nodeThatGotClick_[button] = nodeUnderMouse_;
-            timeOfLastClick_[button] = time_;
+            _nodeThatGotClick[button] = _nodeUnderMouse;
+            _timeOfLastClick[button] = _time;
          }
       }
    }
 
-
    /// The time, in seconds, elapsed since this object started running.
-   private double time_ = 0.0;
+   private double _time = 0.0;
 
    /**
-    * All the event callbacks. eventCallbacks_[MyNode][EventType.CLICK] gets an
-    * array with all callbacks for the "click" event of MyNode.
+    * All the event callbacks.
+    *
+    * $(D _eventCallbacks[MyNode][EventType.CLICK]) gets an array with all
+    * callbacks for the "click" event of $(D MyNode).
     */
-   private EventCallback_t[][EventType][Node] eventCallbacks_;
+   private NodeEventCallback_t[][EventType][Node] _eventCallbacks;
 
    /// The node currently under the mouse pointer.
-   private Node nodeUnderMouse_;
+   private Node _nodeUnderMouse;
 
    /**
-    * The position (in the node coordinate system) of nodeUnderMouse_ (the
+    * The position (in the node coordinate system) of $(D _nodeUnderMouse) (the
     * node currently under the mouse pointer).
     */
-   private point positionUnderMouse_;
+   private point _positionUnderMouse;
 
    /// The node previously under the mouse pointer.
-   private Node prevNodeUnderMouse_;
+   private Node _prevNodeUnderMouse;
 
    /**
-    * The position (in the node coordinate system) of prevNodeUnderMouse_
+    * The position (in the node coordinate system) of $(D _prevNodeUnderMouse)
     * (the node previously under the mouse pointer).
     */
-   private point prevPositionUnderMouse_;
+   private point _prevPositionUnderMouse;
 
    /**
     * The size of arrays indexed by the mouse button number.
@@ -309,23 +305,23 @@ class GUIshEventGenerator: LowLevelEventHandler
     * overhead per button isn't that big, we simply support all buttons Allegro
     * can possibly support.
     */
-   private enum mouseButtonArraySize_ = 33;
+   private enum _mouseButtonArraySize = 33;
 
    /**
     * An array indicating (for every mouse button) which was the node that
     * received the last mouse down event. This is used to identify clicks.
     */
-   private Node nodeThatGotMouseDown_[mouseButtonArraySize_];
+   private Node _nodeThatGotMouseDown[_mouseButtonArraySize];
 
    /**
     * An array indicating (for every mouse button) which was the node that
     * received the last click event. This is used to identify double clicks.
     */
-   private Node nodeThatGotClick_[mouseButtonArraySize_];
+   private Node _nodeThatGotClick[_mouseButtonArraySize];
 
    /**
     * An array indicating (for every mouse button) the time at which the last
     * click event has happened. This is used to identify double clicks.
     */
-   double timeOfLastClick_[mouseButtonArraySize_];
+   double _timeOfLastClick[_mouseButtonArraySize];
 }
