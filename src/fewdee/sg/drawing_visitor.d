@@ -8,6 +8,7 @@ module fewdee.sg.drawing_visitor;
 
 import allegro5.allegro;
 import std.algorithm;
+import fewdee.sg.node;
 import fewdee.sg.drawable;
 import fewdee.sg.node_visitor;
 import fewdee.sg.srt;
@@ -15,13 +16,18 @@ import fewdee.sg.srt;
 
 /**
  * A visitor used to draw a scene graph. After doing the traversal, you must
- * call the draw() method to issue the actual drawing commands.
+ * call the $(D draw()) method to issue the actual drawing commands.
+ *
+ * See_also: draw()
  */
-class DrawingVisitor: NodeVisitor
+public class DrawingVisitor: NodeVisitor
 {
    alias NodeVisitor.visit visit;
 
-   /// Add the drawable to collectedDrawables_, with its respective transform.
+   /**
+    * Add the $(D Drawable) to $(D collectedDrawables_), with its respective
+    * transform.
+    */
    public override void visit(Drawable d)
    {
       // Compute the transformation
@@ -39,7 +45,10 @@ class DrawingVisitor: NodeVisitor
       collectedDrawables_ ~= CollectedDrawable(d, t);
    }
 
-   /// Draws all Drawables in collectedDrawables_, using the proper transforms.
+   /**
+    * Draws all $(D Drawable)s in $(D collectedDrawables_), using the proper
+    * transforms.
+    */
    public void draw()
    {
       sort!("a.d.z < b.d.z")(collectedDrawables_);
@@ -51,19 +60,34 @@ class DrawingVisitor: NodeVisitor
       }
    }
 
-   /// Important information concerning a Drawable that will be drawn.
+   /// Important information concerning a $(D Drawable) that will be drawn.
    private struct CollectedDrawable
    {
-      /// The Drawable itself
+      /// The $(D Drawable) itself.
       Drawable d;
 
-      /// The transform to use when drawing the Drawable
+      /// The transform to use when drawing the $(D Drawable).
       ALLEGRO_TRANSFORM t;
    }
 
    /**
-    * A collection of Drawables (and other data concerning these Drawables) that
-    * will be drawn.
+    * A collection of $(D Drawable)s (and other data concerning these $(D
+    * Drawable)s) that will be drawn.
     */
    private CollectedDrawable[] collectedDrawables_;
+}
+
+
+
+/**
+ * Handy way to draw a scene graph.
+ *
+ * It instantiates a $(D DrawingVisitor), makes it traverse the scene graph from
+ * a given root nod, and calls $(D DrawingVisitor.draw()).
+ */
+public void draw(Node root)
+{
+   auto dv = new DrawingVisitor();
+   root.accept(dv);
+   dv.draw();
 }

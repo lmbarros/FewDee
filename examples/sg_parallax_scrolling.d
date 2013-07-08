@@ -238,20 +238,15 @@ void main()
             (largeClouds);
       });
 
-   // And draw. Drawing is done by making a 'DrawingVisitor' visit the scene
-   // graph.
-   //
-   // TODO: This is probably not the nicest interface for drawing. FewDee
-   //       needs more love here.
+   // And draw, by calling 'fewdee.sg.drawing_visitor.draw()'. Under the hood,
+   // this handy function instantiates a 'DrawingVisitor', makes it visit the
+   // scene graph, and more.
    EventManager.addHandler(
       FEWDEE_EVENT_DRAW,
       delegate(in ref ALLEGRO_EVENT event)
       {
          al_clear_to_color(al_map_rgb(64, 64, 128));
-
-         auto dv = new DrawingVisitor();
-         root.accept(dv);
-         dv.draw();
+         root.draw(); // fewdee.sg.drawing_visitor.draw()
       });
 
    // Create a display

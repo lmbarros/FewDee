@@ -1,11 +1,12 @@
 /**
- * A scene graph Drawable that displays text.
+ * A scene graph $(D Drawable) that displays text.
  *
  * Authors: Leandro Motta Barros
  */
 
 module fewdee.sg.text;
 
+import std.string;
 import allegro5.allegro;
 import allegro5.allegro_font;
 import fewdee.aabb;
@@ -14,10 +15,10 @@ import fewdee.sg.drawable;
 import fewdee.internal.default_implementations;
 
 
-/// A scene graph Drawable that displays text.
-class Text: Drawable
+/// A scene graph $(D Drawable) that displays text.
+public class Text: Drawable
 {
-   mixin PositionableDefaultImplementation!"isAABBDirty_ = true;";
+   mixin PositionableDefaultImplementation!"dirtyAABB();";
    mixin ColorableDefaultImplementation;
 
    /// An enumeration of the possible text alignments.
@@ -34,7 +35,7 @@ class Text: Drawable
    }
 
    /**
-    * Constructs the Text object.
+    * Constructs the $(D Text) object.
     *
     * Parameters:
     *    font = The font to use to when drawing the text.
@@ -47,41 +48,31 @@ class Text: Drawable
    }
    body
    {
-      font_ = font;
-      text_ = text;
+      _font = font;
+      _text = text;
    }
 
    /// Draws the text to the current target bitmap.
    public override void draw()
    {
-      al_draw_text(font_, color, x, y, alignment_, text_.ptr);
+      al_draw_text(_font, color, x, y, _alignment, _text.ptr);
    }
 
+   /// The text alignment.
+   public final @property Alignment alignment() const { return _alignment; }
 
-   /// Returns the text bounding box.
-   public override @property AABB aabb()
+   /// Ditto.
+   public final @property void alignment(Alignment alignment)
    {
-      if (isAABBDirty_)
-         recomputeAABB();
-      return aabb_;
+      _alignment = alignment;
+      dirtyAABB();
    }
 
-
-   /// Gets the text alignment.
-   public @property Alignment alignment() const { return alignment_; }
-
-   /// Sets the text alignment.
-   public @property void alignment(Alignment alignment)
-   {
-      alignment_ = alignment;
-      isAABBDirty_ = true;
-   }
-
-   /// Recomputes the bounding box; stores it in aabb_.
-   private void recomputeAABB()
+   // Inherit docs.
+   protected override void recomputeAABB(ref AABB aabb)
    {
       int bbx, bby, bbw, bbh, ascent, descent;
-      al_get_text_dimensions(font_, text_.ptr, &bbx, &bby, &bbw, &bbh,
+      al_get_text_dimensions(_font, _text.toStringz, &bbx, &bby, &bbw, &bbh,
                              &ascent, &descent);
 
       float dx;
@@ -97,23 +88,15 @@ class Text: Drawable
       auto bbt = y + bby;
       auto bbb = bbt + bbh;
 
-      aabb_ = AABB(bbt, bbb, bbl, bbr);
-
-      isAABBDirty_ = false;
+      aabb = AABB(bbt, bbb, bbl, bbr);
    }
 
    /// The font used to draw the text.
-   private ALLEGRO_FONT* font_;
+   private ALLEGRO_FONT* _font;
 
    /// The text itself.
-   private string text_;
+   private string _text;
 
    /// The text alignment.
-   private Alignment alignment_ = Alignment.LEFT;
-
-   /// The Text's bounding box
-   private AABB aabb_;
-
-   /// Is the bounding box dirty?
-   private bool isAABBDirty_ = true;
+   private Alignment _alignment = Alignment.LEFT;
 }

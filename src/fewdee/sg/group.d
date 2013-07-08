@@ -12,18 +12,24 @@ import fewdee.sg.node_visitor;
 
 
 /// A scene graph node that can have children.
-class Group: Node
+public class Group: Node
 {
-   /// Adds a given node as child of this Group.
+   //
+   // Parent-child relationship
+   //
+
+   /// Adds a given node as child of this $(D Group).
    public void addChild(Node node)
    {
-      children_ ~= node;
+      _children ~= node;
       node.parents_ ~= this;
    }
 
-
    /// Returns the number of children.
-   public @property size_t numChildren() const { return children_.length; }
+   public final @property size_t numChildren() const
+   {
+      return _children.length;
+   }
 
    unittest
    {
@@ -43,7 +49,6 @@ class Group: Node
       assert(g.numChildren == 3);
    }
 
-
    /**
     * Gets the index of a given child.
     *
@@ -51,13 +56,13 @@ class Group: Node
     *    node = The child whose index is desired.
     *
     * Returns:
-    *    The index of node. If node was added multiple times as child, returns
-    *    the index of the first occurrence. If node is not a child of this
-    *    Group, returns a negative number.
+    *    The index of $(D node). If $(D node) was added multiple times as child,
+    *    returns the index of the first occurrence. If $(D node) is not a child
+    *    of this $(D Group), returns a negative number.
     */
    public int childIndex(in Node node)
    {
-      foreach (index, child; children_)
+      foreach (index, child; _children)
       {
          if (child == node)
             return index;
@@ -98,18 +103,17 @@ class Group: Node
       assert(g.childIndex(c4) == 3);
    }
 
-
    /**
-    * Removes a given child from the list of children. If the requested node is
-    * present multiple times as a child of this Group, only its first occurrence
-    * will be removed.
+    * Removes a given node from the list of children. If the requested node is
+    * present multiple times as a child of this $(D Group), only its first
+    * occurrence will be removed.
     *
     * Parameters:
     *    node = The node to remove.
     *
     * Returns:
     *    $(D true) if the node was removed; $(D false) if it was not removed
-    *    (necessarily because it is not a child of this Group).
+    *    (which implies that it wasn't a child of this $(D Group)).
     */
    public bool removeChild(in Node node)
    {
@@ -117,17 +121,17 @@ class Group: Node
       if (i < 0)
          return false;
 
-      foreach (index, childParent; children_[i].parents_)
+      foreach (index, childParent; _children[i].parents_)
       {
          if (childParent == this)
          {
-            children_[i].parents_ = children_[i].parents_[0..index]
-               ~ children_[i].parents_[index+1..$];
+            _children[i].parents_ = _children[i].parents_[0..index]
+               ~ _children[i].parents_[index+1..$];
             break;
          }
       }
 
-      children_ = children_[0..i] ~ children_[i+1..$];
+      _children = _children[0..i] ~ _children[i+1..$];
 
       return true;
    }
@@ -242,38 +246,37 @@ class Group: Node
       assert(g.numChildren == 0);
    }
 
+   /// The child nodes of this Group.
+   protected Node[] _children;
 
-   /// Accepts a NodeVisitor. The Visitor pattern, you know.
+
+   //
+   // Assorted methods
+   //
+
+   /// Accepts a $(D NodeVisitor). The Visitor pattern, you know.
    public override void accept(NodeVisitor visitor)
    {
       visitor.pushNodeToNodePath(this);
 
       visitor.visit(this);
 
-      foreach(node; children_)
+      foreach(node; _children)
          node.accept(visitor);
 
       visitor.popNodeFromNodePath(this);
    }
 
-
-   /**
-    * Returns the node's bounding rectangle. The returned rectangle shall be in
-    * the local coordinate system of this Node.
-    */
-   public override @property AABB aabb()
+   // Inherit docs
+   protected override void recomputeAABB(ref AABB aabb)
    {
-      if (children_.length == 0)
-         return EmptyAABB;
+      if (_children.length == 0)
+         aabb = EmptyAABB;
 
-      auto aabb = children_[0].aabb;
-      foreach(child; children_[1..$])
-         aabb.unionWith(child.aabb);
+      auto newAABB = _children[0].aabb;
+      foreach(child; _children[1..$])
+         newAABB.unionWith(child.aabb);
 
-      return aabb;
+      aabb = newAABB;
    }
-
-
-   /// The child nodes of this Group.
-   protected Node[] children_;
 }

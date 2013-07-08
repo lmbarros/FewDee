@@ -73,14 +73,14 @@ void main()
    sprSun.addBitmap(bmpSun1);
    sprSun.addBitmap(bmpSun2);
 
-   srtRoot.tx = WIDTH / 2.0;
-   srtRoot.ty = HEIGHT / 2.0;
+   srtRoot.x = WIDTH / 2.0;
+   srtRoot.y = HEIGHT / 2.0;
 
    sprPlanet.addBitmap(bmpPlanet);
-   srtPlanet.tx = 200;
+   srtPlanet.x = 200;
 
    sprMoon.addBitmap(bmpMoon);
-   srtMoon.tx = 60;
+   srtMoon.x = 60;
 
    // Time to create event handlers.
 
@@ -105,24 +105,19 @@ void main()
          time += dt;
          sprSun.currentIndex = cast(int)(time*10) % 2;
 
-         srtPlanet.r = srtPlanet.r + dt;
-         srtMoon.r = srtMoon.r + dt * 3;
+         srtPlanet.rotation = srtPlanet.rotation + dt;
+         srtMoon.rotation = srtMoon.rotation + dt * 3;
       });
 
-   // And draw. Drawing is done by making a 'DrawingVisitor' visit the scene
-   // graph.
-   //
-   // TODO: This is probably not the nicest interface for drawing. FewDee
-   //       needs more love here.
+   // And draw, by calling 'fewdee.sg.drawing_visitor.draw()'. Under the hood,
+   // this handy function instantiates a 'DrawingVisitor', makes it visit the
+   // scene graph, and more.
    EventManager.addHandler(
       FEWDEE_EVENT_TICK,
       delegate(in ref ALLEGRO_EVENT event)
       {
          al_clear_to_color(al_map_rgb(16, 16, 32));
-
-         auto dv = new DrawingVisitor();
-         srtRoot.accept(dv);
-         dv.draw();
+         srtRoot.draw(); // fewdee.sg.drawing_visitor.draw()
       });
 
    // Create a display

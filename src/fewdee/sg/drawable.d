@@ -11,12 +11,12 @@ import fewdee.sg.node_visitor;
 
 
 /// A scene graph node that can draw itself.
-class Drawable: Node
+public class Drawable: Node
 {
-   /// Draws the Drawable to Allegro's "current bitmap".
+   /// Draws the $(D Drawable) to Allegro's "current bitmap".
    abstract public void draw();
 
-   /// Accepts a NodeVisitor. The Visitor pattern, you know.
+   /// Accepts a $(D NodeVisitor). The Visitor pattern, you know.
    public override void accept(NodeVisitor visitor)
    {
       visitor.pushNodeToNodePath(this);
@@ -24,17 +24,19 @@ class Drawable: Node
       visitor.popNodeFromNodePath(this);
    }
 
-   /// Gets the Drawable's "z-order".
-   public @property float z() const { return z_; }
-
-   /// Sets the Drawable's "z-order".
-   public @property void z(float newZ) { z_ = newZ; }
-
-   /*
-    * The Drawable's "z-order". When using the standard means, Drawables with
-    * lower z-order are drawn first. In other words, Drawables with higher "z"
-    * are drawn over Drawables with lower "z". Drawables with the same "z-order"
-    * can be drawn in any order.
+   /**
+    * The $(D Drawable)'s "z-order".
+    *
+    * When using the standard means, $(D Drawable)s with lower z-order are drawn
+    * first. In other words, $(D Drawable)s with higher "z" are drawn over $(D
+    * Drawable)s with lower "z". $(D Drawable)s with the same "z-order" can be
+    * drawn in any order.
     */
+   public final @property float z() const { return z_; }
+
+   /// Ditto.
+   public final @property void z(float newZ) { z_ = newZ; }
+
+   /// The $(D Drawable)'s "z-order".
    private float z_ = 0.0;
 }

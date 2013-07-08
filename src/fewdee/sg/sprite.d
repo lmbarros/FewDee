@@ -15,46 +15,39 @@ import fewdee.internal.default_implementations;
 
 
 /// A collection of same-sized bitmaps and a few additional bits.
-class Sprite: Drawable
+public class Sprite: Drawable
 {
    mixin ColorableDefaultImplementation;
-   mixin PositionableDefaultImplementation!"isAABBDirty_ = true;";
-   mixin RotatableDefaultImplementation!"isAABBDirty_ = true;";
-   mixin ScalableDefaultImplementation!"isAABBDirty_ = true;";
+   mixin PositionableDefaultImplementation!"dirtyAABB();";
+   mixin RotatableDefaultImplementation!"dirtyAABB();";
+   mixin ScalableDefaultImplementation!"dirtyAABB();";
 
    /**
-    * Constructs the Sprite, without adding any image to it.
+    * Constructs the $(D Sprite), without adding any image to it.
     *
     * Parameters:
-    *    width = The Sprite width, in pixels.
-    *    height = The Sprite height, in pixels.
-    *    centerX = The x coordinate of the Sprite center, in the local
+    *    width = The $(D Sprite) width, in pixels.
+    *    height = The $(D Sprite) height, in pixels.
+    *    centerX = The $(I x) coordinate of the $(D Sprite) center, in the local
     *       coordinate system.
-    *    centerY = The y coordinate of the Sprite center, in the local
+    *    centerY = The $(I y) coordinate of the $(D Sprite) center, in the local
     *       coordinate system.
     */
    this(float width, float height, float centerX = 0.0, float centerY = 0.0)
    {
-      width_ = width;
-      height_ = height;
-      centerX_ = centerX;
-      centerY_ = centerY;
-   }
-
-   /// Returns the node's bounding rectangle.
-   public override @property AABB aabb()
-   {
-      if (isAABBDirty_)
-         recomputeAABB();
-      return aabb_;
+      _width = width;
+      _height = height;
+      _centerX = centerX;
+      _centerY = centerY;
    }
 
    /**
-    * Adds a bitmap to the Sprite.
+    * Adds a bitmap to the $(D Sprite).
     *
-    * Returns: The index of the added bitmap.
+    * Returns:
+    *    The index of the added bitmap.
     */
-   public size_t addBitmap(ALLEGRO_BITMAP* bitmap)
+   public final size_t addBitmap(ALLEGRO_BITMAP* bitmap)
    in
    {
       assert(bitmap !is null);
@@ -63,39 +56,39 @@ class Sprite: Drawable
    {
       immutable bmpWidth = al_get_bitmap_width(bitmap);
       immutable bmpHeight = al_get_bitmap_height(bitmap);
-      if (bmpWidth != width_ || bmpHeight != height_)
+      if (bmpWidth != _width || bmpHeight != _height)
       {
          throw new Exception(
             "Wrong sized sprite bitmap. Expected "
-            ~ to!string(width_) ~ "x" ~ to!string(height_) ~ ", got "
+            ~ to!string(_width) ~ "x" ~ to!string(_height) ~ ", got "
             ~ to!string(bmpWidth) ~ "x" ~ to!string(bmpHeight));
       }
 
-      bitmaps_ ~= bitmap;
+      _bitmaps ~= bitmap;
 
-      return bitmaps_.length - 1;
+      return _bitmaps.length - 1;
    }
 
    /// The index of current bitmap.
-   public @property size_t currentIndex() const { return currentIndex_; }
+   public final @property size_t currentIndex() const { return _currentIndex; }
 
-   /// The index of current bitmap.
-   public @property void currentIndex(size_t newIndex)
+   /// Ditto
+   public final @property void currentIndex(size_t newIndex)
    {
-      currentIndex_ = newIndex;
+      _currentIndex = newIndex;
    }
 
    /// The sprite width, in pixels.
-   public @property float width() const { return width_; }
+   public final @property float width() const { return _width; }
 
    /// The sprite height, in pixels.
-   public @property float height() const { return height_; }
+   public final @property float height() const { return _height; }
 
-   /// Draws the current Sprite bitmap to the current target.
+   /// Draws the current $(D Sprite) bitmap to the current target.
    public override void draw()
    in
    {
-      assert(currentIndex_ < bitmaps_.length);
+      assert(_currentIndex < _bitmaps.length);
    }
    body
    {
@@ -107,10 +100,10 @@ class Sprite: Drawable
       // performance, since we avoid a sequence of function calls that
       // eventually reach the one we are using.)
       al_draw_tinted_scaled_rotated_bitmap(
-         bitmaps_[currentIndex_],
+         _bitmaps[_currentIndex],
          color,
-         centerX_,
-         centerY_,
+         _centerX,
+         _centerY,
          x,
          y,
          scaleX,
@@ -119,36 +112,28 @@ class Sprite: Drawable
          flags);
    }
 
-   /// Recomputes the bounding box; stores it in aabb_.
-   private void recomputeAABB()
+   // Inherit docs
+   protected override void recomputeAABB(ref AABB aabb)
    {
-      aabb_ = AABB(y - centerY_, y + height - centerY_,
-                   x - centerX_, x + width - centerX_);
-
-      isAABBDirty_ = false;
+      aabb = AABB(y - _centerY, y + height - _centerY,
+                  x - _centerX, x + width - _centerX);
    }
 
-   /// The index (into bitmaps_) of current bitmap.
-   private size_t currentIndex_ = 0;
+   /// The index (into $(D _bitmaps)) of current bitmap.
+   private size_t _currentIndex = 0;
 
    /// Sprite width, in pixels.
-   private float width_;
+   private const float _width;
 
    /// Sprite height, in pixels.
-   private float height_;
+   private const float _height;
 
-   /// Sprite center along the x axis.
-   private float centerX_;
+   /// Sprite center along the $(I x) axis.
+   private float _centerX;
 
-   /// Sprite center along the y axis.
-   private float centerY_;
-
-   /// The bounding box.
-   private AABB aabb_;
-
-   /// Is the bounding box dirty?
-   private bool isAABBDirty_ = true;
+   /// Sprite center along the $(I y) axis.
+   private float _centerY;
 
    /// The bitmaps.
-   private ALLEGRO_BITMAP*[] bitmaps_;
+   private ALLEGRO_BITMAP*[] _bitmaps;
 }
