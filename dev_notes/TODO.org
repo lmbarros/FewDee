@@ -86,8 +86,6 @@
 *** Allow hierarchy of objects
     - Allow hierarchy of objects. (Will need to make AABBs much better
       on the way.)
-*** Add means to remove objects/handlers from node_events.
-
 * Sprite TODOs
 *** Sprite constructor taking arbitrary number of file names
 *** Sprite.contains() -> by transparency? Multiple containment policies?

@@ -7,7 +7,6 @@
 module fewdee.sg.node_events;
 
 import allegro5.allegro;
-import std.conv;
 import fewdee.event;
 import fewdee.low_level_event_handler;
 import fewdee.sg.node;
@@ -19,63 +18,78 @@ public enum EventType
    /**
     * Mouse has moved on the registered object (either because the mouse pointer
     * itself moved or because the object has moved). The event passed to the
-    * callback is of "user" type, without any useful information.
+    * handler is of "user" type, without any useful information.
     */
    MOUSE_MOVE,
 
    /**
     * Mouse has entered in the area of the registered object (either because the
     * mouse pointer itself moved or because the object has moved). The event
-    * passed to the callback is of "user" type, without any useful information.
+    * passed to the handler is of "user" type, without any useful information.
     */
    MOUSE_ENTER,
 
    /**
     * Mouse has left the area of the registered object (either because the mouse
     * pointer itself moved or because the object has moved). The event passed to
-    * the callback is of "user" type, without any useful information.
+    * the handler is of "user" type, without any useful information.
     */
    MOUSE_LEAVE,
 
    /**
     * Mouse button was pressed down in the registered object. The event passed
-    * to the callback is of "mouse" type, and can be inspected to get
-    * information like which button was pressed.
+    * to the handler is of "mouse" type, and can be inspected to get information
+    * like which button was pressed.
     */
    MOUSE_DOWN,
 
    /**
     * Mouse button was released in the registered object. The event passed to
-    * the callback is of "mouse" type, and can be inspected to get information
+    * the handler is of "mouse" type, and can be inspected to get information
     * like which button was released.
     */
    MOUSE_UP,
 
    /**
     * Mouse button was clicked in the registered object. The event passed to the
-    * callback is of "mouse" type, and can be inspected to get information like
+    * handler is of "mouse" type, and can be inspected to get information like
     * which button was clicked.
     */
    CLICK,
 
    /**
     * Mouse button was double-clicked in the registered object. The event passed
-    * to the callback is of "mouse" type, and can be inspected to get
-    * information like which button was double-clicked.
+    * to the handler is of "mouse" type, and can be inspected to get information
+    * like which button was double-clicked.
     */
    DOUBLE_CLICK,
 }
 
 
 /**
- * The type of callbacks called when node events happen. What exactly is
- * passed in the $(D event) parameter depends on what event is being handled;
- * for more information, please see the documentation of $(D EventType). The
- * $(D node) parameter gets the node on which the event was generated (for
- * example, the node clicked).
+ * The type of handlers called when node events happen. What exactly is passed
+ * in the $(D event) parameter depends on what event is being handled; for more
+ * information, please see the documentation of $(D EventType). The $(D node)
+ * parameter gets the node on which the event was generated (for example, the
+ * node clicked).
  */
 public alias void delegate(ref in ALLEGRO_EVENT event, Node node)
-   NodeEventCallback_t;
+   NodeEventHandler;
+
+
+/**
+ * An opaque identifier identifying a $(D NodeEventHandler) added to an $(D
+ * NodeEventsGenerator). It can be used to remove the updater function.
+ */
+public alias size_t NodeEventHandlerID;
+
+
+/**
+ * An "node event handler ID" that is guaranteed to never be equal to any real
+ * node event handler ID. It is safe to pass $(D InvalidUpdaterFuncID) to $(D
+ * NodeEventsGenerator.removeHandler()).
+ */
+public immutable NodeEventHandlerID InvalidNodeEventHandlerID = 0;
 
 
 
@@ -105,17 +119,50 @@ class NodeEventsGenerator: LowLevelEventHandler
    }
 
    /**
-    * Adds a callback for a GUI-like event.
+    * Adds a handler for a GUI-like event.
     *
     * Parameters:
     *   obj = The node receiving the event.
     *   event = The desired event type.
-    *   callback = The callback to run.
+    *   handler = The handler to run when the event is triggered.
+    *
+    * Returns:
+    *   A handle that can be passed to $(D removeHandler()) should you want to
+    *   remove the event handler.
     */
-   public final void addHandler(
-      Node obj, EventType event, NodeEventCallback_t callback)
+   public final NodeEventHandlerID
+   addHandler(Node obj, EventType event, NodeEventHandler handler)
    {
-      _eventCallbacks[obj][event] ~= callback;
+      _eventHandlers[obj][event][_nextEventHandlerID] = handler;
+      return _nextEventHandlerID++;
+   }
+
+   /**
+    * Removes the event handler whose handle is passed as parameter.
+    *
+    * Parameters:
+    *    id = The handle (as returned by $(D addHandler)) of the event handler
+    *       to be removed.
+    *
+    * Returns:
+    *    $(D true) if the handler was removed; $(D false) if it was not (which
+    *    means that no handler with the requested handle was found).
+    *
+    * TODO: "Clean" the data structure, by removing, for example, $(D
+    *    _eventHandlers[node]) if no handler for $(D node) exists anymore.
+    */
+   public final bool removeHandler(NodeEventHandlerID id)
+   {
+      foreach (node, nodeData; _eventHandlers)
+      {
+         foreach (eventType, handlerList; nodeData)
+         {
+            if (handlerList.remove(id))
+               return true;
+         }
+      }
+
+      return false;
    }
 
    /// A point on the screen.
@@ -132,7 +179,7 @@ class NodeEventsGenerator: LowLevelEventHandler
    private final void updatePickingData(float mouseX, float mouseY)
    {
       Node currentNodeUnderMouse = null;
-      foreach (obj, dummy; _eventCallbacks)
+      foreach (obj, dummy; _eventHandlers)
       {
          if (obj.contains(mouseX, mouseY))
          {
@@ -157,13 +204,13 @@ class NodeEventsGenerator: LowLevelEventHandler
    }
 
    /**
-    * Calls all event callbacks of a given event type registered for a given
+    * Calls all event handlers of a given event type registered for a given
     * node.
     */
-   private final void callEventCallbacks(Node node, EventType eventType,
-                                         in ref ALLEGRO_EVENT event)
+   private final void callEventHandlers(Node node, EventType eventType,
+                                        in ref ALLEGRO_EVENT event)
    {
-      foreach (callback; _eventCallbacks[node][eventType])
+      foreach (callback; _eventHandlers[node][eventType])
          callback(event, node);
    }
 
@@ -193,19 +240,19 @@ class NodeEventsGenerator: LowLevelEventHandler
          if (_prevNodeUnderMouse !is null
              && _positionUnderMouse != _prevPositionUnderMouse)
          {
-            callEventCallbacks(_nodeUnderMouse, EventType.MOUSE_MOVE, event);
+            callEventHandlers(_nodeUnderMouse, EventType.MOUSE_MOVE, event);
          }
       }
       else // nodeUnderMouse != _prevNodeUnderMouse
       {
          if (_prevNodeUnderMouse !is null)
          {
-            callEventCallbacks(_prevNodeUnderMouse, EventType.MOUSE_LEAVE,
-                               event);
+            callEventHandlers(
+               _prevNodeUnderMouse, EventType.MOUSE_LEAVE, event);
          }
 
          if (_nodeUnderMouse !is null)
-            callEventCallbacks(_nodeUnderMouse, EventType.MOUSE_ENTER, event);
+            callEventHandlers(_nodeUnderMouse, EventType.MOUSE_ENTER, event);
       }
    }
 
@@ -219,7 +266,7 @@ class NodeEventsGenerator: LowLevelEventHandler
    {
       // Trigger a "MouseDown" signal.
       if (_nodeUnderMouse !is null)
-         callEventCallbacks(_nodeUnderMouse, EventType.MOUSE_DOWN, event);
+         callEventHandlers(_nodeUnderMouse, EventType.MOUSE_DOWN, event);
 
       // Do the bookkeeping for "Click" and "DoubleClick"
       _nodeThatGotMouseDown[event.mouse.button] = _nodeUnderMouse;
@@ -239,18 +286,18 @@ class NodeEventsGenerator: LowLevelEventHandler
       {
          immutable button = event.mouse.button;
 
-         callEventCallbacks(_nodeUnderMouse, EventType.MOUSE_UP, event);
+         callEventHandlers(_nodeUnderMouse, EventType.MOUSE_UP, event);
 
          // Now, the trickier ones: "Click" and "DoubleClick"
          if (_nodeUnderMouse == _nodeThatGotMouseDown[button])
          {
-            callEventCallbacks(_nodeUnderMouse, EventType.CLICK, event);
+            callEventHandlers(_nodeUnderMouse, EventType.CLICK, event);
 
             if (_time - _timeOfLastClick[button] < DOUBLE_CLICK_INTERVAL
                 && _nodeUnderMouse == _nodeThatGotClick[button])
             {
-               callEventCallbacks(_nodeUnderMouse, EventType.DOUBLE_CLICK,
-                                  event);
+               callEventHandlers(
+                  _nodeUnderMouse, EventType.DOUBLE_CLICK, event);
             }
 
             _nodeThatGotClick[button] = _nodeUnderMouse;
@@ -263,12 +310,20 @@ class NodeEventsGenerator: LowLevelEventHandler
    private double _time = 0.0;
 
    /**
-    * All the event callbacks.
+    * All the event handlers.
     *
-    * $(D _eventCallbacks[MyNode][EventType.CLICK]) gets an array with all
-    * callbacks for the "click" event of $(D MyNode).
+    * $(D _eventHandlers[MyNode][EventType.CLICK]) gets an associative array
+    * with all handlers for the "click" event of $(D MyNode), indexed by their
+    * node event handler IDs.
     */
-   private NodeEventCallback_t[][EventType][Node] _eventCallbacks;
+   private NodeEventHandler[NodeEventHandlerID][EventType][Node] _eventHandlers;
+
+   /**
+    * The next node event handler ID to use. The same sequence of IDs is used
+    * for all event types and nodes.
+    */
+   private NodeEventHandlerID _nextEventHandlerID =
+      InvalidNodeEventHandlerID + 1;
 
    /// The node currently under the mouse pointer.
    private Node _nodeUnderMouse;
