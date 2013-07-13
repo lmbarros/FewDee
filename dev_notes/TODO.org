@@ -6,6 +6,21 @@
       but it seems to have something to do with varying the playing
       speed while the audio stream loops.
 * Assorted TODOs
+*** SpriteTemplate: add a data-driven description
+    - [2013-07-12 Fri 21:50] Instead of manually calling many methods,
+      read the specification of a =SpriteTemplate= from a string like
+      this:
+         string aSpriteConfig = `
+            SIZE(64, 64)           # width, height
+            BITMAP(bmp1, 32, 32)   # name in resmgr, corner x, corner y
+            ANIMATION(
+               punch,              # name
+               0, 0.2              # bitmap index, time
+               1, 0.3              # ditto
+               0)                  # bitmap index (no time, lasts forever)`
+*** SpriteTemplates: should them be managed by the ResourceManager?
+    - [2013-07-12 Fri 21:54] It could make sense to make the resource
+      manager manage the =SpriteTemplate=s.
 *** Use a better building system
     - [2013-07-05 Fri 18:29] Right now, Scons probably has the best D
       support. A few days ago, someone said that was going to release

@@ -57,6 +57,18 @@ public class Bitmap: LowLevelResource
       _bitmap = null;
    }
 
+   /// The bitmap width, in pixels.
+   public final @property int width()
+   {
+      return al_get_bitmap_width(_bitmap);
+   }
+
+   /// The bitmap height, in pixels.
+   public final @property int height()
+   {
+      return al_get_bitmap_height(_bitmap);
+   }
+
    /**
     * The wrapped $(D ALLEGRO_BITMAP*). This is public just to make the $(D
     * alias this) work.

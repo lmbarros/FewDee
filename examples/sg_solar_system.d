@@ -60,9 +60,9 @@ void main()
    auto srtRoot = new SRT();
    auto srtPlanet = new SRT();
    auto srtMoon = new SRT();
-   auto sprSun = new Sprite(64, 64, 32, 32);
-   auto sprPlanet = new Sprite(64, 64, 32, 32);
-   auto sprMoon = new Sprite(64, 64, 32, 32);
+   auto sprSun = new SpriteNode(64, 64, 32, 32);
+   auto sprPlanet = new SpriteNode(64, 64, 32, 32);
+   auto sprMoon = new SpriteNode(64, 64, 32, 32);
 
    srtRoot.addChild(srtPlanet);
    srtRoot.addChild(sprSun);

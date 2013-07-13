@@ -21,7 +21,7 @@ void main()
    ResourceManager.fonts.add("font", new Font("data/bluehigl.ttf", 50));
 
    // Create a sprite
-   auto sprite = new Sprite(64, 64, 6, 61);
+   auto sprite = new SpriteNode(64, 64, 6, 61);
    sprite.addBitmap(ResourceManager.bitmaps["bmp1"]);
    sprite.addBitmap(ResourceManager.bitmaps["bmp2"]);
    sprite.addBitmap(ResourceManager.bitmaps["bmp1"]);

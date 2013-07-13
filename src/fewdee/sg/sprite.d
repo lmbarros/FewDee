@@ -15,7 +15,7 @@ import fewdee.internal.default_implementations;
 
 
 /// A collection of same-sized bitmaps and a few additional bits.
-public class Sprite: Drawable
+public class SpriteNode: Drawable
 {
    mixin ColorableDefaultImplementation;
    mixin PositionableDefaultImplementation!"dirtyAABB();";
@@ -84,7 +84,7 @@ public class Sprite: Drawable
    /// The sprite height, in pixels.
    public final @property float height() const { return _height; }
 
-   /// Draws the current $(D Sprite) bitmap to the current target.
+   /// Draws the current $(D SpriteNode) bitmap to the current target.
    public override void draw()
    in
    {

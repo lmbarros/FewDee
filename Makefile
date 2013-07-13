@@ -25,7 +25,8 @@ all: fewdee.a fewdeedemo.example display_manager_info.example \
      updater_simple.example updater_canned.example \
      updater_canned_audio.example sg_solar_system.example \
      sg_parallax_scrolling.example abstracted_input_simple.example \
-     audio_sample_simple.example audio_stream_simple.example
+     audio_sample_simple.example audio_stream_simple.example \
+     sprite_simple.example
 
 
 # The library
@@ -46,6 +47,7 @@ interpolators_graphs.example: examples/interpolators_graphs.d fewdee.a
 abstracted_input_simple.example: examples/abstracted_input_simple.d fewdee.a
 audio_sample_simple.example: examples/audio_sample_simple.d fewdee.a
 audio_stream_simple.example: examples/audio_stream_simple.d fewdee.a
+sprite_simple.example: examples/sprite_simple.d fewdee.a
 
 
 # Unit tests
