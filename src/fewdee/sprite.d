@@ -95,6 +95,21 @@ public class SpriteTemplate
       _height = height;
    }
 
+   /**
+    * Sets the center (reference point) of the $(D Sprite).
+    *
+    * Parameters:
+    *    x = The horizontal coordinate, in pixels, measured from the left side
+    *       of the image, and growing to the right.
+    *    y = The vertical coordinate, in pixels, measured from the top side of
+    *       the image, and growing to the bottom.
+    */
+   public final void setCenter(float x, float y)
+   {
+      _centerX = x;
+      _centerY = y;
+   }
+
    /// The width of the $(D SpriteTemplate) images, in pixels.
    public final @property int width()
    {
@@ -105,6 +120,18 @@ public class SpriteTemplate
    public final @property int height()
    {
       return _height;
+   }
+
+   /// The horizontal coordinate of the sprite center (reference point).
+   public final @property float centerX()
+   {
+      return _centerX;
+   }
+
+   /// The vertical coordinate of the sprite center (reference point).
+   public final @property float centerY()
+   {
+      return _centerY;
    }
 
    /**
@@ -221,6 +248,19 @@ public class SpriteTemplate
     * If it is equals to zero, it is considered uninitialized.
     */
    private uint _height = 0;
+
+   /**
+    * The horizontal coordinate of the sprite center (reference point), in
+    * pixels, measured from the left side of the image, and growing to the
+    * right.
+    */
+   private float _centerX = 0;
+
+   /**
+    * The vertical coordinate of the sprite center (reference point), in pixels,
+    * measured from the top side of the image, and growing to the bottom.
+    */
+   private float _centerY = 0;
 }
 
 
@@ -260,8 +300,10 @@ public class Sprite
    {
       auto image = _template._images[_currentImage];
       al_draw_bitmap_region(
-         image.bitmap, image.x, image.y,
-         _template.width, _template.height, x, y, 0);
+         image.bitmap,
+         image.x, image.y, _template.width, _template.height, // image rectangle
+         x - _template.centerX, y - _template.centerY, // drawing position
+         0); // flags
    }
 
    /*
