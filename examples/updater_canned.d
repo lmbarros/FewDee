@@ -65,14 +65,13 @@ void main()
 
    // And now, add lots of event handlers. Canned updaters will be added in
    // response to key presses.
-
-   // Quit if ESC is pressed
    EventManager.addHandler(
       ALLEGRO_EVENT_KEY_DOWN,
       delegate(in ref ALLEGRO_EVENT event)
       {
          switch (event.keyboard.keycode)
          {
+            // Quit if ESC is pressed
             case ALLEGRO_KEY_ESCAPE:
             {
                exitPlease = true;
