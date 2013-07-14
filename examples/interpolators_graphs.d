@@ -304,166 +304,172 @@ private void drawGraph()
 // The main function. You should now what it is :-)
 void main()
 {
-   // Start the engine
-   scope crank = new fewdee.engine.Crank();
+   al_run_allegro(
+   {
+      // Start the engine
+      scope crank = new fewdee.engine.Crank();
 
-   // We are using the functions provided by the Allegro primitives add on, so
-   // we have to initialize it.
-   AllegroManager.initPrimitives();
+      // We are using the functions provided by the Allegro primitives add on,
+      // so we have to initialize it.
+      AllegroManager.initPrimitives();
 
-   // Load the background image. (Since we are not using the ResourceManager,
-   // we'll need to free it manually later).
-   bmpBG = new Bitmap("data/interpolators_graphs_bg.png");
+      // Load the background image. (Since we are not using the ResourceManager,
+      // we'll need to free it manually later).
+      bmpBG = new Bitmap("data/interpolators_graphs_bg.png");
 
-   // When this is set to 'true', we'll exit the main loop.
-   bool exitPlease = false;
+      // When this is set to 'true', we'll exit the main loop.
+      bool exitPlease = false;
 
-   // Now register all the event handlers we'll need
+      // Now register all the event handlers we'll need
 
-   // Quit if ESC is pressed
-   EventManager.addHandler(
-      ALLEGRO_EVENT_KEY_DOWN,
-      delegate(in ref ALLEGRO_EVENT event)
-      {
-         if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
-            exitPlease = true;
-      });
-
-   // Handle other keys. These just allow the user to change the interpolator
-   // parameters. Nothing really interesting is done here.
-   EventManager.addHandler(
-      ALLEGRO_EVENT_KEY_CHAR,
-      delegate(in ref ALLEGRO_EVENT event)
-      {
-         switch (event.keyboard.keycode)
+      // Quit if ESC is pressed
+      EventManager.addHandler(
+         ALLEGRO_EVENT_KEY_DOWN,
+         delegate(in ref ALLEGRO_EVENT event)
          {
-            // duration
-            case ALLEGRO_KEY_D:
+            if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+               exitPlease = true;
+         });
+
+      // Handle other keys. These just allow the user to change the interpolator
+      // parameters. Nothing really interesting is done here.
+      EventManager.addHandler(
+         ALLEGRO_EVENT_KEY_CHAR,
+         delegate(in ref ALLEGRO_EVENT event)
+         {
+            switch (event.keyboard.keycode)
             {
-               auto mod = event.keyboard.modifiers;
-               if (mod & ALLEGRO_KEYMOD_SHIFT)
-                  duration -= 0.1;
-               else
-                  duration += 0.1;
-
-               if (duration < 0.1)
-                  duration = 0.1;
-
-               writefln("duration = %s", duration);
-               remakeInterpolator();
-
-               break;
-            }
-
-            // from
-            case ALLEGRO_KEY_F:
-            {
-               auto mod = event.keyboard.modifiers;
-               if (mod & ALLEGRO_KEYMOD_SHIFT)
-                  from -= 1.0;
-               else
-                  from += 1.0;
-
-               writefln("from = %s", from);
-               remakeInterpolator();
-
-               break;
-            }
-
-            // to
-            case ALLEGRO_KEY_T:
-            {
-               auto mod = event.keyboard.modifiers;
-               if (mod & ALLEGRO_KEYMOD_SHIFT)
-                  to -= 1.0;
-               else
-                  to += 1.0;
-
-               writefln("to = %s", to);
-               remakeInterpolator();
-
-               break;
-            }
-
-            // amplitude
-            case ALLEGRO_KEY_A:
-            {
-               auto mod = event.keyboard.modifiers;
-               if (mod & ALLEGRO_KEYMOD_SHIFT)
-                  amplitude -= 0.1;
-               else
-                  amplitude += 0.1;
-
-               writefln("amplitude = %s", amplitude);
-               remakeInterpolator();
-
-               break;
-            }
-
-            // period
-            case ALLEGRO_KEY_P:
-            {
-               auto mod = event.keyboard.modifiers;
-               if (mod & ALLEGRO_KEYMOD_SHIFT)
-                  period -= 0.1;
-               else
-                  period += 0.1;
-
-               writefln("period = %s", period);
-               remakeInterpolator();
-
-               break;
-            }
-
-            // Interpolator
-            case ALLEGRO_KEY_I:
-            {
-               auto mod = event.keyboard.modifiers;
-               if (mod & ALLEGRO_KEYMOD_SHIFT)
+               // duration
+               case ALLEGRO_KEY_D:
                {
-                  if (currentInterpolator > 0)
-                     --currentInterpolator;
-               }
-               else
-               {
-                  auto limit = InterpolatorType.Count - 1;
-                  if (currentInterpolator < limit)
-                     ++currentInterpolator;
+                  auto mod = event.keyboard.modifiers;
+                  if (mod & ALLEGRO_KEYMOD_SHIFT)
+                     duration -= 0.1;
+                  else
+                     duration += 0.1;
+
+                  if (duration < 0.1)
+                     duration = 0.1;
+
+                  writefln("duration = %s", duration);
+                  remakeInterpolator();
+
+                  break;
                }
 
-               writefln("Interpolator = %s", currentInterpolator);
-               remakeInterpolator();
+               // from
+               case ALLEGRO_KEY_F:
+               {
+                  auto mod = event.keyboard.modifiers;
+                  if (mod & ALLEGRO_KEYMOD_SHIFT)
+                     from -= 1.0;
+                  else
+                     from += 1.0;
 
-               break;
+                  writefln("from = %s", from);
+                  remakeInterpolator();
+
+                  break;
+               }
+
+               // to
+               case ALLEGRO_KEY_T:
+               {
+                  auto mod = event.keyboard.modifiers;
+                  if (mod & ALLEGRO_KEYMOD_SHIFT)
+                     to -= 1.0;
+                  else
+                     to += 1.0;
+
+                  writefln("to = %s", to);
+                  remakeInterpolator();
+
+                  break;
+               }
+
+               // amplitude
+               case ALLEGRO_KEY_A:
+               {
+                  auto mod = event.keyboard.modifiers;
+                  if (mod & ALLEGRO_KEYMOD_SHIFT)
+                     amplitude -= 0.1;
+                  else
+                     amplitude += 0.1;
+
+                  writefln("amplitude = %s", amplitude);
+                  remakeInterpolator();
+
+                  break;
+               }
+
+               // period
+               case ALLEGRO_KEY_P:
+               {
+                  auto mod = event.keyboard.modifiers;
+                  if (mod & ALLEGRO_KEYMOD_SHIFT)
+                     period -= 0.1;
+                  else
+                     period += 0.1;
+
+                  writefln("period = %s", period);
+                  remakeInterpolator();
+
+                  break;
+               }
+
+               // Interpolator
+               case ALLEGRO_KEY_I:
+               {
+                  auto mod = event.keyboard.modifiers;
+                  if (mod & ALLEGRO_KEYMOD_SHIFT)
+                  {
+                     if (currentInterpolator > 0)
+                        --currentInterpolator;
+                  }
+                  else
+                  {
+                     auto limit = InterpolatorType.Count - 1;
+                     if (currentInterpolator < limit)
+                        ++currentInterpolator;
+                  }
+
+                  writefln("Interpolator = %s", currentInterpolator);
+                  remakeInterpolator();
+
+                  break;
+               }
+
+               default:
+               {
+                  break; // do nothing
+               }
             }
+         });
 
-            default:
-            {
-               break; // do nothing
-            }
-         }
-      });
+      // Handle draw events. Clear all to white, draw the background, plot the
+      // graph. Nothing unexpected.
+      EventManager.addHandler(
+         FEWDEE_EVENT_DRAW,
+         delegate(in ref ALLEGRO_EVENT event)
+         {
+            al_clear_to_color(al_map_rgb(255, 255, 255));
+            al_draw_bitmap(bmpBG, 0.0, 0.0, 0);
+            drawGraph();
+         });
 
-   // Handle draw events. Clear all to white, draw the background, plot the
-   // graph. Nothing unexpected.
-   EventManager.addHandler(
-      FEWDEE_EVENT_DRAW,
-      delegate(in ref ALLEGRO_EVENT event)
-      {
-         al_clear_to_color(al_map_rgb(255, 255, 255));
-         al_draw_bitmap(bmpBG, 0.0, 0.0, 0);
-         drawGraph();
-      });
+      // Initialize 'theInterpolator'.
+      remakeInterpolator();
 
-   // Initialize 'theInterpolator'.
-   remakeInterpolator();
+      // Create a display
+      DisplayManager.createDisplay("main");
 
-   // Create a display
-   DisplayManager.createDisplay("main");
+      // Run the main loop while 'exitPlease' is true.
+      run(() => !exitPlease);
 
-   // Run the main loop while 'exitPlease' is true.
-   run(() => !exitPlease);
+      // And free the one resource we allocated in this example.
+      bmpBG.free();
 
-   // And free the one resource we allocated in this example.
-   bmpBG.free();
+      // We're done!
+      return 0;
+   });
 }

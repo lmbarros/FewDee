@@ -57,11 +57,6 @@
        option when creating (or re-creating, if possible) the
        display).
 
-*** Use =al_run_allegro()=
-     - Latest version of DAllegro includes a al_run_allegro() function
-       that should be used instead of simply putting all the code
-       directly on main() (for portability reasons). Check this out.
-
 *** Replace fewdee.all with something more standard
      - Some people were using =fewdee/_.d=. But it seems that
        =fewdee/package.d= will be the standard.

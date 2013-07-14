@@ -12,26 +12,32 @@ import fewdee.all;
 
 void main()
 {
-   scope crank = new Crank();
-   const monitors = DisplayManager.monitors;
-
-   writefln("Number of monitors: %s", monitors.length);
-
-   foreach (i, monitor; monitors)
+   al_run_allegro(
    {
-      writefln("   Monitor %s: %sx%s pixels, at %s,%s", i,
-               monitor.width, monitor.height, monitor.left, monitor.top);
-   }
+      scope crank = new Crank();
+      const monitors = DisplayManager.monitors;
 
-   writeln("");
+      writefln("Number of monitors: %s", monitors.length);
 
-   immutable modes = DisplayManager.fullScreenDisplayModes;
+      foreach (i, monitor; monitors)
+      {
+         writefln("   Monitor %s: %sx%s pixels, at %s,%s", i,
+                  monitor.width, monitor.height, monitor.left, monitor.top);
+      }
 
-   writefln("Number of display modes: %s", modes.length);
+      writeln("");
 
-   foreach (i, mode; modes)
-   {
-      writefln("   Mode %s: %sx%s pixels @ %s Hz, pixel format: %s", i,
-               mode.width, mode.height, mode.refresh_rate, mode.format);
-   }
+      immutable modes = DisplayManager.fullScreenDisplayModes;
+
+      writefln("Number of display modes: %s", modes.length);
+
+      foreach (i, mode; modes)
+      {
+         writefln("   Mode %s: %sx%s pixels @ %s Hz, pixel format: %s", i,
+                  mode.width, mode.height, mode.refresh_rate, mode.format);
+      }
+
+      // We're done!
+      return 0;
+   });
 }

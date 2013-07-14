@@ -135,21 +135,28 @@ private class StateB: GameState
 // Program execution starts here.
 void main()
 {
-   // Start the engine.
-   scope crank = new fewdee.engine.Crank();
+   al_run_allegro(
+   {
+      // Start the engine.
+      scope crank = new fewdee.engine.Crank();
 
-   // Create a display named "main", using default settings.
-   DisplayManager.createDisplay("main");
+      // Create a display named "main", using default settings.
+      DisplayManager.createDisplay("main");
 
-   // Load the font. This will throw if some error happens.
-   theFont = new Font("data/bluehigl.ttf", 30);
+      // Load the font. This will throw if some error happens.
+      theFont = new Font("data/bluehigl.ttf", 30);
 
-   // Starts the game main loop, with an 'InitialState' as the starting
-   // state. The loop will run as long as there is at least one state in the
-   // stack of states maintained by the 'StateManager'.
-   run(new InitialState());
+      // Starts the game main loop, with an 'InitialState' as the starting
+      // state. The loop will run as long as there is at least one state in the
+      // stack of states maintained by the 'StateManager'.
+      run(new InitialState());
 
-   // As said above, we are managing resources manually. Resources must be
-   // explicitly freed if they are not being managed by the 'ResourceManager'.
-   theFont.free();
+      // As said above, we are managing resources manually. Resources must be
+      // explicitly freed if they are not being managed by the
+      // 'ResourceManager'.
+      theFont.free();
+
+      // We're done!
+      return 0;
+   });
 }

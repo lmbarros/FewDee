@@ -19,25 +19,31 @@ import fewdee.all;
 
 void main()
 {
-   // Start the engine.
-   scope crank = new Crank();
+   al_run_allegro(
+   {
+      // Start the engine.
+      scope crank = new Crank();
 
-   // The first step to play an audio stream in FewDee is to create the
-   // 'AudioStream' object. This is simple enough.
-   auto audioStream = new AudioStream("data/Bassa_Island_Game_Loop.ogg");
+      // The first step to play an audio stream in FewDee is to create the
+      // 'AudioStream' object. This is simple enough.
+      auto audioStream = new AudioStream("data/Bassa_Island_Game_Loop.ogg");
 
-   // The second (and final) step is to play it. This is even simpler.
-   audioStream.play();
+      // The second (and final) step is to play it. This is even simpler.
+      audioStream.play();
 
-   // At this point, the stream is playing. But we need to wait until it
-   // finishes playing (otherwise the program would exit just after the sound
-   // started playing). Therefore, we simply busy wait until the 'isPlaying'
-   // property of the audio stream becomes 'false' (indicating that it finished
-   // playing).
-   while (audioStream.isPlaying)
-      continue;
+      // At this point, the stream is playing. But we need to wait until it
+      // finishes playing (otherwise the program would exit just after the sound
+      // started playing). Therefore, we simply busy wait until the 'isPlaying'
+      // property of the audio stream becomes 'false' (indicating that it
+      // finished playing).
+      while (audioStream.isPlaying)
+         continue;
 
-   // Since we did not use the 'ResourceManager' to manage the audio stream, we
-   // have to manually free it.
-   audioStream.free();
+      // Since we did not use the 'ResourceManager' to manage the audio stream,
+      // we have to manually free it.
+      audioStream.free();
+
+      // We're done!
+      return 0;
+   });
 }
