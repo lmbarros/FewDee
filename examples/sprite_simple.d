@@ -124,7 +124,7 @@ void main()
    DisplayManager.createDisplay("main");
 
    // Run the main loop while 'exitPlease' is true.
-   Engine.run(() => !exitPlease);
+   run(() => !exitPlease);
 
    // Free resources (using the ResourceManager would be a good idea).
    bmpStickMan.free();

@@ -462,7 +462,7 @@ void main()
    DisplayManager.createDisplay("main");
 
    // Run the main loop while 'exitPlease' is true.
-   Engine.run(() => !exitPlease);
+   run(() => !exitPlease);
 
    // And free the one resource we allocated in this example.
    bmpBG.free();

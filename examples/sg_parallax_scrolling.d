@@ -254,5 +254,5 @@ void main()
    DisplayManager.createDisplay("main");
 
    // Run the main loop while 'exitPlease' is true.
-   Engine.run(() => !exitPlease);
+   run(() => !exitPlease);
 }

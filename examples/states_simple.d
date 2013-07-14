@@ -147,7 +147,7 @@ void main()
    // Starts the game main loop, with an 'InitialState' as the starting
    // state. The loop will run as long as there is at least one state in the
    // stack of states maintained by the 'StateManager'.
-   Engine.run(new InitialState());
+   run(new InitialState());
 
    // As said above, we are managing resources manually. Resources must be
    // explicitly freed if they are not being managed by the 'ResourceManager'.

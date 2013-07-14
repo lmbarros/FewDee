@@ -67,7 +67,7 @@ void main()
    // handy overloads for those using the 'StateManager'. You may want to check
    // those out, too!
    //
-   // And there is also a simple 'Engine.run()', which is simply an alias to
+   // And there is also a simple 'run()', which is simply an alias to
    // 'runWithVariableDrawAndTickRates()'.
 
    // All main loops take as parameter a delegate which is used to detect when
@@ -116,14 +116,14 @@ void main()
 
       enum desiredFPS = 30.0; // also the desired ticks per second!
 
-      Engine.runWithConstantDrawAndTickRates(
+      runWithConstantDrawAndTickRates(
          &keepRunning, desiredFPS, &runningBehindHandler);
    }
    else version (FewDee_runWithVariableDrawAndTickRates)
    {
       // This loop generates "draw" and "tick" events as fast as possible, but
       // the intervals between draws/ticks will vary as the workload varies.
-      Engine.runWithVariableDrawAndTickRates(&keepRunning);
+      runWithVariableDrawAndTickRates(&keepRunning);
    }
    else version (FewDee_runWithFixedTickRateAndMaximumDrawRate)
    {
@@ -139,7 +139,7 @@ void main()
       // time the game state was updated).
       enum desiredTPS = 60.0;
       enum maxFrameSkip = 5;
-      Engine.runWithFixedTickRateAndMaximumDrawRate(
+      runWithFixedTickRateAndMaximumDrawRate(
          &keepRunning, desiredTPS, maxFrameSkip, &runningBehindHandler);
    }
    else version (FewDee_customLoop)
