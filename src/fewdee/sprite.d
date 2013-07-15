@@ -19,6 +19,8 @@ module fewdee.sprite;
 import std.conv;
 import allegro5.allegro;
 import fewdee.bitmap;
+import fewdee.event;
+import fewdee.event_manager;
 import fewdee.updater;
 
 
@@ -201,6 +203,39 @@ public class SpriteTemplate
       _animations[name] = frames;
    }
 
+   /**
+    * Adds a sprite animation event.
+    *
+    * Sprite animation events are events triggered whenever a playing sprite
+    * animation reaches a certain frame. You can use this to synchronize stuff
+    * like audio or special effects with an animation.
+    *
+    * In Allegro terms, the event triggered is of type ($D
+    * FEWDEE_EVENT_SPRITE_ANIMATION). An integer ID is passed along the event
+    * data, so that you can recognize exactly which sprite animation event was
+    * triggered. The $(D Sprite) itself is also passed in the event data.
+    *
+    * Parameters:
+    *    animationName = The name of the animation for which the event will be
+    *       added.
+    *    frame = The frame that will be trigger the event.
+    *    eventID = An ID that will be associated with the event data; you can
+    *       use this to differentiate between various types of sprite animation
+    *       events. You may wish to use $(fewdee.strid.strID()) to create
+    *       integer IDs from short strings.
+    */
+   public final void addAnimationEvent(
+      string animationName, size_t frame, int eventID)
+   in
+   {
+      assert(animationName in _animations);
+      assert(_animations[animationName].length > frame);
+   }
+   body
+   {
+      _animationEvents[animationName][frame] ~= eventID;
+   }
+
    /// The structure used internally to represent a sprite image.
    private struct Image
    {
@@ -234,6 +269,17 @@ public class SpriteTemplate
     * (er, a dynamic array) of animation frames.
     */
    Frame[][string] _animations;
+
+   /**
+    * The collection of sprite animation events.
+    *
+    * $(D _animationEvents[animationName][frameNumber]) yields the list of IDs
+    * of the events to generate at that animation frame. Data is added only if
+    * it is present, so it is necessary to check if $(animationName in
+    * _animationEvents) and if $(frameNumber in _animationEvents[animationName])
+    * before accessing the data.
+    */
+   int[][size_t][string] _animationEvents;
 
    /**
     * The width, in pixels, of the images used by this $(D Sprite).
@@ -357,6 +403,7 @@ in
 body
 {
    auto frames = sprite._template._animations[animationName];
+   auto events = animationName in sprite._template._animationEvents;
    auto currentFrame = 0;
    sprite.currentImage = frames[0].image;
    auto timeForNextImage = frames[0].time;
@@ -370,9 +417,25 @@ body
             if (currentFrame < frames.length - 1)
             {
                // Advance to the next frame
+               ++currentFrame;
                const alreadyElapsed = -timeForNextImage;
-               sprite.currentImage = frames[++currentFrame].image;
+               sprite.currentImage = frames[currentFrame].image;
                timeForNextImage = frames[currentFrame].time - alreadyElapsed;
+
+               // Trigger sprite animation events
+               if (events !is null && currentFrame in *events)
+               {
+                  foreach (eventID; (*events)[currentFrame])
+                  {
+                     ALLEGRO_EVENT event;
+                     event.user.type = FEWDEE_EVENT_SPRITE_ANIMATION;
+                     event.user.spriteAnimationEventID = eventID;
+                     event.user.sprite = sprite;
+                     EventManager.postEvent(event);
+                  }
+               }
+
+               // We are done, and want to be called again
                return true;
             }
             else

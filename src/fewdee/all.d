@@ -37,6 +37,7 @@ public import fewdee.low_level_event_handler;
 public import fewdee.low_level_resource;
 public import fewdee.resource_manager;
 public import fewdee.sprite;
+public import fewdee.strid;
 public import fewdee.state_manager;
 public import fewdee.updater;
 public import fewdee.sg.drawable;

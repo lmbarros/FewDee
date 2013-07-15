@@ -239,6 +239,8 @@ private class EventManagerImpl
 
          foreach (handler, dummy; _lowLevelEventHandlers)
             handler.handleEvent(event);
+
+         doPostHandlingEventCleanup(event);
       }
 
       foreach (llHandler, dummy; _lowLevelEventHandlers)
@@ -278,6 +280,17 @@ private class EventManagerImpl
    }
 
    /**
+    * Posts an event to the event queue.
+    *
+    * Parameters:
+    *    event = The event to post.
+    */
+   package final void postEvent(ref ALLEGRO_EVENT event)
+   {
+      al_emit_user_event(&_customEventSource, &event, null);
+   }
+
+   /**
     * Returns the one and only event queue we use. This is accessible by other
     * FewDee modules, because they need to register themselves as event sources
     * (displays, for example, must register and unregister themselves as event
@@ -313,6 +326,22 @@ private class EventManagerImpl
    private ALLEGRO_EVENT_QUEUE* _eventQueue;
 }
 
+
+/**
+ * Performs any necessary cleanup in an event after it has been processed (that
+ * is, all the event handlers interested in this event have already been
+ * called).
+ */
+private void doPostHandlingEventCleanup(ref ALLEGRO_EVENT event)
+{
+   if (event.type == FEWDEE_EVENT_SPRITE_ANIMATION)
+   {
+      // Assigning null to 'sprite' will cause any previously 'Sprite' to be
+      // removed from the list of GC roots and will unpin it from its current
+      // memory position.
+      event.user.sprite = null;
+   }
+}
 
 
 /**

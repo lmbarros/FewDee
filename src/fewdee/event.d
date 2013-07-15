@@ -6,8 +6,10 @@
 
 module fewdee.event;
 
-import allegro5.allegro;
 import std.math;
+import allegro5.allegro;
+import fewdee.sprite;
+
 
 public enum
 {
@@ -17,7 +19,7 @@ public enum
     * time elapsed so far (both in seconds) are encoded in the event "user
     * parameters".
     *
-    * See_Also: $(D deltaTime), $(D totalTime).
+    * See_also: $(D deltaTime), $(D totalTime).
     */
    FEWDEE_EVENT_TICK = ALLEGRO_GET_EVENT_TYPE('F','e','w','D'),
 
@@ -27,9 +29,18 @@ public enum
     * and the total time elapsed so far (both in seconds) are encoded in the
     * event "user parameters".
     *
-    * See_Also: $(D deltaTime), $(D totalTime).
+    * See_also: $(D deltaTime), $(D totalTime).
     */
    FEWDEE_EVENT_DRAW,
+
+   /**
+    * An event triggered when sprite animations reach certain frames. An ID
+    * identifying which sprite animation happened and a reference to the sprite
+    * generating the event are encoded in the event "user parameters".
+    *
+    * See_also: $(D spriteAnimationEventID), $(D sprite).
+    */
+   FEWDEE_EVENT_SPRITE_ANIMATION,
 }
 
 
@@ -62,6 +73,16 @@ public @property double deltaTime(const ref ALLEGRO_USER_EVENT event)
    return event.data1 + (event.data2 / 1_000_000_000.0);
 }
 
+// Tests deltaTime()
+unittest
+{
+   auto t = 123.456;
+   ALLEGRO_USER_EVENT e;
+   e.deltaTime = t;
+   assert(abs(e.deltaTime - t) < 0.0001);
+}
+
+
 /**
  * Encodes a total time (in seconds) and stores it in a given $(D
  * ALLEGRO_USER_EVENT) (assumed to be of type $(D FEWDEE_EVENT_TICK) or $(D
@@ -91,22 +112,116 @@ public @property double totalTime(const ref ALLEGRO_USER_EVENT event)
    return event.data3 + (event.data4 / 1_000_000_000.0);
 }
 
-
-// deltaTime()
-unittest
-{
-   auto t = 123.456;
-   ALLEGRO_USER_EVENT e;
-   e.deltaTime = t;
-   assert(abs(e.deltaTime - t) < 0.0001);
-}
-
-
-// totalTime()
+// Tests totalTime()
 unittest
 {
    auto t = 0.987;
    ALLEGRO_USER_EVENT e;
    e.totalTime = t;
    assert(abs(e.totalTime - t) < 0.0001);
+}
+
+
+/**
+ * Encodes a sprite animation event ID and stores it in a given $(D
+ * ALLEGRO_USER_EVENT), which is assumed to be of type $(D
+ * FEWDEE_EVENT_SPRITE_ANIMATION)..
+ *
+ * D's uniform function call syntax and properties allow to use this just as if
+ * an $(D ALLEGRO_USER_EVENT) had a $(D spriteAnimationEventID) member.
+ */
+public @property void spriteAnimationEventID(
+   ref ALLEGRO_USER_EVENT event, int id)
+{
+   event.data1 = id;
+}
+
+/**
+ * Decodes a sprite animation event ID stored in a given $(D ALLEGRO_USER_EVENT)
+ * (assumed to be of type $(D FEWDEE_EVENT_SPRITE_ANIMATION)) and returns it.
+ *
+ * D's uniform function call syntax and properties allow to use this just as if
+ * an $(D ALLEGRO_USER_EVENT) had a $(D spriteAnimationEventID) member.
+ */
+public @property int spriteAnimationEventID(const ref ALLEGRO_USER_EVENT event)
+{
+   return event.data1;
+}
+
+// Tests spriteAnimationEventID()
+unittest
+{
+   import fewdee.strid;
+   auto id = strID!"AnyID";
+
+   ALLEGRO_USER_EVENT e;
+   e.spriteAnimationEventID = id;
+   assert(e.spriteAnimationEventID == strID!"AnyID");
+}
+
+
+/**
+ * Encodes a reference to a $(D Sprite) and stores it in a given $(D
+ * ALLEGRO_USER_EVENT), which is assumed to be of type $(D
+ * FEWDEE_EVENT_SPRITE_ANIMATION)..
+ *
+ * D's uniform function call syntax and properties allow to use this just as if
+ * an $(D ALLEGRO_USER_EVENT) had a $(D sprite) member.
+ *
+ * Low-level note that shouldn't affect FewDee users: If $(D s) is not $(D
+ * null), this function adds $(D s) to the list of D's garbage collector roots,
+ * and pins it to its position in memory (so that it can work nicely while
+ * living in a C struct). Regardless of $(D s) being $(D null) or not, any
+ * previously assigned $(D Sprite) is removed from the list of GC roots and is
+ * unpinned. Therefore, passing $(D null) to this function is enough to
+ * "cleanup" $(D event) after it has been used.
+ */
+public @property void sprite(ref ALLEGRO_USER_EVENT event, Sprite s)
+{
+   import core.stdc.stdint;
+   import core.memory;
+
+   auto currSprite = cast(void*)(event.data2);
+   auto newSprite = cast(void*)(s);
+
+   // Remove any currently stored sprite from the GC list of roots
+   if (currSprite !is null)
+   {
+      GC.removeRoot(currSprite);
+      GC.clrAttr(currSprite, GC.BlkAttr.NO_MOVE);
+   }
+
+   // Do the assignment proper
+   event.data2 = cast(intptr_t)(newSprite);
+
+   // Add the new sprite to the list of GC roots
+   if (newSprite !is null)
+   {
+      GC.addRoot(newSprite);
+      GC.setAttr(newSprite, GC.BlkAttr.NO_MOVE);
+   }
+}
+
+/**
+ * Decodes a reference to a $(D Sprite) stored in a given $(D
+ * ALLEGRO_USER_EVENT) (assumed to be of type $(D
+ * FEWDEE_EVENT_SPRITE_ANIMATION)) and returns it.
+ *
+ * D's uniform function call syntax and properties allow to use this just as if
+ * an $(D ALLEGRO_USER_EVENT) had a $(D sprite) member.
+ */
+public @property Sprite sprite(const ref ALLEGRO_USER_EVENT event)
+{
+   return cast(Sprite)(cast(void*)(event.data2));
+}
+
+// Tests sprite()
+unittest
+{
+   auto st = new SpriteTemplate();
+   auto s = new Sprite(st);
+
+   ALLEGRO_USER_EVENT e;
+   e.sprite = s;
+   assert(e.sprite is s);
 }
