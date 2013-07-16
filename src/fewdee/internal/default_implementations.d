@@ -56,7 +56,7 @@ mixin template ColorableDefaultImplementation(string postSet = "")
 mixin template PositionableDefaultImplementation(string postSet = "")
 {
    /// The $(I x) coordinate of the object position.
-   public final @property float x() const{ return _x; }
+   public final @property float x() const { return _x; }
 
    /// Ditto.
    public final @property void x(float x)
@@ -98,7 +98,7 @@ mixin template PositionableDefaultImplementation(string postSet = "")
 mixin template RotatableDefaultImplementation(string postSet = "")
 {
    /// The object rotation, in radians.
-   public final @property float rotation() const{ return _rotation; }
+   public final @property float rotation() const { return _rotation; }
 
    /// Ditto.
    public final @property void rotation(float rotation)
@@ -135,7 +135,7 @@ mixin template ScalableDefaultImplementation(string postSet = "")
    }
 
    /// The object scale along the $(I x) axis.
-   public final @property float scaleX() const{ return _scaleX; }
+   public final @property float scaleX() const { return _scaleX; }
 
    /// Ditto.
    public final @property void scaleX(float scaleX)
