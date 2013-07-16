@@ -59,7 +59,11 @@ void main()
       // Let's create our army of stick men.
       scope Sprite sprStickMan[10];
       foreach(i; 0..10)
+      {
          sprStickMan[i] = new fewdee.sprite.Sprite(sptStickMan);
+         sprStickMan[i].x = 50 + i * 50;
+         sprStickMan[i].y = 100;
+      }
 
       // This is just to map a number from 0 to 9 to another number in the same
       // range. The idea is to map the keys in the row of number keys in the
@@ -127,11 +131,8 @@ void main()
          delegate(in ref ALLEGRO_EVENT event)
          {
             al_clear_to_color(al_map_rgb(255, 255, 255));
-            foreach(i; 0..10)
-            {
-               auto index = indexFromSequence(i);
-               sprStickMan[index].draw(50 + index * 50, 100);
-            }
+            foreach (i; 0..10)
+               sprStickMan[i].draw();
          });
 
       // Create a display

@@ -67,6 +67,19 @@ void main()
       scope sprStickMan3 = new fewdee.sprite.Sprite(sptStickMan);
       scope sprStickMan4 = new fewdee.sprite.Sprite(sptStickMan);
 
+      // Let's also set their positions.
+      sprStickMan1.x = 100;
+      sprStickMan1.y = 100;
+
+      sprStickMan2.x = 150;
+      sprStickMan2.y = 100;
+
+      sprStickMan3.x = 200;
+      sprStickMan3.y = 100;
+
+      sprStickMan4.x = 250;
+      sprStickMan4.y = 100;
+
       // The first stick man will wave in a loop. Here, we add to 'updater' an
       // updater function that will update the sprite's current image as the
       // time passes. In addition to the target sprite and the animation name,
@@ -113,16 +126,16 @@ void main()
          });
 
       // Finally, set the drawing function. We simply clear the background to
-      // white and draw each of the stick men, side-by-side.
+      // white and draw each of the stick men.
       EventManager.addHandler(
          FEWDEE_EVENT_DRAW,
          delegate(in ref ALLEGRO_EVENT event)
          {
             al_clear_to_color(al_map_rgb(255, 255, 255));
-            sprStickMan1.draw(100, 100);
-            sprStickMan2.draw(150, 100);
-            sprStickMan3.draw(200, 100);
-            sprStickMan4.draw(250, 100);
+            sprStickMan1.draw();
+            sprStickMan2.draw();
+            sprStickMan3.draw();
+            sprStickMan4.draw();
          });
 
       // Create a display

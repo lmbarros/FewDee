@@ -19,9 +19,12 @@ module fewdee.sprite;
 import std.conv;
 import allegro5.allegro;
 import fewdee.bitmap;
+import fewdee.color;
 import fewdee.event;
 import fewdee.event_manager;
+import fewdee.resource_manager;
 import fewdee.updater;
+import fewdee.internal.default_implementations;
 
 
 /**
@@ -70,7 +73,25 @@ public class SpriteTemplate
    {
       setSize(width, height);
       foreach (bitmap; bitmaps)
-         addImage(bitmap, bitmap.width, bitmap.height);
+         addImage(bitmap, 0, 0);
+   }
+
+   /**
+    * Constructs the $(D SpriteTemplate) initializing its size and adding
+    * bitmaps from the $(D ResourceManager).
+    *
+    * Parameters:
+    *    width = The width of the images, in pixels. Must be greater than zero.
+    *    height = The height of the images, in pixels. Must be greater than
+    *       zero.
+    *    bitmapKeys = The $(D ResourceManager) keys of bitmaps to add. For each
+    *       bitmap, one image comprising the whole bitmap will be added.
+    */
+   public this(uint width, uint height, string[] bitmapKeys...)
+   {
+      setSize(width, height);
+      foreach (key; bitmapKeys)
+         addImage(ResourceManager.bitmaps[key], 0, 0);
    }
 
    /**
@@ -322,6 +343,11 @@ public class SpriteTemplate
  */
 public class Sprite
 {
+   mixin PositionableDefaultImplementation;
+   mixin RotatableDefaultImplementation;
+   mixin ColorableDefaultImplementation;
+   mixin ScalableDefaultImplementation;
+
    /**
     * Constructs the $(D Sprite).
     *
@@ -334,7 +360,23 @@ public class Sprite
    }
 
    /**
-    * Draws the $(D Sprite) in the current target bitmap.
+    * Constructs the $(D Sprite), setting its starting position.
+    *
+    * Parameters:
+    *    spriteTemplate = The template on which this sprite is based.
+    *    xPos = The starting sprite position along the $(I x) axis.
+    *    yPos = The starting sprite position along the $(I y) axis.
+    */
+   public this(SpriteTemplate spriteTemplate, float xPos, float yPos)
+   {
+      _template = spriteTemplate;
+      x = xPos;
+      y = yPos;
+   }
+
+   /**
+    * Draws the $(D Sprite) in the current target bitmap, at the position
+    * defined by its $(D x) and $(D y) properties.
     *
     * Parameters:
     *    x = The $(I x) drawing coordinate, in pixels, measured from the screen
@@ -342,14 +384,22 @@ public class Sprite
     *    y = The $(I y) drawing coordinate, in pixels, measured from the screen
     *       upper side.
     */
-   public final void draw(float x, float y)
+   public final void draw()
    {
+      enum flags = 0;
+
       auto image = _template._images[_currentImage];
-      al_draw_bitmap_region(
+
+      al_draw_tinted_scaled_rotated_bitmap_region(
          image.bitmap,
-         image.x, image.y, _template.width, _template.height, // image rectangle
-         x - _template.centerX, y - _template.centerY, // drawing position
-         0); // flags
+         image.x, image.y,
+         _template.width, _template.height,
+         color,
+         _template.centerX, _template.centerY,
+         x, y,
+         scaleX, scaleY,
+         rotation,
+         flags);
    }
 
    /*
