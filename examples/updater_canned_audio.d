@@ -136,8 +136,7 @@ void main()
             }
          });
 
-      // Draw! We just clear the screen and draw the sprite, which manages its
-      // own state (position, rotation, color...).
+      // Draw! We just clear the screen and write some text.
       EventManager.addHandler(
          FEWDEE_EVENT_DRAW,
          delegate(in ref ALLEGRO_EVENT event)
