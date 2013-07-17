@@ -121,7 +121,16 @@ void main()
          delegate(in ref ALLEGRO_EVENT event)
          {
             if (event.user.spriteAnimationEventID == strID!"SMClap")
-               sndClap.play();
+            {
+               // Just to be fancy (and to show that a reference to the sprite
+               // generating the event is passed in the event data), in addition
+               // to playing the clap sound, we set its balance in proportion to
+               // the sprite position: sound will play more loudly through the
+               // left or right speaker depending on the sprite position on the
+               // screen.
+               const bal = ((event.user.sprite.x - 50) / 225.0) - 1.0;
+               sndClap.play().balance = bal;
+            }
          });
 
       // Finally, set the drawing function. We simply clear the background to
