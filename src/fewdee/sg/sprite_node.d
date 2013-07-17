@@ -21,12 +21,12 @@ public class SpriteNode: Drawable
     * Constructs the $(D SpriteNode).
     *
     * Parameters:
-    *    spriteTemplate = The $(D SpriteTemplate) upon which the internal $(D
-    *       Sprite) instance will be based.
+    *    type = The $(D SpriteType) upon which the internal $(D Sprite) instance
+    *       will be based.
     */
-   public this(SpriteTemplate spriteTemplate)
+   public this(SpriteType type)
    {
-      _sprite = new Sprite(spriteTemplate);
+      _sprite = new Sprite(type);
    }
 
    /// Draws the $(D SpriteNode) to the current target.
@@ -38,10 +38,10 @@ public class SpriteNode: Drawable
    // Inherit docs
    protected override void recomputeAABB(ref AABB aabb)
    {
-      const w = _sprite.spriteTemplate.width;
-      const h = _sprite.spriteTemplate.height;
-      const cx = _sprite.spriteTemplate.centerX;
-      const cy = _sprite.spriteTemplate.centerY;
+      const w = _sprite.type.width;
+      const h = _sprite.type.height;
+      const cx = _sprite.type.centerX;
+      const cy = _sprite.type.centerY;
 
       aabb = AABB(y - cy, y + h - cy,
                   x - cx, x + w - cx);

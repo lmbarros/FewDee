@@ -1,11 +1,11 @@
 /**
  * One word: Sprites.
  *
- * There are two sprite-related classes. One of them, $(D SpriteTemplate),
- * stores data (like animations) that can be shared among several sprites. The
- * second one, $(D Sprite), represents an "instance" of a $(D
- * SpriteTemplate). This design allows to cheaply instantiate a large number of
- * sprites that provide some nice, high-level features.
+ * There are two sprite-related classes. One of them, $(D SpriteType), stores
+ * data (like animations) that can be shared among several sprites. The second
+ * one, $(D Sprite), represents an "instance" of a $(D SpriteType). This design
+ * allows to cheaply instantiate a large number of sprites that provide some
+ * nice, high-level features.
  *
  * In addition to these two classes, some related utilities are also included
  * here. (As I write this, the only one is a function used together with an $(D
@@ -28,8 +28,9 @@ import fewdee.internal.default_implementations;
 
 
 /**
- * A sprite template, which contains a collection of same-sized images and a
- * collection of animations.
+ * A sprite type is a template upon which actual sprite instances (represented
+ * by $(Sprite) instances); it contains collections of same-sized images,
+ * animations and animation events.
  *
  * Notice that it has a collection of $(I images), not of $(D Bitmap)s. What I
  * call an "image" here, is a rectangular area within a $(D Bitmap). Yup, this
@@ -37,16 +38,16 @@ import fewdee.internal.default_implementations;
  * Bitmap) for each image -- though it may be less efficient than using sprite
  * sheets).
  */
-public class SpriteTemplate
+public class SpriteType
 {
-   /// Constructs the $(D SpriteTemplate) leaving its size uninitialized.
+   /// Constructs the $(D SpriteType) leaving its size uninitialized.
    public this()
    {
       // do nothing
    }
 
    /**
-    * Constructs the $(D SpriteTemplate) initializing its size.
+    * Constructs the $(D SpriteType) initializing its size.
     *
     * Parameters:
     *    width = The width of the images, in pixels. Must be greater than zero.
@@ -59,8 +60,8 @@ public class SpriteTemplate
    }
 
    /**
-    * Constructs the $(D SpriteTemplate) initializing its size and adding
-    * bitmaps as the sprite images.
+    * Constructs the $(D SpriteType) initializing its size and adding bitmaps as
+    * the sprite images.
     *
     * Parameters:
     *    width = The width of the images, in pixels. Must be greater than zero.
@@ -77,8 +78,8 @@ public class SpriteTemplate
    }
 
    /**
-    * Constructs the $(D SpriteTemplate) initializing its size and adding
-    * bitmaps from the $(D ResourceManager).
+    * Constructs the $(D SpriteType) initializing its size and adding bitmaps
+    * from the $(D ResourceManager).
     *
     * Parameters:
     *    width = The width of the images, in pixels. Must be greater than zero.
@@ -133,13 +134,13 @@ public class SpriteTemplate
       _centerY = y;
    }
 
-   /// The width of the $(D SpriteTemplate) images, in pixels.
+   /// The width of the $(D SpriteType) images, in pixels.
    public final @property int width() inout
    {
       return _width;
    }
 
-   /// The height of the $(D SpriteTemplate) images, in pixels.
+   /// The height of the $(D SpriteType) images, in pixels.
    public final @property int height() inout
    {
       return _height;
@@ -332,7 +333,7 @@ public class SpriteTemplate
 
 
 /**
- * An instance of a $(D SpriteTemplate).
+ * An instance of a $(D SpriteType).
  *
  * This is what you ultimately need to display a sprite on the screen. (But you
  * can display images on the screen without using a sprite! You could use a $(D
@@ -352,38 +353,38 @@ public class Sprite
     * Constructs the $(D Sprite).
     *
     * Parameters:
-    *    spriteTemplate = The template on which this sprite is based.
+    *    type = The $(D SpriteType) upon which this sprite is based.
     */
-   public this(SpriteTemplate spriteTemplate)
+   public this(SpriteType type)
    {
-      _template = spriteTemplate;
+      _type = type;
    }
 
    /**
     * Constructs the $(D Sprite), setting its starting position.
     *
     * Parameters:
-    *    spriteTemplate = The template on which this sprite is based.
+    *    type = The $(D SpriteType) upon which this sprite is based.
     *    xPos = The starting sprite position along the $(I x) axis.
     *    yPos = The starting sprite position along the $(I y) axis.
     */
-   public this(SpriteTemplate spriteTemplate, float xPos, float yPos)
+   public this(SpriteType spriteType, float xPos, float yPos)
    {
-      _template = spriteTemplate;
+      _type = spriteType;
       x = xPos;
       y = yPos;
    }
 
-   /// The $(D SpriteTemplate) upon which this $(D Sprite) is based.
-   public final const(SpriteTemplate) spriteTemplate() const
+   /// The $(D SpriteType) upon which this $(D Sprite) is based.
+   public final const(SpriteType) type() const
    {
-      return _template;
+      return _type;
    }
 
    /// Ditto.
-   public final immutable(SpriteTemplate) spriteTemplate() immutable
+   public final immutable(SpriteType) type() immutable
    {
-      return _template;
+      return _type;
    }
 
    /**
@@ -400,14 +401,14 @@ public class Sprite
    {
       enum flags = 0;
 
-      auto image = _template._images[_currentImage];
+      auto image = _type._images[_currentImage];
 
       al_draw_tinted_scaled_rotated_bitmap_region(
          image.bitmap,
          image.x, image.y,
-         _template.width, _template.height,
+         _type.width, _type.height,
          color,
-         _template.centerX, _template.centerY,
+         _type.centerX, _type.centerY,
          x, y,
          scaleX, scaleY,
          rotation,
@@ -430,8 +431,8 @@ public class Sprite
       _currentImage = index;
    }
 
-   /// The template this $(D Sprite) is based on.
-   private SpriteTemplate _template;
+   /// The type upon which this $(D Sprite) is based.
+   private SpriteType _type;
 
    /// The index (into $(D _images)) of the current image.
    private size_t _currentImage;
@@ -459,13 +460,13 @@ public UpdaterFuncID addAnimation(
    double speed = 1.0, bool loop = false)
 in
 {
-   assert(animationName in sprite._template._animations,
+   assert(animationName in sprite._type._animations,
           "Unknown animation '" ~ animationName ~ "'");
 }
 body
 {
-   auto frames = sprite._template._animations[animationName];
-   auto events = animationName in sprite._template._animationEvents;
+   auto frames = sprite._type._animations[animationName];
+   auto events = animationName in sprite._type._animationEvents;
    auto currentFrame = 0;
    sprite.currentImage = frames[0].image;
    auto timeForNextImage = frames[0].time;

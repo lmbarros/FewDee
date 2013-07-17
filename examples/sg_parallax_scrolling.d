@@ -47,17 +47,17 @@ void main()
       auto bmpLargeCloud = new Bitmap("data/large_cloud.png");
       auto bmpWitch = new Bitmap("data/witch.png");
 
-      // We'll need 'SpriteTemplate's for using with our 'SpriteNode's. Here
+      // We'll need 'SpriteType's for using with our 'SpriteNode's. Here
       // they are.
-      auto sptStar = new SpriteTemplate(STAR_SIZE, STAR_SIZE, bmpStar);
+      auto sptStar = new SpriteType(STAR_SIZE, STAR_SIZE, bmpStar);
       sptStar.setCenter(STAR_SIZE/2, STAR_SIZE/2);
-      auto sptSmallCloud = new SpriteTemplate(
+      auto sptSmallCloud = new SpriteType(
          SMALL_CLOUD_SIZE, SMALL_CLOUD_SIZE, bmpSmallCloud);
       sptSmallCloud.setCenter(SMALL_CLOUD_SIZE/2, SMALL_CLOUD_SIZE/2);
-      auto sptLargeCloud = new SpriteTemplate(
+      auto sptLargeCloud = new SpriteType(
          LARGE_CLOUD_SIZE, LARGE_CLOUD_SIZE, bmpLargeCloud);
       sptLargeCloud.setCenter(LARGE_CLOUD_SIZE/2, LARGE_CLOUD_SIZE/2);
-      auto sptWitch = new SpriteTemplate(WITCH_SIZE, WITCH_SIZE, bmpWitch);
+      auto sptWitch = new SpriteType(WITCH_SIZE, WITCH_SIZE, bmpWitch);
       sptWitch.setCenter(WITCH_SIZE/2, WITCH_SIZE/2);
 
       // We'll a large (and varying!) number of stars, small clouds and large

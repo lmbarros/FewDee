@@ -42,9 +42,9 @@ void main()
       // modifying its properties. A 'Sprite' implements lots of interesting
       // interfaces (like 'Positionable', 'Rotatable' and 'Colorable') on which
       // the canned updaters actuate.
-      auto spriteTemplate = new SpriteTemplate(64, 64, bitmap);
-      spriteTemplate.setCenter(32, 32);
-      auto sprite = new Sprite(spriteTemplate);
+      auto spriteType = new SpriteType(64, 64, bitmap);
+      spriteType.setCenter(32, 32);
+      auto sprite = new Sprite(spriteType);
       sprite.x = WIDTH/2.0;
       sprite.y = HEIGHT/2.0;
 

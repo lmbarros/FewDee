@@ -24,12 +24,12 @@ void main()
       // we'll have to release this bitmap manually when the program ends.
       auto bmpStickMan = new Bitmap("data/stick_man.png");
 
-      // First thing to do is to create a 'SpriteTemplate'. A 'SpriteTemplate'
-      // contains a collection of images and a collection of animations that can
-      // be shared among several sprite instances. The constructor we are using
+      // First thing to do is to create a 'SpriteType'. A 'SpriteType' contains
+      // a collection of images and a collection of animations that can be
+      // shared among several sprite instances. The constructor we are using
       // here sets the size of the images used by this sprite (all images must
       // be of the same size).
-      scope sptStickMan = new SpriteTemplate(64, 64);
+      scope sptStickMan = new SpriteType(64, 64);
 
       // Now, we add the images. Notice that all the images are actually
       // referencing the same bitmap (our sprite sheet). The two numeric
@@ -45,22 +45,22 @@ void main()
       // frame contains an image index and the time, in seconds, that this frame
       // will be displayed.
       sptStickMan.addAnimation("wave",
-                               SpriteTemplate.Frame(1, 0.2),
-                               SpriteTemplate.Frame(2, 0.2),
-                               SpriteTemplate.Frame(3, 0.2),
-                               SpriteTemplate.Frame(2, 0.2),
-                               SpriteTemplate.Frame(1, 0.2),
-                               SpriteTemplate.Frame(0, 0.2));
+                               SpriteType.Frame(1, 0.2),
+                               SpriteType.Frame(2, 0.2),
+                               SpriteType.Frame(3, 0.2),
+                               SpriteType.Frame(2, 0.2),
+                               SpriteType.Frame(1, 0.2),
+                               SpriteType.Frame(0, 0.2));
 
       sptStickMan.addAnimation("jump",
-                               SpriteTemplate.Frame(4, 0.2),
-                               SpriteTemplate.Frame(0, 0.2),
-                               SpriteTemplate.Frame(5, 0.2),
-                               SpriteTemplate.Frame(0, 0.2),
-                               SpriteTemplate.Frame(4, 0.2),
-                               SpriteTemplate.Frame(0, 0.2));
+                               SpriteType.Frame(4, 0.2),
+                               SpriteType.Frame(0, 0.2),
+                               SpriteType.Frame(5, 0.2),
+                               SpriteType.Frame(0, 0.2),
+                               SpriteType.Frame(4, 0.2),
+                               SpriteType.Frame(0, 0.2));
 
-      // At this point, the 'SpriteTemplate' is complete. Let's create some
+      // At this point, the 'SpriteType' is complete. Let's create some
       // 'Sprite's based on this template. Here they are, four stick men:
       scope sprStickMan1 = new Sprite(sptStickMan);
       scope sprStickMan2 = new Sprite(sptStickMan);

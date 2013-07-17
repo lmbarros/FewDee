@@ -25,14 +25,14 @@ void main()
       ResourceManager.fonts.add("font", new Font("data/bluehigl.ttf", 50));
 
       // Create a sprite
-      auto spriteTemplate = new SpriteTemplate(64, 64, "bmp1", "bmp2", "bmp3");
-      spriteTemplate.setCenter(6, 61);
-      spriteTemplate.addAnimation("wave",
-                                  SpriteTemplate.Frame(1, 0.15),
-                                  SpriteTemplate.Frame(0, 0.15),
-                                  SpriteTemplate.Frame(2, 0.15),
-                                  SpriteTemplate.Frame(0, 0.15));
-      auto sprite = new SpriteNode(spriteTemplate);
+      auto spriteType = new SpriteType(64, 64, "bmp1", "bmp2", "bmp3");
+      spriteType.setCenter(6, 61);
+      spriteType.addAnimation("wave",
+                              SpriteType.Frame(1, 0.15),
+                              SpriteType.Frame(0, 0.15),
+                              SpriteType.Frame(2, 0.15),
+                              SpriteType.Frame(0, 0.15));
+      auto sprite = new SpriteNode(spriteType);
       sprite.x = 200;
       sprite.y = 200;
       sprite.scaleX = 2.0;

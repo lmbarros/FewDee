@@ -30,9 +30,9 @@ void main()
       // when the program ends.
       auto bmpAll = new Bitmap("data/solar_system.png");
 
-      // We'll use a single 'SpriteTemplate' for all the 'SpriteNode's we'll
+      // We'll use a single 'SpriteType' for all the 'SpriteNode's we'll
       // use. Here it is.
-      auto sptCelestialBodies = new SpriteTemplate(64, 64);
+      auto sptCelestialBodies = new SpriteType(64, 64);
       sptCelestialBodies.setCenter(32, 32);
       sptCelestialBodies.addImage(bmpAll, 0, 0);   // sun 1
       sptCelestialBodies.addImage(bmpAll, 64, 0);  // sun 2

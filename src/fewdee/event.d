@@ -218,7 +218,7 @@ public @property Sprite sprite(const ref ALLEGRO_USER_EVENT event)
 // Tests sprite()
 unittest
 {
-   auto st = new SpriteTemplate();
+   auto st = new SpriteType();
    auto s = new Sprite(st);
 
    ALLEGRO_USER_EVENT e;

@@ -30,8 +30,8 @@ void main()
       auto bmpStickMan = new Bitmap("data/stick_man.png");
       auto sndClap = new AudioSample("data/clap.ogg");
 
-      // Create a 'SpriteTemplate'.
-      scope sptStickMan = new SpriteTemplate(64, 64);
+      // Create a 'SpriteType'.
+      scope sptStickMan = new SpriteType(64, 64);
 
       sptStickMan.addImage(bmpStickMan, 0, 0);
       sptStickMan.addImage(bmpStickMan, 64, 0);
@@ -43,10 +43,10 @@ void main()
       sptStickMan.addImage(bmpStickMan, 192, 64);
 
       sptStickMan.addAnimation("clap",
-                               SpriteTemplate.Frame(6, 0.3),
-                               SpriteTemplate.Frame(0, 0.2),
-                               SpriteTemplate.Frame(7, 0.2),
-                               SpriteTemplate.Frame(0, 0.2));
+                               SpriteType.Frame(6, 0.3),
+                               SpriteType.Frame(0, 0.2),
+                               SpriteType.Frame(7, 0.2),
+                               SpriteType.Frame(0, 0.2));
 
       // This is where we create the sprite animation event. We are saying at,
       // when reaching the frame 2 of the "clap" animation, we want to generate
@@ -96,7 +96,7 @@ void main()
                // Clap the corresponding stick man when pressing number keys. We
                // don't do anything special here, this is just a regular sprite
                // animation playing. Events will be generated automatically
-               // because we added them to the sprite template.
+               // because we added them to the sprite type.
                case ALLEGRO_KEY_0: .. case ALLEGRO_KEY_9:
                {
                   auto i = indexFromSequence(
