@@ -62,10 +62,10 @@ void main()
 
       // At this point, the 'SpriteTemplate' is complete. Let's create some
       // 'Sprite's based on this template. Here they are, four stick men:
-      scope sprStickMan1 = new fewdee.sprite.Sprite(sptStickMan);
-      scope sprStickMan2 = new fewdee.sprite.Sprite(sptStickMan);
-      scope sprStickMan3 = new fewdee.sprite.Sprite(sptStickMan);
-      scope sprStickMan4 = new fewdee.sprite.Sprite(sptStickMan);
+      scope sprStickMan1 = new Sprite(sptStickMan);
+      scope sprStickMan2 = new Sprite(sptStickMan);
+      scope sprStickMan3 = new Sprite(sptStickMan);
+      scope sprStickMan4 = new Sprite(sptStickMan);
 
       // Let's also set their positions.
       sprStickMan1.x = 100;

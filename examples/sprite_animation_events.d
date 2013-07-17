@@ -60,7 +60,7 @@ void main()
       scope Sprite sprStickMan[10];
       foreach(i; 0..10)
       {
-         sprStickMan[i] = new fewdee.sprite.Sprite(sptStickMan);
+         sprStickMan[i] = new Sprite(sptStickMan);
          sprStickMan[i].x = 50 + i * 50;
          sprStickMan[i].y = 100;
       }
