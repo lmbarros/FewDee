@@ -6,6 +6,7 @@
 
 module fewdee.event;
 
+import core.stdc.stdint;
 import std.math;
 import allegro5.allegro;
 import fewdee.sprite;
@@ -54,10 +55,19 @@ public enum
  */
 public @property void deltaTime(ref ALLEGRO_USER_EVENT event, double deltaTime)
 {
-   event.data1 = cast(typeof(event.data1))
-      (floor(deltaTime));
-   event.data2 = cast(typeof(event.data2))
-      ((deltaTime - event.data1) * 1_000_000_000);
+   static if (event.data1.sizeof == float.sizeof)
+   {
+      const float dtf = deltaTime;
+      event.data1 = *(cast(intptr_t*)(&dtf));
+   }
+   else if (event.data1.sizeof == double.sizeof)
+   {
+      event.data1 = *(cast(intptr_t*)(&deltaTime));
+   }
+   else
+   {
+      static assert(false, "Architecture not supported.");
+   }
 }
 
 /**
@@ -70,7 +80,18 @@ public @property void deltaTime(ref ALLEGRO_USER_EVENT event, double deltaTime)
  */
 public @property double deltaTime(const ref ALLEGRO_USER_EVENT event)
 {
-   return event.data1 + (event.data2 / 1_000_000_000.0);
+   static if (event.data1.sizeof == float.sizeof)
+   {
+      return *(cast(float*)(&event.data1));
+   }
+   else if (event.data1.sizeof == double.sizeof)
+   {
+      return *(cast(double*)(&event.data1));
+   }
+   else
+   {
+      static assert(false, "Architecture not supported.");
+   }
 }
 
 // Tests deltaTime()
@@ -93,10 +114,19 @@ unittest
  */
 public @property void totalTime(ref ALLEGRO_USER_EVENT event, double totalTime)
 {
-   event.data3 = cast(typeof(event.data3))
-      (floor(totalTime));
-   event.data4 = cast(typeof(event.data4))
-      ((totalTime - event.data3) * 1_000_000_000);
+   static if (event.data2.sizeof == float.sizeof)
+   {
+      const float dtf = totalTime;
+      event.data2 = *(cast(intptr_t*)(&dtf));
+   }
+   else if (event.data2.sizeof == double.sizeof)
+   {
+      event.data2 = *(cast(intptr_t*)(&totalTime));
+   }
+   else
+   {
+      static assert(false, "Architecture not supported.");
+   }
 }
 
 /**
@@ -109,7 +139,18 @@ public @property void totalTime(ref ALLEGRO_USER_EVENT event, double totalTime)
  */
 public @property double totalTime(const ref ALLEGRO_USER_EVENT event)
 {
-   return event.data3 + (event.data4 / 1_000_000_000.0);
+   static if (event.data2.sizeof == float.sizeof)
+   {
+      return *(cast(float*)(&event.data2));
+   }
+   else if (event.data2.sizeof == double.sizeof)
+   {
+      return *(cast(double*)(&event.data2));
+   }
+   else
+   {
+      static assert(false, "Architecture not supported.");
+   }
 }
 
 // Tests totalTime()
@@ -133,7 +174,7 @@ unittest
 public @property void spriteAnimationEventID(
    ref ALLEGRO_USER_EVENT event, int id)
 {
-   event.data1 = id;
+   event.data3 = id;
 }
 
 /**
@@ -145,7 +186,7 @@ public @property void spriteAnimationEventID(
  */
 public @property int spriteAnimationEventID(const ref ALLEGRO_USER_EVENT event)
 {
-   return event.data1;
+   return event.data3;
 }
 
 // Tests spriteAnimationEventID()
@@ -181,7 +222,7 @@ public @property void sprite(ref ALLEGRO_USER_EVENT event, Sprite s)
    import core.stdc.stdint;
    import core.memory;
 
-   auto currSprite = cast(void*)(event.data2);
+   auto currSprite = cast(void*)(event.data4);
    auto newSprite = cast(void*)(s);
 
    // Remove any currently stored sprite from the GC list of roots
@@ -192,7 +233,7 @@ public @property void sprite(ref ALLEGRO_USER_EVENT event, Sprite s)
    }
 
    // Do the assignment proper
-   event.data2 = cast(intptr_t)(newSprite);
+   event.data4 = cast(intptr_t)(newSprite);
 
    // Add the new sprite to the list of GC roots
    if (newSprite !is null)
@@ -212,7 +253,7 @@ public @property void sprite(ref ALLEGRO_USER_EVENT event, Sprite s)
  */
 public @property Sprite sprite(const ref ALLEGRO_USER_EVENT event)
 {
-   return cast(Sprite)(cast(void*)(event.data2));
+   return cast(Sprite)(cast(void*)(event.data4));
 }
 
 // Tests sprite()
