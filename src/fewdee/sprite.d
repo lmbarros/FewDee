@@ -134,25 +134,25 @@ public class SpriteTemplate
    }
 
    /// The width of the $(D SpriteTemplate) images, in pixels.
-   public final @property int width()
+   public final @property int width() inout
    {
       return _width;
    }
 
    /// The height of the $(D SpriteTemplate) images, in pixels.
-   public final @property int height()
+   public final @property int height() inout
    {
       return _height;
    }
 
    /// The horizontal coordinate of the sprite center (reference point).
-   public final @property float centerX()
+   public final @property float centerX() inout
    {
       return _centerX;
    }
 
    /// The vertical coordinate of the sprite center (reference point).
-   public final @property float centerY()
+   public final @property float centerY() inout
    {
       return _centerY;
    }
@@ -374,6 +374,18 @@ public class Sprite
       y = yPos;
    }
 
+   /// The $(D SpriteTemplate) upon which this $(D Sprite) is based.
+   public final const(SpriteTemplate) spriteTemplate() const
+   {
+      return _template;
+   }
+
+   /// Ditto.
+   public final immutable(SpriteTemplate) spriteTemplate() immutable
+   {
+      return _template;
+   }
+
    /**
     * Draws the $(D Sprite) in the current target bitmap, at the position
     * defined by its $(D x) and $(D y) properties.
@@ -407,7 +419,7 @@ public class Sprite
     *
     * This current image is the one that gets drawn when $(D draw()) is called.
     */
-   public final @property size_t currentImage() const
+   public final @property size_t currentImage() inout
    {
       return _currentImage;
    }

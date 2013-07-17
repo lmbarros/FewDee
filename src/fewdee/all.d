@@ -46,6 +46,6 @@ public import fewdee.sg.group;
 public import fewdee.sg.node;
 public import fewdee.sg.node_events;
 public import fewdee.sg.node_visitor;
-public import fewdee.sg.sprite;
+public import fewdee.sg.sprite_node;
 public import fewdee.sg.srt;
 public import fewdee.sg.text;

@@ -30,23 +30,14 @@ void main()
       // when the program ends.
       auto bmpAll = new Bitmap("data/solar_system.png");
 
-      // We have all the resources packed in a single image (a sprite
-      // sheet). Here, we use the Allegro API to create sub bitmaps representing
-      // the individual images we are interested in using.
-      //
-      // TODO: This is too low-level. FewDee needs to provide a nicer way to use
-      //       sprite sheets.
-      auto bmpSun1 = al_create_sub_bitmap(bmpAll, 0, 0, 64, 64);
-      enforce(bmpSun1 !is null);
-
-      auto bmpSun2 = al_create_sub_bitmap(bmpAll, 64, 0, 64, 64);
-      enforce(bmpSun2 !is null);
-
-      auto bmpPlanet = al_create_sub_bitmap(bmpAll, 128, 0, 64, 64);
-      enforce(bmpPlanet !is null);
-
-      auto bmpMoon = al_create_sub_bitmap(bmpAll, 192, 0, 64, 64);
-      enforce(bmpMoon !is null);
+      // We'll use a single 'SpriteTemplate' for all the 'SpriteNode's we'll
+      // use. Here it is.
+      auto sptCelestialBodies = new SpriteTemplate(64, 64);
+      sptCelestialBodies.setCenter(32, 32);
+      sptCelestialBodies.addImage(bmpAll, 0, 0);   // sun 1
+      sptCelestialBodies.addImage(bmpAll, 64, 0);  // sun 2
+      sptCelestialBodies.addImage(bmpAll, 128, 0); // planet
+      sptCelestialBodies.addImage(bmpAll, 192, 0); // moon
 
       // Now, create the scene graph. We want to create a scene graph like the
       // one shown below. The code just create the nodes and connections between
@@ -63,9 +54,15 @@ void main()
       auto srtRoot = new SRT();
       auto srtPlanet = new SRT();
       auto srtMoon = new SRT();
-      auto sprSun = new SpriteNode(64, 64, 32, 32);
-      auto sprPlanet = new SpriteNode(64, 64, 32, 32);
-      auto sprMoon = new SpriteNode(64, 64, 32, 32);
+
+      auto sprSun = new SpriteNode(sptCelestialBodies);
+      sprSun.currentImage = 0;
+
+      auto sprPlanet = new SpriteNode(sptCelestialBodies);
+      sprPlanet.currentImage = 2;
+
+      auto sprMoon = new SpriteNode(sptCelestialBodies);
+      sprMoon.currentImage = 3;
 
       srtRoot.addChild(srtPlanet);
       srtRoot.addChild(sprSun);
@@ -73,16 +70,11 @@ void main()
       srtPlanet.addChild(sprPlanet);
       srtMoon.addChild(sprMoon);
 
-      sprSun.addBitmap(bmpSun1);
-      sprSun.addBitmap(bmpSun2);
-
       srtRoot.x = WIDTH / 2.0;
       srtRoot.y = HEIGHT / 2.0;
 
-      sprPlanet.addBitmap(bmpPlanet);
       srtPlanet.x = 200;
 
-      sprMoon.addBitmap(bmpMoon);
       srtMoon.x = 60;
 
       // Time to create event handlers.
@@ -104,9 +96,11 @@ void main()
          FEWDEE_EVENT_TICK,
          delegate(in ref ALLEGRO_EVENT event)
          {
+            // We are changing the sprite images manually here; we could use a
+            // sprite animation to automate this.
             auto dt = event.user.deltaTime;
             time += dt;
-            sprSun.currentIndex = cast(int)(time*10) % 2;
+            sprSun.currentImage = cast(int)(time*10) % 2;
 
             srtPlanet.rotation = srtPlanet.rotation + dt;
             srtMoon.rotation = srtMoon.rotation + dt * 3;

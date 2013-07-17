@@ -47,6 +47,19 @@ void main()
       auto bmpLargeCloud = new Bitmap("data/large_cloud.png");
       auto bmpWitch = new Bitmap("data/witch.png");
 
+      // We'll need 'SpriteTemplate's for using with our 'SpriteNode's. Here
+      // they are.
+      auto sptStar = new SpriteTemplate(STAR_SIZE, STAR_SIZE, bmpStar);
+      sptStar.setCenter(STAR_SIZE/2, STAR_SIZE/2);
+      auto sptSmallCloud = new SpriteTemplate(
+         SMALL_CLOUD_SIZE, SMALL_CLOUD_SIZE, bmpSmallCloud);
+      sptSmallCloud.setCenter(SMALL_CLOUD_SIZE/2, SMALL_CLOUD_SIZE/2);
+      auto sptLargeCloud = new SpriteTemplate(
+         LARGE_CLOUD_SIZE, LARGE_CLOUD_SIZE, bmpLargeCloud);
+      sptLargeCloud.setCenter(LARGE_CLOUD_SIZE/2, LARGE_CLOUD_SIZE/2);
+      auto sptWitch = new SpriteTemplate(WITCH_SIZE, WITCH_SIZE, bmpWitch);
+      sptWitch.setCenter(WITCH_SIZE/2, WITCH_SIZE/2);
+
       // We'll a large (and varying!) number of stars, small clouds and large
       // clouds. So, let's create some dynamic arrays to store them
       SpriteNode[] stars;
@@ -73,9 +86,7 @@ void main()
       // graph root.
       void addStar(float x)
       {
-         auto s =
-            new SpriteNode(STAR_SIZE, STAR_SIZE, STAR_SIZE/2, STAR_SIZE/2);
-         s.addBitmap(bmpStar);
+         auto s = new SpriteNode(sptStar);
          s.x = x;
          s.y = uniform(0, HEIGHT);
          s.z = -2.0;
@@ -85,10 +96,7 @@ void main()
 
       void addSmallCloud(float x)
       {
-         immutable sz = SMALL_CLOUD_SIZE;
-         immutable halfSz = SMALL_CLOUD_SIZE / 2;
-         auto s = new SpriteNode(sz, sz, halfSz, halfSz);
-         s.addBitmap(bmpSmallCloud);
+         auto s = new SpriteNode(sptSmallCloud);
          s.x = x;
          s.y = uniform(0, HEIGHT);
          s.z = -1.0;
@@ -98,10 +106,7 @@ void main()
 
       void addLargeCloud(float x)
       {
-         immutable sz = LARGE_CLOUD_SIZE;
-         immutable halfSz = LARGE_CLOUD_SIZE / 2;
-         auto s = new SpriteNode(sz, sz, halfSz, halfSz);
-         s.addBitmap(bmpLargeCloud);
+         auto s = new SpriteNode(sptLargeCloud);
          s.x = x;
          s.y = uniform(0, HEIGHT);
          s.z = 1.0;
@@ -124,8 +129,7 @@ void main()
 
       // Now, create a sprite for the witch, which will remain always in the
       // center of the screen.
-      auto sprWitch = new SpriteNode(64, 64, 32, 32);
-      sprWitch.addBitmap(bmpWitch);
+      auto sprWitch = new SpriteNode(sptWitch);
       sprWitch.x = WIDTH / 2;
       sprWitch.y = HEIGHT / 2;
       sprWitch.z = 0.0;

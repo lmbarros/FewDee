@@ -25,11 +25,14 @@ void main()
       ResourceManager.fonts.add("font", new Font("data/bluehigl.ttf", 50));
 
       // Create a sprite
-      auto sprite = new SpriteNode(64, 64, 6, 61);
-      sprite.addBitmap(ResourceManager.bitmaps["bmp1"]);
-      sprite.addBitmap(ResourceManager.bitmaps["bmp2"]);
-      sprite.addBitmap(ResourceManager.bitmaps["bmp1"]);
-      sprite.addBitmap(ResourceManager.bitmaps["bmp3"]);
+      auto spriteTemplate = new SpriteTemplate(64, 64, "bmp1", "bmp2", "bmp3");
+      spriteTemplate.setCenter(6, 61);
+      spriteTemplate.addAnimation("wave",
+                                  SpriteTemplate.Frame(1, 0.15),
+                                  SpriteTemplate.Frame(0, 0.15),
+                                  SpriteTemplate.Frame(2, 0.15),
+                                  SpriteTemplate.Frame(0, 0.15));
+      auto sprite = new SpriteNode(spriteTemplate);
       sprite.x = 200;
       sprite.y = 200;
       sprite.scaleX = 2.0;
@@ -58,19 +61,36 @@ void main()
          });
 
       // Animate the flag sprite when the mouse button is pressed
+      UpdaterFuncID wavingAnimID = InvalidUpdaterFuncID;
+      auto numWavingAnims = 0;
+
       EventManager.addHandler(
          ALLEGRO_EVENT_MOUSE_BUTTON_DOWN,
          delegate(in ref ALLEGRO_EVENT event)
          {
+            updater.remove(wavingAnimID);
+            wavingAnimID = updater.addAnimation(
+               sprite, "wave", 1.0, true);
+            ++numWavingAnims;
+
             auto totalTime = 0.0;
             updater.add(
                delegate(double deltaT)
                {
                   totalTime += deltaT;
-                  immutable dt = cast(size_t)(totalTime * 5);
-                  sprite.currentIndex = dt % 4;
                   sprite.rotation = sprite.rotation + deltaT;
-                  return totalTime < 2.0;
+
+                  if (totalTime > 2.0)
+                  {
+                     if (--numWavingAnims == 0)
+                        updater.remove(wavingAnimID);
+
+                     return false;
+                  }
+                  else
+                  {
+                     return true;
+                  }
                });
          });
 
