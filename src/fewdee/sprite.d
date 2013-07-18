@@ -390,12 +390,6 @@ public class Sprite
    /**
     * Draws the $(D Sprite) in the current target bitmap, at the position
     * defined by its $(D x) and $(D y) properties.
-    *
-    * Parameters:
-    *    x = The $(I x) drawing coordinate, in pixels, measured from the screen
-    *       left side.
-    *    y = The $(I y) drawing coordinate, in pixels, measured from the screen
-    *       upper side.
     */
    public final void draw()
    {
