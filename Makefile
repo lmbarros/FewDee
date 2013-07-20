@@ -26,8 +26,8 @@ all: fewdee.a fewdeedemo.example display_manager_info.example \
      updater_canned_audio.example sg_solar_system.example \
      sg_parallax_scrolling.example abstracted_input_simple.example \
      audio_sample_simple.example audio_stream_simple.example \
-     sprite_simple.example sprite_animation_events.example game_loops.example \
-     game_loop_prediction.example
+     sprite_simple.example sprite_animation_events.example \
+     game_loop_simple.example game_loop_prediction.example
 
 
 # The library
@@ -50,7 +50,7 @@ audio_sample_simple.example: examples/audio_sample_simple.d fewdee.a
 audio_stream_simple.example: examples/audio_stream_simple.d fewdee.a
 sprite_simple.example: examples/sprite_simple.d fewdee.a
 sprite_animation_events.example: examples/sprite_animation_events.d fewdee.a
-game_loops.example: examples/game_loops.d fewdee.a
+game_loop_simple.example: examples/game_loop_simple.d fewdee.a
 game_loop_prediction.example: examples/game_loop_prediction.d fewdee.a
 
 
