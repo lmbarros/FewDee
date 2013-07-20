@@ -206,7 +206,7 @@ private class EventManagerImpl
     * Causes a tick event to be generated. This must be called from the main
     * game loop.
     *
-    * Ticks are the game logic heartbeats. Tick handler are the usual place
+    * Ticks are the game logic heartbeats. Tick handlers are the usual places
     * where the game state is updated.
     *
     * Parameters:
@@ -215,8 +215,11 @@ private class EventManagerImpl
     */
    public final void triggerTickEvent(double deltaT)
    {
-      // Emit a tick event
+      // Update tick time, re-sync drawing time with it
       _tickTime += deltaT;
+      _drawingTime = _tickTime;
+
+      // Emit a tick event
       ALLEGRO_EVENT tickEvent;
       tickEvent.user.type = FEWDEE_EVENT_TICK;
       tickEvent.user.deltaTime = deltaT;
@@ -261,8 +264,9 @@ private class EventManagerImpl
       _drawingTime += deltaT;
       ALLEGRO_EVENT drawEvent;
       drawEvent.user.type = FEWDEE_EVENT_DRAW;
-      drawEvent.user.deltaTime(deltaT);
-      drawEvent.user.totalTime(_drawingTime);
+      drawEvent.user.deltaTime = deltaT;
+      drawEvent.user.totalTime = _drawingTime;
+      drawEvent.user.timeSinceTick = _drawingTime - _tickTime;
 
       // Call the handlers
       if (FEWDEE_EVENT_DRAW in _eventHandlers)
@@ -302,18 +306,22 @@ private class EventManagerImpl
    }
 
    /**
-    * The drawing time. This is the number of seconds elapsed since an
-    * arbitrary instant (the "epoch"), which gets updated whenever
-    * $(triggerDrawEvent()) is called.
+    * The drawing time, which is like the tick time ($(D _tickTime)), but may
+    * get temporarily ahead of it, if multiple "draw" events happen between two
+    * "tick" events.
+    *
+    * This is the number of seconds elapsed since an arbitrary instant (the
+    * "epoch"). It gets updated whenever $(D triggerDrawEvent()) or $(D
+    * triggerTickEvent()) is called.
     */
-   private double _drawingTime = 0;
+   private double _drawingTime = 0.0;
 
    /**
-    * The tick time. This is the number of seconds elapsed since an
-    * arbitrary instant (the "epoch"), which gets updated whenever
-    * $(triggerTickEvent()) is called.
+    * The tick time. This is the number of seconds elapsed since an arbitrary
+    * instant (the "epoch"), which gets updated whenever $(D triggerTickEvent())
+    * is called.
     */
-   private double _tickTime;
+   private double _tickTime = 0.0;
 
    /// The source of custom events.
    private ALLEGRO_EVENT_SOURCE _customEventSource;

@@ -7,6 +7,7 @@
 
 module fewdee.color;
 
+import std.math;
 import allegro5.allegro;
 
 
@@ -112,6 +113,38 @@ struct Color
    }
 
    /**
+    * Checks if the current color is valid.
+    *
+    * To make a color invalid, simply assign $(D InvalidColor) to it. You may
+    * want to use an invalid color in more or less the same situations in which
+    * you would use a null pointer.
+    *
+    * See_also: InvalidColor
+    */
+   public final @property bool isValid()
+   {
+      // We test just for one component here; we assume that the only
+      // "reasonable" way to a color component to become NaN is via assignment
+      // of InvalidColor. (This assumption may not be really valid, let's hope
+      // it doesn't cause many problems -- anyway, this is easily fixable.)
+      return !isNaN(_rgba.r);
+   }
+
+   ///
+   unittest
+   {
+      Color color;
+      assert(color.isValid);
+
+      color.baseColor = [ 0.1, 0.2, 0.7 ];
+      assert(color.isValid);
+
+      color = InvalidColor;
+      assert(!color.isValid);
+   }
+
+
+   /**
     * Recomputes the $(D _rgba) member, after either component of the
     * "conventional alpha blending" representation is changed.
     */
@@ -139,6 +172,22 @@ struct Color
    alias rgba this;
 }
 
+
+/**
+ * An invalid color.
+ *
+ * This is guaranteed to be different to any actual color, and thus can be used
+ * as a "null" value for colors.
+ *
+ * Please, use $(D Color.isvalid) to check if a color is valid.
+ *
+ * See_also: Color.isValid
+ */
+public immutable Color InvalidColor = {
+   ALLEGRO_COLOR(float.nan, float.nan, float.nan, float.nan),
+   [0, 0, 0],
+   0
+};
 
 
 // Theoretically, ALLEGRO_COLOR is an opaque type that should be accessed only

@@ -26,11 +26,11 @@ public enum
 
    /**
     * An event sent whenever rendering is expected to be done. Handling it is
-    * the expected way to draw stuff. The time elapsed since the last draw event
-    * and the total time elapsed so far (both in seconds) are encoded in the
-    * event "user parameters".
+    * the expected way to draw stuff. The time elapsed since the last draw
+    * event, the total time elapsed so far, and the time elapsed since the last
+    * tick event (all in seconds) are encoded in the event "user parameters".
     *
-    * See_also: $(D deltaTime), $(D totalTime).
+    * See_also: $(D deltaTime), $(D totalTime), $(D timeSinceTick).
     */
    FEWDEE_EVENT_DRAW,
 
@@ -57,8 +57,8 @@ public @property void deltaTime(ref ALLEGRO_USER_EVENT event, double deltaTime)
 {
    static if (event.data1.sizeof == float.sizeof)
    {
-      const float dtf = deltaTime;
-      event.data1 = *(cast(intptr_t*)(&dtf));
+      const float asFloat = deltaTime;
+      event.data1 = *(cast(intptr_t*)(&asFloat));
    }
    else if (event.data1.sizeof == double.sizeof)
    {
@@ -116,8 +116,8 @@ public @property void totalTime(ref ALLEGRO_USER_EVENT event, double totalTime)
 {
    static if (event.data2.sizeof == float.sizeof)
    {
-      const float dtf = totalTime;
-      event.data2 = *(cast(intptr_t*)(&dtf));
+      const float asFloat = totalTime;
+      event.data2 = *(cast(intptr_t*)(&asFloat));
    }
    else if (event.data2.sizeof == double.sizeof)
    {
@@ -160,6 +160,66 @@ unittest
    ALLEGRO_USER_EVENT e;
    e.totalTime = t;
    assert(abs(e.totalTime - t) < 0.0001);
+}
+
+
+/**
+ * Encodes time elapsed since the last tick event (in seconds) and stores it in
+ * a given $(D ALLEGRO_USER_EVENT) (assumed to be of type $(D
+ * FEWDEE_EVENT_DRAW)).
+ *
+ * D's uniform function call syntax and properties allow to use this just as if
+ * an $(D ALLEGRO_USER_EVENT) had a $(D totalTime) member.
+ */
+public @property void
+timeSinceTick(ref ALLEGRO_USER_EVENT event, double timeSinceTick)
+{
+   static if (event.data3.sizeof == float.sizeof)
+   {
+      const float asFloat = timeSinceTick;
+      event.data3 = *(cast(intptr_t*)(&asFloat));
+   }
+   else if (event.data3.sizeof == double.sizeof)
+   {
+      event.data3 = *(cast(intptr_t*)(&totalTime));
+   }
+   else
+   {
+      static assert(false, "Architecture not supported.");
+   }
+}
+
+/**
+ * Decodes the time (in seconds) elapsed since the last tick event stored in a
+ * given $(D ALLEGRO_USER_EVENT) (assumed to be of type $(D FEWDEE_EVENT_DRAW))
+ * and returns it.
+ *
+ * D's uniform function call syntax and properties allow to use this just as if
+ * an $(D ALLEGRO_USER_EVENT) had a $(D totalTime) member.
+ */
+public @property double timeSinceTick(const ref ALLEGRO_USER_EVENT event)
+{
+   static if (event.data3.sizeof == float.sizeof)
+   {
+      return *(cast(float*)(&event.data3));
+   }
+   else if (event.data3.sizeof == double.sizeof)
+   {
+      return *(cast(double*)(&event.data3));
+   }
+   else
+   {
+      static assert(false, "Architecture not supported.");
+   }
+}
+
+// Tests timeSinceTick()
+unittest
+{
+   auto t = 1.123;
+   ALLEGRO_USER_EVENT e;
+   e.timeSinceTick = t;
+   assert(abs(e.timeSinceTick - t) < 0.0001);
 }
 
 

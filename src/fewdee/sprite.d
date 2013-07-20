@@ -17,6 +17,7 @@
 module fewdee.sprite;
 
 import std.conv;
+import std.math;
 import allegro5.allegro;
 import fewdee.bitmap;
 import fewdee.color;
@@ -388,8 +389,8 @@ public class Sprite
    }
 
    /**
-    * Draws the $(D Sprite) in the current target bitmap, at the position
-    * defined by its $(D x) and $(D y) properties.
+    * Draws the $(D Sprite) in the current target bitmap, using the position,
+    * rotation, scale and color defined by its corresponding properties.
     */
    public final void draw()
    {
@@ -406,6 +407,64 @@ public class Sprite
          x, y,
          scaleX, scaleY,
          rotation,
+         flags);
+   }
+
+
+   /**
+    * Draws the $(D Sprite), with parameters that allow to override some (or
+    * all) properties that affect drawing.
+    *
+    * Why would someone want to override the actual sprite properties when
+    * drawing it? Well, this function was created to ease the use of
+    * interpolation/prediction to draw several intermediate frames between a
+    * pair of game state updates.
+    *
+    * Calling this function using its default parameters is functionally the
+    * same thing as calling $(D draw()) (possibly a bit slower, however). When
+    * you passing at least one of its arguments with a value different than the
+    * default, the value passed is used in the drawing operation, instead of the
+    * corresponding $(D Sprite) property. For example, if you pass $(D 1.23) in
+    * the $(D rotation) parameter, this value is used for the sprite rotation,
+    * instead of the value stored in the $(D rotation) property.
+    *
+    * Parameters:
+    *    x = If the value passed is different than the default, it is used as
+    *       the horizontal sprite coordinate, instead of the $(D Sprite) $(D x)
+    *       property.
+    *    y = If the value passed is different than the default, it is used as
+    *       the vertical sprite coordinate, instead of the $(D Sprite) $(D y)
+    *       property.
+    *    scaleX = If the value passed is different than the default, it is used
+    *       as the scale along the horizontal axis, instead of the $(D Sprite)
+    *       $(D scaleX) property.
+    *    scaleY = If the value passed is different than the default, it is used
+    *       as the scale along the vertical axis, instead of the $(D Sprite) $(D
+    *       scaleY) property.
+    *    rotation = If the value passed is different than the default, it is
+    *       used as the rotation, instead of the $(D Sprite) $(D rotation)
+    *       property.
+    *    color = If the value passed is different than the default, it is used
+    *       as the color, instead of the $(D Sprite) $(D color) property.
+    */
+   public final void drawOverriding(
+      float x = float.nan, float y = float.nan,
+      float scaleX = float.nan, float scaleY = float.nan,
+      float rotation = float.nan, Color color = InvalidColor,)
+   {
+      enum flags = 0;
+
+      auto image = _type._images[_currentImage];
+
+      al_draw_tinted_scaled_rotated_bitmap_region(
+         image.bitmap, image.x, image.y, _type.width, _type.height,
+         color.isValid ? color : this.color,
+         _type.centerX, _type.centerY,
+         isNaN(x) ? this.x : x,
+         isNaN(y) ? this.y : y,
+         isNaN(scaleX) ? this.scaleX : scaleX,
+         isNaN(scaleY) ? this.scaleY : scaleY,
+         isNaN(rotation) ? this.rotation : rotation,
          flags);
    }
 
