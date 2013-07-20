@@ -97,7 +97,6 @@
     - Allow hierarchy of objects. (Will need to make AABBs much better
       on the way.)
 * Sprite TODOs
-*** Sprite constructor taking arbitrary number of file names
 *** Sprite.contains() -> by transparency? Multiple containment policies?
   * Use subbitmaps?
     - For Sprite: there is a handy al_get_parent_bitmap() function;
