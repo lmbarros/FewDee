@@ -6,6 +6,11 @@
       but it seems to have something to do with varying the playing
       speed while the audio stream loops.
 * Assorted TODOs
+*** Add GameState-specific updaters
+    - [2013-07-21 Sun 21:19] What if I want an Updater that respects
+      the State "wants ticks" and "wants to draw" flags? Maybe add a
+      GameState parameter to the constructor (null, by default); if
+      not null, add to the state; if null, add globally.
 *** SpriteTemplate: add a data-driven description
     - [2013-07-12 Fri 21:50] Instead of manually calling many methods,
       read the specification of a =SpriteTemplate= from a string like
@@ -27,6 +32,11 @@
       much improved CMake support in the next couple of weeks.
 *** Generate nice docs
     - [2013-07-05 Fri 18:39] CandyDoc?
+*** If possible use "Ditto" when documenting the Managers
+    - [2013-07-25 Thu 20:57] Document the =FooManagerImpl= class; then
+      use "Ditto" to document =FooManager=. However, must check if
+      this will really work and produce documentation for the (public)
+      =FooManager=.
 *** Use =~this()= instead of =free()= to release "low-level resources"
     - If we use the destructor to free low-level resources, then we
       can just create =scope= resources when needed (specially in
@@ -182,3 +192,12 @@
     - Think about a decent way to represent input devices
       uniquely. Also, consider that joysticks can be plugged or
       unplugged at any time. This should be supported.
+    - [2013-07-21 Sun 00:03] Well, each input device has a unique
+      pointer identifying it; as long as joysticks are not connected
+      and disconnected, joystick pointers "remain unique". I could map
+      a sequential number to input devices... like "0 = keyboard", "1
+      = mouse", "2 = joystick A", "3 = joystick B". If joystick A is
+      disconnected, id 2 becomes invalid. If a new (perhaps the same)
+      joystick is the connected, a new inout device id, 4, is created
+      for it (which may be associated with the same JOYSTICK* as id 2,
+      since JOYSTICK* can be recycled).

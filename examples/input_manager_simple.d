@@ -1,5 +1,5 @@
 /**
- * A simple example showing the use of $(D AbstractedInput).
+ * A simple example showing how to use the $(D InputManager).
  *
  * Authors: Leandro Motta Barros
  */
@@ -16,6 +16,7 @@ private enum TheCommands
 {
    JUMP,
    FIRE,
+   STEERING,
    NOTHING,
 }
 
@@ -42,6 +43,15 @@ void main()
                       text.ptr);
       }
 
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      setupMappingConstants!TheCommands();
+
+      InputManager.addCommand(TheCommands.JUMP, new DummyCommandTrigger());
+      InputManager.addCommand(TheCommands.FIRE, new DummyCommandTrigger());
+      InputManager.addState(TheCommands.STEERING, new DummyGameInputState());
+
+
+      /++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       // Create the 'AbstractedInput'. It is created without mappings between
       // low-level events and high-level commands, nor with any high-level event
       // handlers. Adding those is our next step.
@@ -88,6 +98,7 @@ void main()
          {
             writeln("NOTHING!");
          });
+         ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/
 
       // Quit if ESC is pressed
       EventManager.addHandler(
@@ -103,7 +114,7 @@ void main()
          delegate(in ref ALLEGRO_EVENT event)
          {
             al_clear_to_color(al_map_rgb(50, 50, 50));
-            drawText("AbstractedInput simple example", 30, 30);
+            drawText("InputManager simple example", 30, 30);
             drawText("Generate some events and watch the console", 50, 60);
             drawText("Press ESC to quit", 50, 90);
          });
