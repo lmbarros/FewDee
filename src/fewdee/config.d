@@ -106,6 +106,21 @@ private string nextToken(string data, out Token token)
             token.rawData = originalData[0..size];
             return true;
          }
+
+         if (data[0] == '\\')
+         {
+            if (data.length == 1)
+            {
+               token.type = TokenType.ERROR;
+               token.rawData = "String not closed: " ~ originalData;
+               return false;
+            }
+            else
+            {
+               data = data[2..$];
+               size += 2;
+            }
+         }
       }
    }
 
@@ -281,7 +296,8 @@ private string nextToken(string data, out Token token)
 
    assert(success || token.type == TokenType.ERROR);
 
-   writefln("READ: type = %s, rawData = '%s'", token.type, token.rawData);
+   if (!__ctfe)
+      writefln("READ: type = %s, rawData = |%s|", token.type, token.rawData);
 
    return data;
 }
@@ -332,8 +348,8 @@ unittest
 unittest
 {
    assert(simpleTest(`"fú"`, TokenType.STRING));
-   assert(simpleTest("'foo\"bar'", TokenType.STRING));
-   assert(simpleTest("'foo\'bar'", TokenType.STRING));
+   assert(simpleTest(`'foo\"bar'`, TokenType.STRING));
+   assert(simpleTest(`'foo\'bar'`, TokenType.STRING));
    assert(simpleTest(`"foo\"bar"`, TokenType.STRING));
    assert(simpleTest(`""`, TokenType.STRING));
 }
@@ -348,6 +364,8 @@ unittest
    // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    // string: "something \"quoted\" here"
    // string: 'something \'quoted\' here'
+
+   // string: "aaaaaa\"  // escape at the end of the string
 }
 
 
@@ -385,9 +403,18 @@ int fun()
    return v.len();
 }
 
+string gun()
+{
+   Token token;
+   nextToken("'foo'", token);
+   return token.rawData;
+}
+
 
 void main()
 {
    enum i = fun();
+   enum j = gun();
    writefln("%s", i);
+   writefln("%s", j);
 }
