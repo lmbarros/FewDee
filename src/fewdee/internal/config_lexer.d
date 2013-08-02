@@ -466,24 +466,50 @@ unittest
 
    assert(testStringFail("'"));
    assert(testStringFail("\""));
+   assert(testStringFail("\"This is not closed"));
+   assert(testStringFail("\'Neither is this"));
+   assert(testStringFail("\"backslash at the end\\"));
+   assert(testStringFail("'backslash at the end\\"));
 }
 
+// More demanding tests with numbers
 unittest
 {
-   // assert(simpleTest("--12345", TokenType.EOF)); // comment
+   bool testNumber(string data, string expectedRemaining, double expectedNumber)
+   {
+      Token token;
+      auto rem = nextToken(data, token);
+      return rem == expectedRemaining
+         && token.type == TokenType.NUMBER
+         && token.asNumber == expectedNumber;
+   }
+
+   assert(testNumber("11.11, nil", ", nil", 11.11));
+   assert(testNumber("+45E2, nilll", ", nilll", 45e2));
+   assert(testNumber("-85e-3,a{}", ",a{}", -85e-3));
+   assert(testNumber("-.1234e-9=", "=", -.1234e-9));
+   assert(testNumber(".0", "", 0.0));
+   assert(testNumber("-1--", "--", -1.0));
 }
 
+
+// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+// numbers failing
 unittest
 {
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   // string: "something \"quoted\" here"
-   // string: 'something \'quoted\' here'
-
-   // string: "aaaaaa\"  // escape at the end of the string
+   // ".0."
+   // "123yyy"
 }
 
+// nil
 
+// identifier
 
+// identifier failing
+
+// eof (including comments)
+
+// sequences of tokens
 
 
 enum input = "
