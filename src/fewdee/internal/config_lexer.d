@@ -5,7 +5,7 @@
  * Authors: Leandro Motta Barros
  */
 
-module fewdee.config;
+module fewdee.config_lexer;
 
 import std.ascii;
 import std.format;
