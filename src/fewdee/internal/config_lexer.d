@@ -200,18 +200,20 @@ private string nextToken(string data, out Token token)
       auto originalData = data;
       size_t size = 0;
 
-      // Read while the input looks like something that could be a number. We
-      // include all alphabetic characters, so that we get things like "1.0e2"
-      // and "0xdeadbeef"; we'll get things that are not numbers, too, but we'll
-      // take care of these shortly.
+      // Read while the input looks like something that could be a number; we'll
+      // get things that are not numbers, too, but we'll take care of these
+      // shortly.
       while (true)
       {
          if (data.length == 0)
             break;
 
-         if (isAlphaNum(data[0])
+         if (isDigit(data[0]) || data[0] == 'e'  || data[0] == 'E'
              || data[0] == '+' || data[0] == '-' || data[0] == '.')
          {
+            if (data.length >= 2 && data[0..2] == "--")
+               break;
+
             data = data[1..$];
             ++size;
          }
@@ -490,15 +492,25 @@ unittest
    assert(testNumber("-.1234e-9=", "=", -.1234e-9));
    assert(testNumber(".0", "", 0.0));
    assert(testNumber("-1--", "--", -1.0));
+   assert(testNumber("2.11aaa", "aaa", 2.11));
 }
 
 
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-// numbers failing
+// Some tests with number in which lexing shall fail.
 unittest
 {
-   // ".0."
-   // "123yyy"
+   bool testNumberFail(string data)
+   {
+      Token token;
+      auto rem = nextToken(data, token);
+      return token.type == TokenType.ERROR;
+   }
+
+   assert(testNumberFail(".0."));
+   assert(testNumberFail("123yyy"));
+   assert(testNumberFail("1.5.7"));
+   assert(testNumberFail("1.2ee3"));
+   assert(testNumberFail("4.5E-2E1"));
 }
 
 // nil
