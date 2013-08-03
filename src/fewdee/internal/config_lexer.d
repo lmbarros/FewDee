@@ -23,6 +23,7 @@ import std.stdio; // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 /// The possible token types.
 package enum TokenType
 {
+   INVALID,       /// The token is uninitialized.
    STRING,        /// A string.
    NUMBER,        /// A number (all numbers are floating point).
    NIL,           /// Nil, which represents a non-value or something like this.
@@ -200,6 +201,16 @@ private string nextToken(string data, out Token token)
       auto originalData = data;
       size_t size = 0;
 
+      void setError()
+      {
+         token.type = TokenType.ERROR;
+         token.rawData = "Error reading number: " ~ originalData[0..size];
+      }
+
+      bool gotPoint = false;
+      bool gotE = false;
+      bool gotSignal = false;
+
       // Read while the input looks like something that could be a number; we'll
       // get things that are not numbers, too, but we'll take care of these
       // shortly.
@@ -214,33 +225,73 @@ private string nextToken(string data, out Token token)
             if (data.length >= 2 && data[0..2] == "--")
                break;
 
+            if (data[0] == '.')
+            {
+               if (gotPoint)
+               {
+                  setError();
+                  break;
+               }
+               else
+               {
+                  gotPoint = true;
+               }
+            }
+
+            if (data[0] == '+' || data[0] == '-')
+            {
+               if (gotSignal)
+               {
+                  setError();
+                  break;
+               }
+               else
+               {
+                  gotSignal = true;
+               }
+            }
+
+            if (data[0] == 'e' || data[0] == 'E')
+            {
+               if (gotE)
+               {
+                  setError();
+                  break;
+               }
+               else
+               {
+                  gotE = true;
+                  gotPoint = false;
+                  gotSignal = false;
+               }
+            }
+
             data = data[1..$];
             ++size;
          }
          else
          {
-            // No way this a number anymore, get out
+            if (!isWhite(data[0]) && data[0] != ',' && data[0] != '='
+                && data[0] != '{' && data[0] != '}')
+            {
+               token.type = TokenType.ERROR;
+               token.rawData = "Malformed number starting from here: "
+                  ~ originalData[0..$];
+            }
+
             break;
          }
       }
 
-      // Now, take the characters read so far and check if they are indeed a
-      // number.
-      string dataCopy = originalData[0..size];
-      double d;
-      const numMatches = formattedRead(dataCopy, "%s", &d);
-
-      if (numMatches == 1)
+      if (token.type == TokenType.ERROR)
+      {
+         return false;
+      }
+      else
       {
          token.type = TokenType.NUMBER;
          token.rawData = originalData[0..size];
          return true;
-      }
-      else
-      {
-         token.type = TokenType.ERROR;
-         token.rawData = "Error reading number: " ~ originalData[0..size];
-         return false;
       }
    }
 
@@ -456,6 +507,7 @@ unittest
    assert(testString(`'some \'quote\''`, "", `some 'quote'`));
 }
 
+
 // Some tests with strings in which lexing shall fail.
 unittest
 {
@@ -474,7 +526,8 @@ unittest
    assert(testStringFail("'backslash at the end\\"));
 }
 
-// More demanding tests with numbers
+
+// More demanding tests with numbers.
 unittest
 {
    bool testNumber(string data, string expectedRemaining, double expectedNumber)
@@ -492,11 +545,10 @@ unittest
    assert(testNumber("-.1234e-9=", "=", -.1234e-9));
    assert(testNumber(".0", "", 0.0));
    assert(testNumber("-1--", "--", -1.0));
-   assert(testNumber("2.11aaa", "aaa", 2.11));
 }
 
 
-// Some tests with number in which lexing shall fail.
+// Some tests with numbers in which lexing shall fail.
 unittest
 {
    bool testNumberFail(string data)
@@ -506,12 +558,14 @@ unittest
       return token.type == TokenType.ERROR;
    }
 
+   assert(testNumberFail("..1"));
    assert(testNumberFail(".0."));
    assert(testNumberFail("123yyy"));
    assert(testNumberFail("1.5.7"));
    assert(testNumberFail("1.2ee3"));
    assert(testNumberFail("4.5E-2E1"));
 }
+
 
 // nil
 
