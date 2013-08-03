@@ -96,6 +96,23 @@ package struct Token
 
       return result;
    }
+
+   /**
+    * Returns the token value as an identifier.
+    *
+    * This is the same thing as accessing the $(D rawData) member.
+    *
+    * $(D assert())s if $(D type) is not the expected one.
+    */
+   final @property string asIdentifier()
+   in
+   {
+      assert(type == TokenType.IDENTIFIER);
+   }
+   body
+   {
+      return rawData;
+   }
 }
 
 
@@ -505,6 +522,7 @@ unittest
    assert(testString(`"foo\"bar"`, "", `foo"bar`));
    assert(testString(`"some \"quote\"" --`, " --", `some "quote"`));
    assert(testString(`'some \'quote\''`, "", `some 'quote'`));
+   assert(testString(`   "blah"--`, "--", "blah"));
 }
 
 
@@ -545,6 +563,7 @@ unittest
    assert(testNumber("-.1234e-9=", "=", -.1234e-9));
    assert(testNumber(".0", "", 0.0));
    assert(testNumber("-1--", "--", -1.0));
+   assert(testNumber("  \t 3.14===", "===", 3.14));
 }
 
 
@@ -567,13 +586,82 @@ unittest
 }
 
 
-// nil
+// Tests with nil.
+unittest
+{
+   bool testNil(string data, string expectedRemaining,
+                TokenType expectedTokenType = TokenType.NIL)
+   {
+      Token token;
+      auto rem = nextToken(data, token);
+      return rem == expectedRemaining && token.type == expectedTokenType;
+   }
 
-// identifier
+   assert(testNil("nil, 1.2", ", 1.2"));
+   assert(testNil("   nil{}", "{}"));
+   assert(testNil("nill", "", TokenType.IDENTIFIER));
+   assert(testNil("funil", "", TokenType.IDENTIFIER));
+}
 
-// identifier failing
 
-// eof (including comments)
+// More demanding tests with identifiers.
+unittest
+{
+   bool testIdent(string data, string expectedRemaining, string expectedIdent)
+   {
+      Token token;
+      auto rem = nextToken(data, token);
+      return rem == expectedRemaining
+         && token.type == TokenType.IDENTIFIER
+         && token.asIdentifier == expectedIdent;
+   }
+
+   assert(testIdent(" foo,bar", ",bar", "foo"));
+   assert(testIdent("\t\ni", "", "i"));
+   assert(testIdent("_____foo{{{}}}", "{{{}}}", "_____foo"));
+   assert(testIdent("__foo_-", "-", "__foo_"));
+   assert(testIdent("    _ ", " ", "_"));
+   assert(testIdent("foo23, 123", ", 123", "foo23"));
+}
+
+
+// Some tests with things that are not identifiers but could conceivably be
+// confused with them.
+unittest
+{
+   bool testNotIdentifier(string data)
+   {
+      Token token;
+      auto rem = nextToken(data, token);
+      return token.type != TokenType.IDENTIFIER || rem != "";
+   }
+
+   assert(testNotIdentifier("123baz"));  // cannot start with a digit
+   assert(testNotIdentifier("fuu-bar")); // this isn't a single identifier
+   assert(testNotIdentifier("foo,bar")); // this isn't a single identifier
+   assert(testNotIdentifier("foo{bar")); // this isn't a single identifier
+}
+
+
+// Check if EOF is properly returned
+unittest
+{
+   bool testEOF(string data)
+   {
+      Token token;
+      auto rem = nextToken(data, token);
+      return rem == "" && token.type == TokenType.EOF;
+   }
+
+   assert(testEOF(""));
+   assert(testEOF("--"));
+   assert(testEOF("   -- foo bar
+
+                    --
+                    --
+                    --+__!!"));
+}
+
 
 // sequences of tokens
 
