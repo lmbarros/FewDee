@@ -10,14 +10,6 @@ module fewdee.config;
 import std.ascii;
 import std.format;
 import std.string;
-// import std.exception;
-// import std.string;
-// import allegro5.allegro_font;
-// import fewdee.allegro_manager;
-// import fewdee.engine;
-// import fewdee.low_level_resource;
-
-import std.stdio; // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 
 /// The possible token types.
@@ -441,11 +433,6 @@ private string nextToken(string data, out Token token)
 
    // And we are done. Do a sanity check and return.
    assert(success || token.type == TokenType.ERROR);
-
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   if (!__ctfe)
-      writefln("READ: type = %s, rawData = |%s|", token.type, token.rawData);
-
    return data;
 }
 
@@ -497,8 +484,23 @@ unittest
       auto rem = nextToken("-1.5893e+7", token);
       return token.asNumber;
    }
+
+   string gun()
+   {
+      Token token;
+      auto data = "{8.11, foo=2.3,} -- blah";
+      data = nextToken(data, token);
+      data = nextToken(data, token);
+      data = nextToken(data, token);
+      data = nextToken(data, token);
+      return token.asIdentifier;
+   }
+
    enum value = fun();
    assert(value == -1.5893e+7);
+
+   enum ident = gun();
+   assert(ident == "foo");
 }
 
 
@@ -663,52 +665,61 @@ unittest
 }
 
 
-// sequences of tokens
-
-
-enum input = "
+// Tests if sequences of tokens are properly lexed.
+unittest
 {
-   type = foo,
-   params = { 'a', 'b', 'c' },
-   extra = {
-      one = 1,
-      two = 2,
-      three = 3,
-   }
-}
-";
-
-public struct LuaLikeValue
-{
-   public this(string data)
+   /**
+    * Tests if $(D data) yields a given sequence of token types; there is no
+    * need to pass and EOF in $(D expectedTokens), it is implicit.
+    */
+   bool testSequence(string data, TokenType[] expectedTokens)
+   in
    {
-      _data = data;
+      assert(expectedTokens.length > 0);
+   }
+   body
+   {
+      while(true)
+      {
+         Token token;
+         data = nextToken(data, token);
+
+         if (token.type == TokenType.EOF)
+         {
+            if (data != "" || expectedTokens.length != 0)
+               return false;
+            else
+               return true;
+         }
+
+         if (token.type != expectedTokens[0])
+            return false;
+
+         expectedTokens = expectedTokens[1..$];
+      }
    }
 
-   int len() { return _data.length; }
+   with(TokenType)
+   {
+      assert(testSequence("{}", [OPENING_BRACE, CLOSING_BRACE]));
 
-   string _data;
-}
+      assert(testSequence("foo bar 3.2e-8 }--}",
+                          [ IDENTIFIER, IDENTIFIER, NUMBER, CLOSING_BRACE ]));
 
+      assert(testSequence("foo = { 1.2, 9.4, 'bla' } -- some comment",
+                          [ IDENTIFIER, EQUALS, OPENING_BRACE, NUMBER, COMMA,
+                            NUMBER, COMMA, STRING, CLOSING_BRACE ]));
 
-int fun()
-{
-   auto v = LuaLikeValue(input);
-   return v.len();
-}
-
-string gun()
-{
-   Token token;
-   nextToken("'foo'", token);
-   return token.rawData;
-}
-
-
-void main()
-{
-   enum i = fun();
-   enum j = gun();
-   writefln("%s", i);
-   writefln("%s", j);
+      assert(testSequence("foo = { -- a comment
+                                   --- some more
+                                   id = 'blah',
+                                   foo = nil,\t
+                                   baz = {}
+                                 }      ",
+                          [ IDENTIFIER, EQUALS, OPENING_BRACE,
+                            IDENTIFIER, EQUALS, STRING, COMMA,
+                            IDENTIFIER, EQUALS, NIL, COMMA,
+                            IDENTIFIER, EQUALS, OPENING_BRACE, CLOSING_BRACE,
+                            CLOSING_BRACE ]));
+   }
 }
