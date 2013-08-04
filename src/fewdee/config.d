@@ -238,10 +238,10 @@ unittest
 
 
 /**
- * Parses and returns one value from a list of tokens. It is expected that all
- * elements in $(D tokens) will be consumed.
+ * Parses and returns one value from a list of tokens; removes the parsed
+ * elements from this list of tokens.
  */
-private ConfigValue parseValue(Token[] tokens)
+private ConfigValue parseValue(ref Token[] tokens)
 in
 {
    assert(tokens.length > 0);
@@ -251,20 +251,26 @@ body
    switch (tokens[0].type)
    {
       case TokenType.NIL:
-         assert(tokens.length == 1);
+         tokens = tokens[1..$];
          return ConfigValue();
 
       case TokenType.STRING:
-         assert(tokens.length == 1);
-         return ConfigValue(tokens[0].asString);
+      {
+         auto res = ConfigValue(tokens[0].asString);
+         tokens = tokens[1..$];
+         return res;
+      }
 
       case TokenType.NUMBER:
-         assert(tokens.length == 1);
-         return ConfigValue(tokens[0].asNumber);
+      {
+         auto res = ConfigValue(tokens[0].asNumber);
+         tokens = tokens[1..$];
+         return res;
+      }
 
       case TokenType.OPENING_BRACE:
          if (tokens.length < 2)
-            throw new Exception("Error parsing near " ~ tokens[0].rawData);
+            throw new Exception("Table not closed near " ~ tokens[0].rawData);
          else if (tokens[1].type == TokenType.IDENTIFIER)
             return parseTable(tokens);
          else
@@ -284,22 +290,25 @@ unittest
       // Simple case: nil
       auto tokensNil = [ Token(NIL, "nil") ];
       assert(parseValue(tokensNil).type == ConfigValueType.NIL);
+      assert(tokensNil == [ ]);
 
       // Simple case: string
       auto tokensString = [ Token(STRING, "'hello'") ];
       auto stringData = parseValue(tokensString);
       assert(stringData.type == ConfigValueType.STRING);
       assert(stringData.asString == "hello");
+      assert(tokensString == [ ]);
 
       // Simple case: number
       auto tokensNumber = [ Token(NUMBER, "-8.571") ];
       auto numberData = parseValue(tokensNumber);
       assert(numberData.type == ConfigValueType.NUMBER);
       assert(numberData.asNumber == -8.571);
+      assert(tokensNumber == [ ]);
 
       // Some shortcuts for the next few tests
       auto openingBrace = Token(OPENING_BRACE, "{");
-      auto closingBrace = Token(OPENING_BRACE, "}");
+      auto closingBrace = Token(CLOSING_BRACE, "}");
       auto comma = Token(COMMA, ",");
       auto equals = Token(EQUALS, "=");
 
@@ -308,6 +317,7 @@ unittest
       auto emptyListData = parseValue(tokensEmptyList);
       assert(emptyListData.type == ConfigValueType.LIST);
       assert(emptyListData.asList.length == 0);
+      assert(tokensEmptyList == [ ]);
 
       // List (with members)
       auto tokensList = [
@@ -321,6 +331,7 @@ unittest
       assert(listData.asList[0].asNumber == 1.11);
       assert(listData.asList[1].type == ConfigValueType.STRING);
       assert(listData.asList[1].asString == "abc");
+      assert(tokensList == [ ]);
 
       auto tokensAA = [
          openingBrace,
@@ -340,11 +351,12 @@ unittest
       assert("foobar" in aaData.asAA);
       assert(aaData.asAA["foobar"].type == ConfigValueType.STRING);
       assert(aaData.asAA["foobar"].asString == "baz");
+      assert(tokensAA == [ ]);
    }
 }
 
 /// Like $(D parseValue), but specific for tables.
-private ConfigValue parseTable(Token[] tokens)
+private ConfigValue parseTable(ref Token[] tokens)
 in
 {
    assert(tokens.length > 0);
@@ -357,7 +369,7 @@ body
 }
 
 /// Like $(D parseValue), but specific for lists.
-private ConfigValue parseList(Token[] tokens)
+private ConfigValue parseList(ref Token[] tokens)
 in
 {
    assert(tokens.length > 0);
@@ -365,9 +377,32 @@ in
 }
 body
 {
-   // xxxxxxxx { } { v, } { v } { v, v, } { v, v, v }
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   return ConfigValue();
+   ConfigValue[] result;
+
+   tokens = tokens[1..$]; // skip opening brace
+
+   while (true)
+   {
+      if (tokens.length == 0)
+         throw new Exception("List not closed.");
+
+      if (tokens[0].type == TokenType.CLOSING_BRACE)
+      {
+         tokens = tokens[1..$];
+         return ConfigValue(result);
+      }
+
+      result ~= parseValue(tokens);
+
+      if (tokens[0].type == TokenType.COMMA)
+      {
+         tokens = tokens[1..$];
+      }
+      else if (tokens[0].type != TokenType.CLOSING_BRACE)
+      {
+         throw new Exception("Error parsing list near " ~ tokens[0].rawData);
+      }
+   }
 }
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
