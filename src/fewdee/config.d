@@ -71,7 +71,7 @@ public struct ConfigValue
    public this(const ConfigValue[string] data)
    {
       _type = ConfigValueType.AA;
-      _table = data;
+      _aa = data;
    }
 
    /// Constructs a $(D ConfigValue) with a "list" type.
@@ -114,7 +114,7 @@ public struct ConfigValue
    }
    body
    {
-      return _table;
+      return _aa;
    }
 
    /// Gets the value assuming it is a list of values.
@@ -151,7 +151,7 @@ public struct ConfigValue
    {
       string _string;
       double _number;
-      const(ConfigValue[string]) _table;
+      const(ConfigValue[string]) _aa;
       const(ConfigValue[]) _list;
    }
 }
