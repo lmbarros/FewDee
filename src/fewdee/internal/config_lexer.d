@@ -118,7 +118,7 @@ package struct Token
  * Returns:
  *    The remaining of $(D data), after the token has been removed from it.
  */
-private string nextToken(string data, out Token token)
+public string nextToken(string data, out Token token)
 {
    /**
     * Skips blanks (including comments) in $(D data). If nothing remains in $(D
