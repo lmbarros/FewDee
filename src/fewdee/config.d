@@ -13,11 +13,20 @@ import fewdee.internal.config_lexer;
 /// The possible values a $(D ConfigValue) can have.
 public enum ConfigValueType
 {
-   NIL,    /// Nil; kind of a non-value.
-   NUMBER, /// A number; always floating point.
-   STRING, /// A string.
-   TABLE,  /// An collection of $(D ConfigValue)s, indexed by $(D string)s.
-   LIST,   /// A sequential collection of $(D ConfigValue)s.
+   /// Nil; kind of a non-value.
+   NIL,
+
+   /// A number; always floating point.
+   NUMBER,
+
+   /// A string.
+   STRING,
+
+   /// An associative array of $(D ConfigValue)s, indexed by $(D string)s.
+   AA,
+
+   /// A sequential collection of $(D ConfigValue)s.
+   LIST,
 }
 
 
@@ -30,17 +39,17 @@ public enum ConfigValueType
  * represent.
  *
  * Concerning the supported subset of Lua tables, a $(D ConfigValue) can only
- * represent tables in which all values are indexed by keys, or tables that used
- * as lists. Even then, these two cases are internally represented as separate
- * types ($(D ConfigValueType.TABLE) and $(D ConfigValueType.LIST),
- * respectively).
+ * represent tables in which all values are indexed by string keys, or tables
+ * that are used as lists. These two cases are internally represented as
+ * separate types (respectively, $(D ConfigValueType.AA) and $(D
+ * ConfigValueType.LIST)).
  *
  * By the way, this brings an interesting question, which doesn't exist in the
- * real Lua world: is $(D { }) considered a $(D ConfigValueType.TABLE) or a $(D
+ * real Lua world: is $(D { }) considered a $(D ConfigValueType.AA) or a $(D
  * ConfigValueType.LIST)? Well, based on the fact that $(D { }) doesn't have any
  * string key, we use the convention that it is a $(D ConfigValueType.LIST). You
  * may want to use $(D isEmptyTable()) to check if something is either an empty
- * table or an empty list.
+ * associative array or an empty list.
  */
 public struct ConfigValue
 {
@@ -58,10 +67,10 @@ public struct ConfigValue
       _number = data;
    }
 
-   /// Constructs a $(D ConfigValue) with a "table" type.
+   /// Constructs a $(D ConfigValue) with an "associative array" type.
    public this(const ConfigValue[string] data)
    {
-      _type = ConfigValueType.TABLE;
+      _type = ConfigValueType.AA;
       _table = data;
    }
 
@@ -98,10 +107,10 @@ public struct ConfigValue
    }
 
    /// Gets the value assuming it is a table of values indexed by strings.
-   public @property const(ConfigValue[string]) asTable() inout
+   public @property const(ConfigValue[string]) asAA() inout
    in
    {
-      assert(_type == ConfigValueType.TABLE);
+      assert(_type == ConfigValueType.AA);
    }
    body
    {
@@ -123,7 +132,7 @@ public struct ConfigValue
    public @property bool isEmptyTable() inout
    {
       return (_type == ConfigValueType.LIST && asList.length == 0)
-         || (_type == ConfigValueType.TABLE && asTable.length == 0);
+         || (_type == ConfigValueType.AA && asAA.length == 0);
    }
 
 
@@ -175,15 +184,15 @@ unittest
    ];
    auto tableValue = ConfigValue(aTable);
 
-   assert(tableValue.type == ConfigValueType.TABLE);
+   assert(tableValue.type == ConfigValueType.AA);
 
-   assert("foo" in tableValue.asTable);
-   assert(tableValue.asTable["foo"].type == ConfigValueType.NUMBER);
-   assert(tableValue.asTable["foo"].asNumber == 1.1);
+   assert("foo" in tableValue.asAA);
+   assert(tableValue.asAA["foo"].type == ConfigValueType.NUMBER);
+   assert(tableValue.asAA["foo"].asNumber == 1.1);
 
-   assert("bar" in tableValue.asTable);
-   assert(tableValue.asTable["bar"].type == ConfigValueType.STRING);
-   assert(tableValue.asTable["bar"].asString == "baz");
+   assert("bar" in tableValue.asAA);
+   assert(tableValue.asAA["bar"].type == ConfigValueType.STRING);
+   assert(tableValue.asAA["bar"].asString == "baz");
 
    // List
    const ConfigValue[] aList = [ ConfigValue(-0.3), ConfigValue("blah") ];
