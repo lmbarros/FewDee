@@ -452,8 +452,29 @@ body
    }
 }
 
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+/**
+ * Parses a given configuration string, and returns the data read.
+ *
+ * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ * xxxxxx Doc the format!
+ *
+ * Parameters:
+ *    data = The configuration data string. The configuration format is a subset
+ *       of what Lua supports, and is described above.
+ *
+ * Returns: A $(ConfigValue) of type $(D ConfigValueType.AA) with all the
+ *    key/value pairs found in $(D data).
+ *
+ * Throws:
+ *    Throws an $(D Exception) if parsing fails.
+ */
 public ConfigValue parseConfig(string data)
+out(result)
+{
+   assert(result.type == ConfigValueType.AA);
+}
+body
 {
    /// Lexes $(D data), returns the list of tokens. Throws on error.
    Token[] tokenize(string data)
@@ -475,19 +496,39 @@ public ConfigValue parseConfig(string data)
       }
    }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   ConfigValue[string] result;
+
    // Tokenize all input data
    Token[] tokens = tokenize(data);
 
-   // Assume it is a list of IDENTIFIER = VALUE
-   // Return
+   // Parse a sequence of 'key = value' entries
+   while (true)
+   {
+      // Check for the end of the input stream.
+      if (tokens.length == 0)
+         return ConfigValue(result);
 
-   ConfigValue cv;
-   cv._number = 2.3;
+      // Read the key = value entry
+      if (tokens.length < 3)
+      {
+         throw new Exception(
+            "Incomplete key = value entry near " ~ tokens[0].rawData);
+      }
 
-   if (data == "...")
-      throw new Exception("Augh!");
-   return cv;
+      if (tokens[0].type != TokenType.IDENTIFIER)
+         throw new Exception("Not a valid table key: " ~ tokens[0].rawData);
+
+      if (tokens[1].type != TokenType.EQUALS)
+         throw new Exception("Expected =, got " ~ tokens[0].rawData);
+
+      auto key = tokens[0].asIdentifier;
+      tokens = tokens[2..$];
+      auto value = parseValue(tokens);
+
+      result[key] = value;
+   }
+
+   assert(false);
 }
 
 
@@ -498,38 +539,23 @@ unittest
    // xxxxxxxx for lists: { } { v, } { v } { v, v, } { v, v, v }
 }
 
-
-enum input = "
-{
-   type = foo,
-   params = { 'a', 'b', 'c' },
-   extra = {
-      one = 1,
-      two = 2,
-      three = 3,
-   }
-}
-";
-
-enum altInput = "
-   type = foo
-   params = { 'a', 'b', 'c' }
-   extra = {
-      one = 1,
-      two = 2,
-      three = 3,
-   }
-";
-
-
-// {} --> a table or a list? a list, I'd say... no indexes there...
-
-
-
-
+// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+// compile-time...
 unittest
 {
-   enum val = parseConfig("throw")._number;
-   assert(val == 2.3);
-   //...
+   double fun()
+   {
+      auto v = parseConfig("a = 2.2");
+      assert(v.type == ConfigValueType.AA);
+      assert("a" in v.asAA);
+      assert(v.asAA["a"].type == ConfigValueType.NUMBER);
+      assert(v.asAA["a"].asNumber == 2.2);
+
+      return v.asAA["a"].asNumber;
+   }
+
+   //fun();
+
+   enum val = fun();
+   assert(val == 2.2);
 }
