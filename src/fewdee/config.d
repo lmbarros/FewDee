@@ -251,12 +251,15 @@ body
    switch (tokens[0].type)
    {
       case TokenType.NIL:
+         assert(tokens.length == 1);
          return ConfigValue();
 
       case TokenType.STRING:
+         assert(tokens.length == 1);
          return ConfigValue(tokens[0].asString);
 
       case TokenType.NUMBER:
+         assert(tokens.length == 1);
          return ConfigValue(tokens[0].asNumber);
 
       case TokenType.OPENING_BRACE:
@@ -272,10 +275,72 @@ body
    }
 }
 
+// Tests for parseValue(). This is also indirectly tested by whatever tests
+// parseConfig().
 unittest
 {
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   // xxxxxxxx { } { v, } { v } { v, v, } { v, v, v }
+   with (TokenType)
+   {
+      // Simple case: nil
+      auto tokensNil = [ Token(NIL, "nil") ];
+      assert(parseValue(tokensNil).type == ConfigValueType.NIL);
+
+      // Simple case: string
+      auto tokensString = [ Token(STRING, "'hello'") ];
+      auto stringData = parseValue(tokensString);
+      assert(stringData.type == ConfigValueType.STRING);
+      assert(stringData.asString == "hello");
+
+      // Simple case: number
+      auto tokensNumber = [ Token(NUMBER, "-8.571") ];
+      auto numberData = parseValue(tokensNumber);
+      assert(numberData.type == ConfigValueType.NUMBER);
+      assert(numberData.asNumber == -8.571);
+
+      // Some shortcuts for the next few tests
+      auto openingBrace = Token(OPENING_BRACE, "{");
+      auto closingBrace = Token(OPENING_BRACE, "}");
+      auto comma = Token(COMMA, ",");
+      auto equals = Token(EQUALS, "=");
+
+      // Empty list
+      auto tokensEmptyList = [ openingBrace, closingBrace ];
+      auto emptyListData = parseValue(tokensEmptyList);
+      assert(emptyListData.type == ConfigValueType.LIST);
+      assert(emptyListData.asList.length == 0);
+
+      // List (with members)
+      auto tokensList = [
+         openingBrace,
+         Token(NUMBER, "1.11"), comma, Token(STRING, "'abc'"), comma,
+         closingBrace ];
+      auto listData = parseValue(tokensList);
+      assert(listData.type == ConfigValueType.LIST);
+      assert(listData.asList.length == 2);
+      assert(listData.asList[0].type == ConfigValueType.NUMBER);
+      assert(listData.asList[0].asNumber == 1.11);
+      assert(listData.asList[1].type == ConfigValueType.STRING);
+      assert(listData.asList[1].asString == "abc");
+
+      auto tokensAA = [
+         openingBrace,
+         Token(IDENTIFIER, "one"), equals, Token(NUMBER, "1"), comma,
+         Token(IDENTIFIER, "two"), equals, Token(NUMBER, "2"), comma,
+         Token(IDENTIFIER, "foobar"), equals, Token(STRING, "'baz'"), comma,
+         closingBrace ];
+      auto aaData = parseValue(tokensAA);
+      assert(aaData.type == ConfigValueType.AA);
+      assert(aaData.asList.length == 3);
+      assert("one" in aaData.asAA);
+      assert(aaData.asAA["one"].type == ConfigValueType.NUMBER);
+      assert(aaData.asAA["one"].asNumber == 1);
+      assert("two" in aaData.asAA);
+      assert(aaData.asAA["two"].type == ConfigValueType.NUMBER);
+      assert(aaData.asAA["two"].asNumber == 2);
+      assert("foobar" in aaData.asAA);
+      assert(aaData.asAA["foobar"].type == ConfigValueType.STRING);
+      assert(aaData.asAA["foobar"].asString == "baz");
+   }
 }
 
 /// Like $(D parseValue), but specific for tables.
@@ -344,6 +409,12 @@ public ConfigValue parseConfig(string data)
 }
 
 
+// Tests parseConfig(), which is the main thing we have in this module.
+unittest
+{
+   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   // xxxxxxxx for lists: { } { v, } { v } { v, v, } { v, v, v }
+}
 
 
 enum input = "
