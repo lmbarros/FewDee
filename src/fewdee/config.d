@@ -272,7 +272,7 @@ body
          if (tokens.length < 2)
             throw new Exception("Table not closed near " ~ tokens[0].rawData);
          else if (tokens[1].type == TokenType.IDENTIFIER)
-            return parseTable(tokens);
+            return parseAA(tokens);
          else
             return parseList(tokens);
 
@@ -333,6 +333,7 @@ unittest
       assert(listData.asList[1].asString == "abc");
       assert(tokensList == [ ]);
 
+      // Associative array
       auto tokensAA = [
          openingBrace,
          Token(IDENTIFIER, "one"), equals, Token(NUMBER, "1"), comma,
@@ -341,7 +342,7 @@ unittest
          closingBrace ];
       auto aaData = parseValue(tokensAA);
       assert(aaData.type == ConfigValueType.AA);
-      assert(aaData.asList.length == 3);
+      assert(aaData.asAA.length == 3);
       assert("one" in aaData.asAA);
       assert(aaData.asAA["one"].type == ConfigValueType.NUMBER);
       assert(aaData.asAA["one"].asNumber == 1);
@@ -355,8 +356,8 @@ unittest
    }
 }
 
-/// Like $(D parseValue), but specific for tables.
-private ConfigValue parseTable(ref Token[] tokens)
+/// Like $(D parseValue), but specific for associative arrays.
+private ConfigValue parseAA(ref Token[] tokens)
 in
 {
    assert(tokens.length > 0);
@@ -364,8 +365,51 @@ in
 }
 body
 {
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   return ConfigValue();
+   ConfigValue[string] result;
+
+   tokens = tokens[1..$]; // skip opening brace
+
+   while (true)
+   {
+      // Check for the end of the table
+      if (tokens.length == 0)
+         throw new Exception("List not closed.");
+
+      if (tokens[0].type == TokenType.CLOSING_BRACE)
+      {
+         tokens = tokens[1..$];
+         return ConfigValue(result);
+      }
+
+      // Read the key/value pair
+      if (tokens.length < 3)
+      {
+         throw new Exception(
+            "Incomplete key/value pair near " ~ tokens[0].rawData);
+      }
+
+      if (tokens[0].type != TokenType.IDENTIFIER)
+         throw new Exception("Not a valid table key: " ~ tokens[0].rawData);
+
+      if (tokens[1].type != TokenType.EQUALS)
+         throw new Exception("Expected =, got " ~ tokens[0].rawData);
+
+      auto key = tokens[0].asIdentifier;
+      tokens = tokens[2..$];
+      auto value = parseValue(tokens);
+
+      result[key] = value;
+
+      // After the key/value pair, we need either a comma or a closing brace
+      if (tokens[0].type == TokenType.COMMA)
+      {
+         tokens = tokens[1..$];
+      }
+      else if (tokens[0].type != TokenType.CLOSING_BRACE)
+      {
+         throw new Exception("Error parsing table near " ~ tokens[0].rawData);
+      }
+   }
 }
 
 /// Like $(D parseValue), but specific for lists.
@@ -383,6 +427,7 @@ body
 
    while (true)
    {
+      // Check for the end of the table
       if (tokens.length == 0)
          throw new Exception("List not closed.");
 
@@ -392,8 +437,10 @@ body
          return ConfigValue(result);
       }
 
+      // Read the value
       result ~= parseValue(tokens);
 
+      // After the value, we need either a comma or a closing brace
       if (tokens[0].type == TokenType.COMMA)
       {
          tokens = tokens[1..$];
