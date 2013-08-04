@@ -177,7 +177,7 @@ unittest
    assert(numberValue.type == ConfigValueType.NUMBER);
    assert(numberValue.asNumber == aNumber);
 
-   // Table
+   // AA
    const ConfigValue[string] aTable = [
       "foo": ConfigValue(1.1),
       "bar": ConfigValue("baz")
@@ -195,7 +195,7 @@ unittest
    assert(tableValue.asAA["bar"].asString == "baz");
 
    // List
-   const ConfigValue[] aList = [ ConfigValue(-0.3), ConfigValue("blah") ];
+   const aList = [ ConfigValue(-0.3), ConfigValue("blah") ];
    auto listValue = ConfigValue(aList);
 
    assert(listValue.type == ConfigValueType.LIST);
@@ -210,10 +210,30 @@ unittest
    assert(listValue.asList[1].asString == "blah");
 }
 
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+// Tests ConfigValue.isEmptyTable
 unittest
 {
-   // test isEmptyTable
+   // Non-empty list
+   auto fullListValue = ConfigValue([ ConfigValue(-0.3), ConfigValue("blah") ]);
+   assert(!fullListValue.isEmptyTable);
+
+   // Empty list
+   const ConfigValue[] aList;
+   auto emptyListValue = ConfigValue(aList);
+   assert(emptyListValue.isEmptyTable);
+
+   // Non-empty AA
+   const ConfigValue[string] aTable = [
+      "foo": ConfigValue(1.1),
+      "bar": ConfigValue("baz")
+   ];
+   auto fullAAValue = ConfigValue(aTable);
+   assert(!fullAAValue.isEmptyTable);
+
+   // Empty AA
+   const ConfigValue[string] anEmptyTable;
+   auto emptyAAValue = ConfigValue(anEmptyTable);
+   assert(emptyAAValue.isEmptyTable);
 }
 
 
