@@ -81,6 +81,72 @@ public struct ConfigValue
       _list = data;
    }
 
+   /**
+    * Assuming a $(D ConfigValue) of type $(D ConfigValueType.LIST), returns the
+    * value at a given index.
+    *
+    * Using this yields code like $(D value[0]), which is more readable than $(D
+    * value.asList[0]).
+    */
+   public const(ConfigValue) opIndex(size_t index) inout
+   in
+   {
+      assert(
+         _type == ConfigValueType.LIST,
+         "Trying to index with an integer a ConfigValue that is not a list");
+      assert(
+         index < _list.length,
+         "Out-of-bounds index for ConfigValue");
+   }
+   body
+   {
+      return _list[index];
+   }
+
+   /**
+    * Assuming a $(D ConfigValue) of type $(D ConfigValueType.AA), returns the
+    * value associated with a given key.
+    *
+    * Using this yields code like $(D value["key"]), which is more readable than
+    * $(D value.asAA["key"]).
+    */
+   public const(ConfigValue) opIndex(string key) inout
+   in
+   {
+      assert(_type == ConfigValueType.AA,
+             "Trying to index with a string a ConfigValue that is not an "
+             "associative array");
+      assert(key in _aa, "Key not found in ConfigValue");
+   }
+   body
+   {
+      return _aa[key];
+   }
+
+   /**
+    * Assuming a $(D ConfigValue) of type $(D ConfigValueType.AA) or $(D
+    * ConfigValueType.LIST), returns the number of elements stored in the
+    * associative array or list.
+    *
+    * Using this yields code like $(D value.length), which is more readable than
+    * $(D value.asAA.length).
+    */
+   public @property size_t length() inout
+   in
+   {
+      assert(_type == ConfigValueType.AA || _type == ConfigValueType.LIST,
+             "Can only take length of associative arrays and lists.");
+   }
+   body
+   {
+      if (isAA)
+         return _aa.length;
+      else if (isList)
+         return _list.length;
+      else
+         assert(false, "Only AAs and lists are accepted here");
+   }
+
    /// Returns the type of this $(D ConfigValue).
    public @property ConfigValueType type() inout { return _type; }
 
@@ -221,12 +287,12 @@ unittest
    assert(tableValue.isAA);
 
    assert("foo" in tableValue.asAA);
-   assert(tableValue.asAA["foo"].isNumber);
-   assert(tableValue.asAA["foo"].asNumber == 1.1);
+   assert(tableValue["foo"].isNumber);
+   assert(tableValue["foo"].asNumber == 1.1);
 
    assert("bar" in tableValue.asAA);
-   assert(tableValue.asAA["bar"].isString);
-   assert(tableValue.asAA["bar"].asString == "baz");
+   assert(tableValue["bar"].isString);
+   assert(tableValue["bar"].asString == "baz");
 
    // List
    const aList = [ ConfigValue(-0.3), ConfigValue("blah") ];
@@ -235,14 +301,14 @@ unittest
    assert(listValue.type == ConfigValueType.LIST);
    assert(listValue.isList);
 
-   assert(listValue.asList.length == aList.length);
-   assert(listValue.asList.length == 2);
+   assert(listValue.length == aList.length);
+   assert(listValue.length == 2);
 
-   assert(listValue.asList[0].isNumber);
-   assert(listValue.asList[0].asNumber == -0.3);
+   assert(listValue[0].isNumber);
+   assert(listValue[0].asNumber == -0.3);
 
-   assert(listValue.asList[1].isString);
-   assert(listValue.asList[1].asString == "blah");
+   assert(listValue[1].isString);
+   assert(listValue[1].asString == "blah");
 }
 
 // Tests ConfigValue.isEmptyTable
@@ -351,7 +417,7 @@ unittest
       auto tokensEmptyList = [ openingBrace, closingBrace ];
       auto emptyListData = parseValue(tokensEmptyList);
       assert(emptyListData.isList);
-      assert(emptyListData.asList.length == 0);
+      assert(emptyListData.length == 0);
       assert(tokensEmptyList == [ ]);
 
       // List (with members)
@@ -361,11 +427,11 @@ unittest
          closingBrace ];
       auto listData = parseValue(tokensList);
       assert(listData.isList);
-      assert(listData.asList.length == 2);
-      assert(listData.asList[0].isNumber);
-      assert(listData.asList[0].asNumber == 1.11);
-      assert(listData.asList[1].isString);
-      assert(listData.asList[1].asString == "abc");
+      assert(listData.length == 2);
+      assert(listData[0].isNumber);
+      assert(listData[0].asNumber == 1.11);
+      assert(listData[1].isString);
+      assert(listData[1].asString == "abc");
       assert(tokensList == [ ]);
 
       // Associative array
@@ -377,16 +443,16 @@ unittest
          closingBrace ];
       auto aaData = parseValue(tokensAA);
       assert(aaData.isAA);
-      assert(aaData.asAA.length == 3);
+      assert(aaData.length == 3);
       assert("one" in aaData.asAA);
-      assert(aaData.asAA["one"].isNumber);
-      assert(aaData.asAA["one"].asNumber == 1);
+      assert(aaData["one"].isNumber);
+      assert(aaData["one"].asNumber == 1);
       assert("two" in aaData.asAA);
-      assert(aaData.asAA["two"].isNumber);
-      assert(aaData.asAA["two"].asNumber == 2);
+      assert(aaData["two"].isNumber);
+      assert(aaData["two"].asNumber == 2);
       assert("foobar" in aaData.asAA);
-      assert(aaData.asAA["foobar"].isString);
-      assert(aaData.asAA["foobar"].asString == "baz");
+      assert(aaData["foobar"].isString);
+      assert(aaData["foobar"].asString == "baz");
       assert(tokensAA == [ ]);
    }
 }
@@ -567,9 +633,23 @@ body
 }
 
 
-// Tests parseConfig(), which is the main thing we have in this module.
+// Very basic parseConfig() tests.
 unittest
 {
+   // An empty input string yields an empty associative array
+   auto v1 = parseConfig("");
+   assert(v1.isAA);
+   assert(v1.length == 0);
+
+   // An empty pair of braces yields an empty list
+   auto v2 = parseConfig("list = {}");
+   assert(v2.isAA);
+   assert(v2.length == 1);
+   assert("list" in v2.asAA);
+   assert(v2["list"].isList);
+   assert(v2["list"].length == 0);
+
+   // 
    // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    // xxxxxxxx for lists: { } { v, } { v } { v, v, } { v, v, v }
 }
@@ -581,12 +661,10 @@ unittest
    double fun()
    {
       auto v = parseConfig("a = 2.2");
-      assert(v.type == ConfigValueType.AA);
+      assert(v.isAA);
       assert("a" in v.asAA);
-      assert(v.asAA["a"].type == ConfigValueType.NUMBER);
-      assert(v.asAA["a"].asNumber == 2.2);
-
-      return v.asAA["a"].asNumber;
+      assert(v["a"].isNumber);
+      return v["a"].asNumber;
    }
 
    //fun();
