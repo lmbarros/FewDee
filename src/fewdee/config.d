@@ -684,9 +684,151 @@ unittest
    assert(v2["list"].isList);
    assert(v2["list"].length == 0);
 
-   // 
+   // A string value
+   auto v3 = parseConfig("x = 'asdf'");
+   assert(v3.isAA);
+   assert(v3.length == 1);
+   assert("x" in v3.asAA);
+   assert(v3["x"] == "asdf");
+
+   // A numeric value
+   auto v4 = parseConfig("_v = 1.3e-6");
+   assert(v4.isAA);
+   assert(v4.length == 1);
+   assert("_v" in v4.asAA);
+   assert(v4["_v"] == 1.3e-6);
+
+   // A nil value
+   auto v5 = parseConfig("sigh = nil");
+   assert(v5.isAA);
+   assert(v5.length == 1);
+   assert("sigh" in v5.asAA);
+   assert(v5["sigh"].isNil);
+
+   // A list
+   auto v6 = parseConfig("myList = { +1.2, nil, 'foobar' }");
+   assert(v6.isAA);
+   assert(v6.length == 1);
+   assert("myList" in v6.asAA);
+   assert(v6["myList"][0] == 1.2);
+   assert(v6["myList"][1].isNil);
+   assert(v6["myList"][2] == "foobar");
+
+   // An associative array
+   auto v7 = parseConfig("myAA = { first = 1, second = 2, third = 'three' }");
+   assert(v7.isAA);
+   assert(v7.length == 1);
+   assert("myAA" in v7.asAA);
+   assert(v7["myAA"]["first"] == 1);
+   assert(v7["myAA"]["second"] == 2);
+   assert(v7["myAA"]["third"] == "three");
+}
+
+/// A few more tests with strings
+unittest
+{
+   assert(parseConfig(`s = "aaa"`)["s"] == "aaa");
+   assert(parseConfig(`s = 'aaa'`)["s"] == "aaa");
+   assert(parseConfig(`s = '\''`)["s"] == "'");
+   assert(parseConfig(`s = ''`)["s"] == "");
+   assert(parseConfig(`s=""`)["s"] == "");
+}
+
+/// A few more tests with numbers
+unittest
+{
+   assert(parseConfig(`n = 1.111`)["n"] == 1.111);
+   assert(parseConfig(`n = -4.11`)["n"] == -4.11);
+   assert(parseConfig(`n = .01`)["n"] == .01);
+   assert(parseConfig(`n= .01`)["n"] == .01);
+   assert(parseConfig(`n =.01e5`)["n"] == .01e5);
+   assert(parseConfig(`n =-.01E5`)["n"] == -.01e5);
+}
+
+/// More tests with lists
+unittest
+{
+   // No trailing comma, one element
+   auto v1 = parseConfig("x = { 'abc' } ");
+   assert(v1["x"].isList);
+   assert(v1["x"].length == 1);
+   assert(v1["x"][0] == "abc");
+
+   // Trailing comma, one element
+   auto v2 = parseConfig("x = { 'abc', } ");
+   assert(v2["x"].isList);
+   assert(v2["x"].length == 1);
+   assert(v2["x"][0] == "abc");
+
+   // No trailing comma, multiple elements
+   auto v3 = parseConfig("x = { 'abc', 123.4 } ");
+   assert(v3["x"].isList);
+   assert(v3["x"].length == 2);
+   assert(v3["x"][0] == "abc");
+   assert(v3["x"][1] == 123.4);
+
+   // Trailing comma, multiple elements
+   auto v4 = parseConfig("x = { 'abc', 123.4, } ");
+   assert(v4["x"].isList);
+   assert(v4["x"].length == 2);
+   assert(v4["x"][0] == "abc");
+   assert(v4["x"][1] == 123.4);
+
+   // Unorthodox formatting
+   auto v5 = parseConfig("
+     x
+     = {     'abc'
+       ,123.4,
+       --1.5,
+       5.1--howdy!}
+     }--} ");
+   assert(v5["x"].isList);
+   assert(v5["x"].length == 3);
+   assert(v5["x"][0] == "abc");
+   assert(v5["x"][1] == 123.4);
+   assert(v5["x"][2] == 5.1);
+}
+
+/// More tests with associative arrays
+unittest
+{
    // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   // xxxxxxxx for lists: { } { v, } { v } { v, v, } { v, v, v }
+}
+
+/// Try some comments and blanks
+unittest
+{
+   auto value = parseConfig(`
+      -- This is a comment
+      -- This is still a comment
+      a = 9.8 -- a comment
+      b =          8.7
+
+      c = 7.6--more comment...--
+      -- d = 6.5
+   `);
+
+   assert(value.isAA);
+   assert(value.length == 3);
+   assert("a" in value.asAA);
+   assert("b" in value.asAA);
+   assert("c" in value.asAA);
+   assert("d" !in value.asAA);
+   assert(value["a"] == 9.8);
+   assert(value["b"] == 8.7);
+   assert(value["c"] == 7.6);
+}
+
+/// Nested data structures, simple case
+unittest
+{
+   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+}
+
+/// Nested data structures, more complex case
+unittest
+{
+   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 }
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
