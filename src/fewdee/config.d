@@ -84,6 +84,36 @@ public struct ConfigValue
    /// Returns the type of this $(D ConfigValue).
    public @property ConfigValueType type() inout { return _type; }
 
+   // Is this value a string?
+   public @property bool isString() inout
+   {
+      return _type == ConfigValueType.STRING;
+   }
+
+   // Is this value a number?
+   public @property bool isNumber() inout
+   {
+      return _type == ConfigValueType.NUMBER;
+   }
+
+   // Is this value nil?
+   public @property bool isNil() inout
+   {
+      return _type == ConfigValueType.NIL;
+   }
+
+   // Is this value a list?
+   public @property bool isList() inout
+   {
+      return _type == ConfigValueType.LIST;
+   }
+
+   // Is this value an associative array?
+   public @property bool isAA() inout
+   {
+      return _type == ConfigValueType.AA;
+   }
+
    /// Gets the value assuming it is a string.
    public @property string asString() inout
    in
@@ -162,12 +192,14 @@ unittest
    // Nil
    ConfigValue nilValue;
    assert(nilValue.type == ConfigValueType.NIL);
+   assert(nilValue.isNil);
 
    // String
    enum aString = "I am a string!";
    auto stringValue = ConfigValue(aString);
 
    assert(stringValue.type == ConfigValueType.STRING);
+   assert(stringValue.isString);
    assert(stringValue.asString == aString);
 
    // Number
@@ -175,6 +207,7 @@ unittest
    auto numberValue = ConfigValue(aNumber);
 
    assert(numberValue.type == ConfigValueType.NUMBER);
+   assert(numberValue.isNumber);
    assert(numberValue.asNumber == aNumber);
 
    // AA
@@ -185,13 +218,14 @@ unittest
    auto tableValue = ConfigValue(aTable);
 
    assert(tableValue.type == ConfigValueType.AA);
+   assert(tableValue.isAA);
 
    assert("foo" in tableValue.asAA);
-   assert(tableValue.asAA["foo"].type == ConfigValueType.NUMBER);
+   assert(tableValue.asAA["foo"].isNumber);
    assert(tableValue.asAA["foo"].asNumber == 1.1);
 
    assert("bar" in tableValue.asAA);
-   assert(tableValue.asAA["bar"].type == ConfigValueType.STRING);
+   assert(tableValue.asAA["bar"].isString);
    assert(tableValue.asAA["bar"].asString == "baz");
 
    // List
@@ -199,14 +233,15 @@ unittest
    auto listValue = ConfigValue(aList);
 
    assert(listValue.type == ConfigValueType.LIST);
+   assert(listValue.isList);
 
    assert(listValue.asList.length == aList.length);
    assert(listValue.asList.length == 2);
 
-   assert(listValue.asList[0].type == ConfigValueType.NUMBER);
+   assert(listValue.asList[0].isNumber);
    assert(listValue.asList[0].asNumber == -0.3);
 
-   assert(listValue.asList[1].type == ConfigValueType.STRING);
+   assert(listValue.asList[1].isString);
    assert(listValue.asList[1].asString == "blah");
 }
 
@@ -271,7 +306,7 @@ body
       case TokenType.OPENING_BRACE:
          if (tokens.length < 2)
             throw new Exception("Table not closed near " ~ tokens[0].rawData);
-         else if (tokens[1].type == TokenType.IDENTIFIER)
+         else if (tokens[1].isIdentifier)
             return parseAA(tokens);
          else
             return parseList(tokens);
@@ -289,20 +324,20 @@ unittest
    {
       // Simple case: nil
       auto tokensNil = [ Token(NIL, "nil") ];
-      assert(parseValue(tokensNil).type == ConfigValueType.NIL);
+      assert(parseValue(tokensNil).isNil);
       assert(tokensNil == [ ]);
 
       // Simple case: string
       auto tokensString = [ Token(STRING, "'hello'") ];
       auto stringData = parseValue(tokensString);
-      assert(stringData.type == ConfigValueType.STRING);
+      assert(stringData.isString);
       assert(stringData.asString == "hello");
       assert(tokensString == [ ]);
 
       // Simple case: number
       auto tokensNumber = [ Token(NUMBER, "-8.571") ];
       auto numberData = parseValue(tokensNumber);
-      assert(numberData.type == ConfigValueType.NUMBER);
+      assert(numberData.isNumber);
       assert(numberData.asNumber == -8.571);
       assert(tokensNumber == [ ]);
 
@@ -315,7 +350,7 @@ unittest
       // Empty list
       auto tokensEmptyList = [ openingBrace, closingBrace ];
       auto emptyListData = parseValue(tokensEmptyList);
-      assert(emptyListData.type == ConfigValueType.LIST);
+      assert(emptyListData.isList);
       assert(emptyListData.asList.length == 0);
       assert(tokensEmptyList == [ ]);
 
@@ -325,11 +360,11 @@ unittest
          Token(NUMBER, "1.11"), comma, Token(STRING, "'abc'"), comma,
          closingBrace ];
       auto listData = parseValue(tokensList);
-      assert(listData.type == ConfigValueType.LIST);
+      assert(listData.isList);
       assert(listData.asList.length == 2);
-      assert(listData.asList[0].type == ConfigValueType.NUMBER);
+      assert(listData.asList[0].isNumber);
       assert(listData.asList[0].asNumber == 1.11);
-      assert(listData.asList[1].type == ConfigValueType.STRING);
+      assert(listData.asList[1].isString);
       assert(listData.asList[1].asString == "abc");
       assert(tokensList == [ ]);
 
@@ -341,16 +376,16 @@ unittest
          Token(IDENTIFIER, "foobar"), equals, Token(STRING, "'baz'"), comma,
          closingBrace ];
       auto aaData = parseValue(tokensAA);
-      assert(aaData.type == ConfigValueType.AA);
+      assert(aaData.isAA);
       assert(aaData.asAA.length == 3);
       assert("one" in aaData.asAA);
-      assert(aaData.asAA["one"].type == ConfigValueType.NUMBER);
+      assert(aaData.asAA["one"].isNumber);
       assert(aaData.asAA["one"].asNumber == 1);
       assert("two" in aaData.asAA);
-      assert(aaData.asAA["two"].type == ConfigValueType.NUMBER);
+      assert(aaData.asAA["two"].isNumber);
       assert(aaData.asAA["two"].asNumber == 2);
       assert("foobar" in aaData.asAA);
-      assert(aaData.asAA["foobar"].type == ConfigValueType.STRING);
+      assert(aaData.asAA["foobar"].isString);
       assert(aaData.asAA["foobar"].asString == "baz");
       assert(tokensAA == [ ]);
    }
@@ -361,7 +396,7 @@ private ConfigValue parseAA(ref Token[] tokens)
 in
 {
    assert(tokens.length > 0);
-   assert(tokens[0].type == TokenType.OPENING_BRACE);
+   assert(tokens[0].isOpeningBrace);
 }
 body
 {
@@ -375,7 +410,7 @@ body
       if (tokens.length == 0)
          throw new Exception("List not closed.");
 
-      if (tokens[0].type == TokenType.CLOSING_BRACE)
+      if (tokens[0].isClosingBrace)
       {
          tokens = tokens[1..$];
          return ConfigValue(result);
@@ -401,7 +436,7 @@ body
       result[key] = value;
 
       // After the key/value pair, we need either a comma or a closing brace
-      if (tokens[0].type == TokenType.COMMA)
+      if (tokens[0].isComma)
       {
          tokens = tokens[1..$];
       }
@@ -417,7 +452,7 @@ private ConfigValue parseList(ref Token[] tokens)
 in
 {
    assert(tokens.length > 0);
-   assert(tokens[0].type == TokenType.OPENING_BRACE);
+   assert(tokens[0].isOpeningBrace);
 }
 body
 {
@@ -431,7 +466,7 @@ body
       if (tokens.length == 0)
          throw new Exception("List not closed.");
 
-      if (tokens[0].type == TokenType.CLOSING_BRACE)
+      if (tokens[0].isClosingBrace)
       {
          tokens = tokens[1..$];
          return ConfigValue(result);
@@ -441,7 +476,7 @@ body
       result ~= parseValue(tokens);
 
       // After the value, we need either a comma or a closing brace
-      if (tokens[0].type == TokenType.COMMA)
+      if (tokens[0].isComma)
       {
          tokens = tokens[1..$];
       }
@@ -472,7 +507,7 @@ body
 public ConfigValue parseConfig(string data)
 out(result)
 {
-   assert(result.type == ConfigValueType.AA);
+   assert(result.isAA);
 }
 body
 {
@@ -486,10 +521,10 @@ body
          Token token;
          data = nextToken(data, token);
 
-         if (token.type == TokenType.ERROR)
+         if (token.isError)
             throw new Exception(token.rawData);
 
-         if (token.type == TokenType.EOF)
+         if (token.isEOF)
             return res;
 
          res ~= token;

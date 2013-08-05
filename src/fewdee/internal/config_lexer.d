@@ -42,6 +42,67 @@ package struct Token
     */
    string rawData;
 
+   /// Is this token a string?
+   final @property bool isString() inout
+   {
+      return type == TokenType.STRING;
+   }
+
+   /// Is this token a number?
+   final @property bool isNumber() inout
+   {
+      return type == TokenType.NUMBER;
+   }
+
+   /// Is this token an identifier?
+   final @property bool isIdentifier() inout
+   {
+      return type == TokenType.IDENTIFIER;
+   }
+
+   /// Is this token a "nil"?
+   final @property bool isNil() inout
+   {
+      return type == TokenType.NIL;
+   }
+
+   /// Is this token a comma?
+   final @property bool isComma() inout
+   {
+      return type == TokenType.COMMA;
+   }
+
+   /// Is this token an equals sign?
+   final @property bool isEquals() inout
+   {
+      return type == TokenType.EQUALS;
+   }
+
+   /// Is this token an opening brace?
+   final @property bool isOpeningBrace() inout
+   {
+      return type == TokenType.OPENING_BRACE;
+   }
+
+   /// Is this token a closing brace?
+   final @property bool isClosingBrace() inout
+   {
+      return type == TokenType.CLOSING_BRACE;
+   }
+
+   /// Is this token an "EOF"?
+   final @property bool isEOF() inout
+   {
+      return type == TokenType.EOF;
+   }
+
+   /// Is this token an "error token"?
+   final @property bool isError() inout
+   {
+      return type == TokenType.ERROR;
+   }
+
+
    /**
     * Returns the token value as a number.
     *
@@ -292,7 +353,7 @@ public string nextToken(string data, out Token token)
          }
       }
 
-      if (token.type == TokenType.ERROR)
+      if (token.isError)
       {
          return false;
       }
@@ -432,7 +493,7 @@ public string nextToken(string data, out Token token)
    }
 
    // And we are done. Do a sanity check and return.
-   assert(success || token.type == TokenType.ERROR);
+   assert(success || token.isError);
    return data;
 }
 
@@ -512,7 +573,7 @@ unittest
       Token token;
       auto rem = nextToken(data, token);
       return rem == expectedRemaining
-         && token.type == TokenType.STRING
+         && token.isString
          && token.asString == expectedString;
    }
 
@@ -535,7 +596,7 @@ unittest
    {
       Token token;
       auto rem = nextToken(data, token);
-      return token.type == TokenType.ERROR;
+      return token.isError;
    }
 
    assert(testStringFail("'"));
@@ -555,7 +616,7 @@ unittest
       Token token;
       auto rem = nextToken(data, token);
       return rem == expectedRemaining
-         && token.type == TokenType.NUMBER
+         && token.isNumber
          && token.asNumber == expectedNumber;
    }
 
@@ -576,7 +637,7 @@ unittest
    {
       Token token;
       auto rem = nextToken(data, token);
-      return token.type == TokenType.ERROR;
+      return token.isError;
    }
 
    assert(testNumberFail("..1"));
@@ -614,7 +675,7 @@ unittest
       Token token;
       auto rem = nextToken(data, token);
       return rem == expectedRemaining
-         && token.type == TokenType.IDENTIFIER
+         && token.isIdentifier
          && token.asIdentifier == expectedIdent;
    }
 
@@ -652,7 +713,7 @@ unittest
    {
       Token token;
       auto rem = nextToken(data, token);
-      return rem == "" && token.type == TokenType.EOF;
+      return rem == "" && token.isEOF;
    }
 
    assert(testEOF(""));
@@ -684,7 +745,7 @@ unittest
          Token token;
          data = nextToken(data, token);
 
-         if (token.type == TokenType.EOF)
+         if (token.isEOF)
          {
             if (data != "" || expectedTokens.length != 0)
                return false;
