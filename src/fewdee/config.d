@@ -7,6 +7,7 @@
 
 module fewdee.config;
 
+import std.traits;
 import fewdee.internal.config_lexer;
 
 
@@ -147,6 +148,38 @@ public struct ConfigValue
          assert(false, "Only AAs and lists are accepted here");
    }
 
+   /**
+    * Equality operator. Comparing with the "wrong" type is not an error -- it
+    * simply returns $(D false) in this case.
+    */
+   public bool opEquals(T)(T value) const
+   {
+      static if(is(T == string))
+      {
+         return isString && _string == value;
+      }
+      else if (isNumeric!T)
+      {
+         return isNumber && _number == value;
+      }
+   }
+
+   ///
+   unittest
+   {
+      auto stringValue = ConfigValue("xyz");
+      auto numberValue = ConfigValue(123);
+
+      assert(stringValue == "xyz");
+      assert(stringValue != "abc");
+
+      assert(numberValue == 123);
+      assert(numberValue != 999);
+
+      assert(stringValue != 123);
+      assert(numberValue != "xyz");
+   }
+
    /// Returns the type of this $(D ConfigValue).
    public @property ConfigValueType type() inout { return _type; }
 
@@ -267,6 +300,7 @@ unittest
    assert(stringValue.type == ConfigValueType.STRING);
    assert(stringValue.isString);
    assert(stringValue.asString == aString);
+   assert(stringValue == aString);
 
    // Number
    enum aNumber = 171.171;
@@ -275,6 +309,7 @@ unittest
    assert(numberValue.type == ConfigValueType.NUMBER);
    assert(numberValue.isNumber);
    assert(numberValue.asNumber == aNumber);
+   assert(numberValue == aNumber);
 
    // AA
    const ConfigValue[string] aTable = [
@@ -288,7 +323,7 @@ unittest
 
    assert("foo" in tableValue.asAA);
    assert(tableValue["foo"].isNumber);
-   assert(tableValue["foo"].asNumber == 1.1);
+   assert(tableValue["foo"] == 1.1);
 
    assert("bar" in tableValue.asAA);
    assert(tableValue["bar"].isString);
@@ -305,7 +340,7 @@ unittest
    assert(listValue.length == 2);
 
    assert(listValue[0].isNumber);
-   assert(listValue[0].asNumber == -0.3);
+   assert(listValue[0] == -0.3);
 
    assert(listValue[1].isString);
    assert(listValue[1].asString == "blah");
@@ -397,14 +432,14 @@ unittest
       auto tokensString = [ Token(STRING, "'hello'") ];
       auto stringData = parseValue(tokensString);
       assert(stringData.isString);
-      assert(stringData.asString == "hello");
+      assert(stringData == "hello");
       assert(tokensString == [ ]);
 
       // Simple case: number
       auto tokensNumber = [ Token(NUMBER, "-8.571") ];
       auto numberData = parseValue(tokensNumber);
       assert(numberData.isNumber);
-      assert(numberData.asNumber == -8.571);
+      assert(numberData == -8.571);
       assert(tokensNumber == [ ]);
 
       // Some shortcuts for the next few tests
@@ -429,9 +464,9 @@ unittest
       assert(listData.isList);
       assert(listData.length == 2);
       assert(listData[0].isNumber);
-      assert(listData[0].asNumber == 1.11);
+      assert(listData[0] == 1.11);
       assert(listData[1].isString);
-      assert(listData[1].asString == "abc");
+      assert(listData[1] == "abc");
       assert(tokensList == [ ]);
 
       // Associative array
@@ -446,13 +481,13 @@ unittest
       assert(aaData.length == 3);
       assert("one" in aaData.asAA);
       assert(aaData["one"].isNumber);
-      assert(aaData["one"].asNumber == 1);
+      assert(aaData["one"] == 1);
       assert("two" in aaData.asAA);
       assert(aaData["two"].isNumber);
-      assert(aaData["two"].asNumber == 2);
+      assert(aaData["two"] == 2);
       assert("foobar" in aaData.asAA);
       assert(aaData["foobar"].isString);
-      assert(aaData["foobar"].asString == "baz");
+      assert(aaData["foobar"] == "baz");
       assert(tokensAA == [ ]);
    }
 }
