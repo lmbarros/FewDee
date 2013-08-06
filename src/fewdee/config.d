@@ -792,7 +792,47 @@ unittest
 /// More tests with associative arrays
 unittest
 {
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   // No trailing comma, one element
+   auto v1 = parseConfig("aa = { x = 'abc' } ");
+   assert(v1["aa"].isAA);
+   assert(v1["aa"].length == 1);
+   assert(v1["aa"]["x"] == "abc");
+
+   // Trailing comma, one element
+   auto v2 = parseConfig("aa = { x = 'abc', } ");
+   assert(v2["aa"].isAA);
+   assert(v2["aa"].length == 1);
+   assert(v2["aa"]["x"] == "abc");
+
+   // No trailing comma, multiple elements
+   auto v3 = parseConfig("aa = { x = 'abc', y = 123.4 } ");
+   assert(v3["aa"].isAA);
+   assert(v3["aa"].length == 2);
+   assert(v3["aa"]["x"] == "abc");
+   assert(v3["aa"]["y"] == 123.4);
+
+   // Trailing comma, multiple elements
+   auto v4 = parseConfig("aa = { x = 'abc', y = 123.4, } ");
+   assert(v4["aa"].isAA);
+   assert(v4["aa"].length == 2);
+   assert(v4["aa"]["x"] == "abc");
+   assert(v4["aa"]["y"] == 123.4);
+
+   // Unorthodox formatting
+   auto v5 = parseConfig("
+     aa
+     = {     x = --\"xxx'
+       'abc'
+       ,y=123.4,
+       --1.5,
+       z             =
+       5.1--howdy!}
+     }--} ");
+   assert(v5["aa"].isAA);
+   assert(v5["aa"].length == 3);
+   assert(v5["aa"]["x"] == "abc");
+   assert(v5["aa"]["y"] == 123.4);
+   assert(v5["aa"]["z"] == 5.1);
 }
 
 /// Try some comments and blanks
@@ -822,30 +862,89 @@ unittest
 /// Nested data structures, simple case
 unittest
 {
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   auto v = parseConfig(
+      "aa = {
+          seq = {1,2,3},
+          nestedAA = { foo = 'bar' }} ");
+
+   assert(v["aa"].isAA);
+   assert(v["aa"].length == 2);
+
+   assert(v["aa"]["seq"].isList);
+   assert(v["aa"]["seq"].length == 3);
+   assert(v["aa"]["seq"][0] == 1);
+   assert(v["aa"]["seq"][1] == 2);
+   assert(v["aa"]["seq"][2] == 3);
+
+   assert(v["aa"]["nestedAA"].isAA);
+   assert(v["aa"]["nestedAA"].length == 1);
+   assert("foo" in v["aa"]["nestedAA"].asAA);
+   assert(v["aa"]["nestedAA"]["foo"] == "bar");
 }
 
 /// Nested data structures, more complex case
 unittest
 {
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   auto v = parseConfig(
+      "aa = {
+          seq = {1, { 2, 'two' } ,3},
+          nestedAA = { foo = 'bar', baz = { oneMore = 'enough' } }
+      }
+
+      list = { nil, { 'a', 'b', -11.1, }, { x = '0', y = 0, z = { 0 }, } }
+ ");
+
+   assert(v["aa"].isAA);
+   assert(v["aa"].length == 2);
+
+   assert(v["aa"]["seq"].isList);
+   assert(v["aa"]["seq"].length == 3);
+   assert(v["aa"]["seq"][0] == 1);
+   assert(v["aa"]["seq"][2] == 3);
+   assert(v["aa"]["seq"][1].isList);
+   assert(v["aa"]["seq"][1].length == 2);
+   assert(v["aa"]["seq"][1][0] == 2);
+   assert(v["aa"]["seq"][1][1] == "two");
+
+   assert(v["aa"]["nestedAA"].isAA);
+   assert(v["aa"]["nestedAA"].length == 2);
+   assert("foo" in v["aa"]["nestedAA"].asAA);
+   assert(v["aa"]["nestedAA"]["foo"] == "bar");
+   assert("baz" in v["aa"]["nestedAA"].asAA);
+   assert(v["aa"]["nestedAA"]["baz"].isAA);
+   assert(v["aa"]["nestedAA"]["baz"].length == 1);
+   assert("oneMore" in v["aa"]["nestedAA"]["baz"].asAA);
+   assert(v["aa"]["nestedAA"]["baz"]["oneMore"] == "enough");
+
+   assert(v["list"].isList);
+   assert(v["list"].length == 3);
+
+   assert(v["list"][0].isNil);
+
+   assert(v["list"][1].isList);
+   assert(v["list"][1].length == 3);
+   assert(v["list"][1][0] == "a");
+   assert(v["list"][1][1] == "b");
+   assert(v["list"][1][2] == -11.1);
+
+   assert(v["list"][2].isAA);
+   assert(v["list"][2].length == 3);
+   assert(v["list"][2]["x"] == "0");
+   assert(v["list"][2]["y"] == 0);
+   assert(v["list"][2]["z"].isList);
+   assert(v["list"][2]["z"].length == 1);
+   assert(v["list"][2]["z"][0] == 0);
 }
 
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-// compile-time...
+// Test if this really works at compile-time.
 unittest
 {
-   double fun()
+   double fun(string data)
    {
-      auto v = parseConfig("a = 2.2");
-      assert(v.isAA);
-      assert("a" in v.asAA);
-      assert(v["a"].isNumber);
-      return v["a"].asNumber;
+      auto v = parseConfig(data);
+      return v["u_u"]["foo"][1].asNumber;
    }
 
-   //fun();
-
-   enum val = fun();
-   assert(val == 2.2);
+   enum val = fun("u_u = { foo = { nil, 4, 'foo', -3e-2}, bar = 627.478} ----");
+   assert(val == 4);
 }
