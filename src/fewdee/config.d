@@ -1,6 +1,6 @@
 /**
- * Configuration files/strings, which work even at compile-time and use a
- * Lua-like syntax.
+ * Configuration files (actually, configuration strings), which work even at
+ * compile-time and use a Lua-like syntax.
  *
  * Authors: Leandro Motta Barros
  */
@@ -592,15 +592,75 @@ body
 /**
  * Parses a given configuration string, and returns the data read.
  *
- * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
- * xxxxxx Doc the format!
+ * The format of configuration strings is a subset of the Lua programming
+ * language. Why Lua? Because it works great as a data description language and
+ * because I use Lua anyway whenever I have to embed a scripting language into
+ * some other program something (so to makes sense to use the same format). Why
+ * a $(I subset) of Lua? Because I didn't want to re-implement Lua in D; I just
+ * wanted to implement something quickly that provided enough data description
+ * capabilities for my needs, and which worked at compile-time.
+ *
+ * So, what's supported? Well, a configuration string is a sequence of
+ * assignments in the format "key = value". The key must be a valid identifier
+ * (you know, alphanumeric characters and underscores, but not starting with a
+ * digit nor being a reserved word like "nil). The values must be one of the
+ * following:
+ *
+ * $(UL
+ *    $(LI Numbers. As in standard Lua, they are always floating point numbers
+ *       ($(D double)s, to be exact)).
+ *    $(LI Strings. They can be written between single or double quotes. The
+ *       more exotic string format supported by Lua are not supported
+ *       here.)
+ *    $(LI Nil. You can use "nil" to represent something invalid; it is a kind
+ *       of non-value.)
+ *    $(LI Lua tables, with restrictions. Real Lua tables are insanely
+ *       versatile; what we support here is just a subset of what Lua
+ *       supports. Specifically, two kinds of Lua tables are supported:
+ *       $(UL
+ *          $(LI Tables in which all keys are (implicitly) numbers. For example,
+ *             "{ 'hello', 3.14, nil, -4.3e-6 }" and "{ 5.3, }" fit into this
+ *             case. An empty table, "{ }", is also considered to fit into this
+ *             case. In a $(D ConfigValue), this type of table is called a
+ *             "list", and, unlike in Lua, indices are zero-based.)
+ *          $(LI Tables that use only strings as keys, like "{ aNumber = 1.23,
+ *             aString = 'hello!', somethingElse = nil, }" and "{ luckyNumber =
+ *             13 }". In a $(D ConfigValue), this type of table is called an
+ *             "associative array" (often abbreviated to "AA").)
+ *       )
+ *    )
+ * )
+ *
+ * "Simple" Lua comments are supported, too: "--" starts a comment that
+ * continues until the end of the line. And tables can be nested as much as you
+ * need.
+ *
+ * So, here is an example of what would be a valid (though not necessarily a
+ * well-designed) configuration string.
+ *
+ * $(D `
+ * --
+ * -- Example of configuration string
+ * --
+ *
+ * favoriteColor = "Blue"
+ *
+ * luckyNumbers = { 13, 55, 171, } -- OK to use trailing comma...
+ *
+ * unluckyNumbers = { -4.56e-4, +4, .1235 } -- ...but it is not required
+ *
+ * translationTable = {
+ *    one = { 'um', 'eins', 'un' },
+ *    two = { 'dois', 'zwei', 'deux' },
+ *    three = { 'três', 'drei', 'trois' }
+ * }
+ * `)
  *
  * Parameters:
- *    data = The configuration data string. The configuration format is a subset
- *       of what Lua supports, and is described above.
+ *    data = The configuration data string.
  *
  * Returns: A $(ConfigValue) of type $(D ConfigValueType.AA) with all the
- *    key/value pairs found in $(D data).
+ *    "top-level key/value pairs found in $(D data).
  *
  * Throws:
  *    Throws an $(D Exception) if parsing fails.
