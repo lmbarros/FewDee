@@ -437,8 +437,10 @@ body
    switch (tokens[0].type)
    {
       case TokenType.NIL:
+      {
          tokens = tokens[1..$];
          return ConfigValue();
+      }
 
       case TokenType.STRING:
       {
@@ -462,12 +464,14 @@ body
       }
 
       case TokenType.OPENING_BRACE:
+      {
          if (tokens.length < 2)
             throw new Exception("Table not closed near " ~ tokens[0].rawData);
          else if (tokens[1].isIdentifier)
             return parseAA(tokens);
          else
             return parseList(tokens);
+      }
 
       default:
          throw new Exception("Error parsing near " ~ tokens[0].rawData);
@@ -542,15 +546,18 @@ unittest
          Token(IDENTIFIER, "godMode"), equals, Token(BOOLEAN, "true"), comma,
          closingBrace ];
       auto aaData = parseValue(tokensAA);
+
       assert(aaData.isAA);
       assert(aaData.length == 4);
 
       assert("one" in aaData.asAA);
       assert(aaData["one"].isNumber);
       assert(aaData["one"] == 1);
+
       assert("two" in aaData.asAA);
       assert(aaData["two"].isNumber);
       assert(aaData["two"] == 2);
+
       assert("foobar" in aaData.asAA);
       assert(aaData["foobar"].isString);
       assert(aaData["foobar"] == "baz");

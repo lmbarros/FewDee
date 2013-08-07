@@ -109,7 +109,6 @@ package struct Token
       return type == TokenType.ERROR;
    }
 
-
    /**
     * Returns the token value as a number.
     *
@@ -424,7 +423,6 @@ public string nextToken(string data, out Token token)
       {
          token.type = TokenType.NIL;
          token.rawData = originalData[0..3];
-
          data = data[3..$];
          return true;
       }
