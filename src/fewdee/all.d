@@ -25,6 +25,7 @@ public import fewdee.audio_stream;
 public import fewdee.bitmap;
 public import fewdee.canned_updaters;
 public import fewdee.color;
+public import fewdee.config;
 public import fewdee.display_manager;
 public import fewdee.engine;
 public import fewdee.event;
