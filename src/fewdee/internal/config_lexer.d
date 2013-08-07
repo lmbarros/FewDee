@@ -18,6 +18,7 @@ package enum TokenType
    INVALID,       /// The token is uninitialized.
    STRING,        /// A string.
    NUMBER,        /// A number (all numbers are floating point).
+   BOOLEAN,       /// A Boolean value.
    NIL,           /// Nil, which represents a non-value or something like this.
    IDENTIFIER,    /// An identifier (think of the keys used to index tables).
    COMMA,         /// A comma (",").
@@ -52,6 +53,12 @@ package struct Token
    final @property bool isNumber() inout
    {
       return type == TokenType.NUMBER;
+   }
+
+   /// Is this token a Boolean?
+   final @property bool isBoolean() inout
+   {
+      return type == TokenType.BOOLEAN;
    }
 
    /// Is this token an identifier?
@@ -120,6 +127,22 @@ package struct Token
       const numMatches = formattedRead(dataCopy, "%s", &value);
       assert(numMatches == 1);
       return value;
+   }
+
+   /**
+    * Returns the token value as a Boolean.
+    *
+    * $(D assert())s if $(D type) is not the expected one.
+    */
+   final @property bool asBoolean()
+   in
+   {
+      assert(type == TokenType.BOOLEAN);
+      assert(rawData == "true" || rawData == "false");
+   }
+   body
+   {
+      return rawData == "true";
    }
 
    /**
@@ -366,13 +389,13 @@ public string nextToken(string data, out Token token)
    }
 
    /**
-    * Reads an identifier or a "nil" from $(D data), stores the read data in ($D
-    * token).
+    * Reads an identifier, a "nil" or a Boolean value from $(D data), stores the
+    * read data in ($D token).
     *
     * Returns: $(D true) if the data was successfully read. $(D false)
     *    otherwise, in which case, $(D token) will be an "error token".
     */
-   bool readIdentifierOrNil()
+   bool readIdentifierOrNilOrBooean()
    in
    {
       assert(data.length > 0);
@@ -380,13 +403,24 @@ public string nextToken(string data, out Token token)
    }
    body
    {
+      /// Is the next token a given keyword?
+      bool isKeyword(string which)
+      {
+         const len = which.length;
+
+         return (data.length == len
+                 && data[0..len] == which)
+            || (data.length > len
+                && data[0..len] == which
+                && !isAlphaNum(data[len])
+                && data[len] != '_');
+      }
+
       auto originalData = data;
       size_t size = 0;
 
-      // Check for nil
-      if ((data.length == 3 && data[0..3] == "nil")
-         || (data.length > 3 && data[0..3] == "nil" && !isAlphaNum(data[3])
-             && data[3] != '_'))
+      // Check for "nil"
+      if (isKeyword("nil"))
       {
          token.type = TokenType.NIL;
          token.rawData = originalData[0..3];
@@ -395,7 +429,25 @@ public string nextToken(string data, out Token token)
          return true;
       }
 
-      // Not nil, assume it is an identifier
+      // Check for "true"
+      if (isKeyword("true"))
+      {
+         token.type = TokenType.BOOLEAN;
+         token.rawData = originalData[0..4];
+         data = data[4..$];
+         return true;
+      }
+
+      // Check for "false"
+      if (isKeyword("false"))
+      {
+         token.type = TokenType.BOOLEAN;
+         token.rawData = originalData[0..5];
+         data = data[5..$];
+         return true;
+      }
+
+      // Not a reserved word; must be an identifier
       while (true)
       {
          if (data.length == 0)
@@ -478,7 +530,7 @@ public string nextToken(string data, out Token token)
          break;
 
       case 'a': .. case 'z': case 'A': .. case 'Z': case '_':
-         success = readIdentifierOrNil();
+         success = readIdentifierOrNilOrBooean();
          break;
 
       case ',': case '=': case '{': case '}':
@@ -523,6 +575,8 @@ unittest
    assert(simpleTest("1e-6", TokenType.NUMBER));
    assert(simpleTest("-1e+3", TokenType.NUMBER));
    assert(simpleTest("-1.01E-6", TokenType.NUMBER));
+   assert(simpleTest("true", TokenType.BOOLEAN));
+   assert(simpleTest("false", TokenType.BOOLEAN));
    assert(simpleTest("nil", TokenType.NIL));
    assert(simpleTest("foo", TokenType.IDENTIFIER));
    assert(simpleTest(",", TokenType.COMMA));
@@ -648,6 +702,28 @@ unittest
    assert(testNumberFail("4.5E-2E1"));
 }
 
+// More tests with Booleans.
+unittest
+{
+   bool testBoolean(string data, string expectedRemaining,
+                    TokenType expectedTokenType = TokenType.BOOLEAN)
+   {
+      Token token;
+      auto rem = nextToken(data, token);
+      return rem == expectedRemaining && token.type == expectedTokenType;
+   }
+
+   assert(testBoolean("true,false", ",false"));
+   assert(testBoolean("false,true", ",true"));
+   assert(testBoolean("truee", "", TokenType.IDENTIFIER));
+   assert(testBoolean("falsee", "", TokenType.IDENTIFIER));
+   assert(testBoolean("true_", "", TokenType.IDENTIFIER));
+   assert(testBoolean("_false", "", TokenType.IDENTIFIER));
+   assert(testBoolean("'true'", "", TokenType.STRING));
+   assert(testBoolean(`"false"`, "", TokenType.STRING));
+   assert(testBoolean("--false", "", TokenType.EOF));
+}
+
 
 // Tests with nil.
 unittest
@@ -767,17 +843,20 @@ unittest
       assert(testSequence("foo bar 3.2e-8 }--}",
                           [ IDENTIFIER, IDENTIFIER, NUMBER, CLOSING_BRACE ]));
 
-      assert(testSequence("foo = { 1.2, 9.4, 'bla' } -- some comment",
-                          [ IDENTIFIER, EQUALS, OPENING_BRACE, NUMBER, COMMA,
-                            NUMBER, COMMA, STRING, CLOSING_BRACE ]));
+      assert(testSequence("foo = { false, 1.2, 9.4, 'bla' } -- some comment",
+                          [ IDENTIFIER, EQUALS, OPENING_BRACE, BOOLEAN, COMMA,
+                            NUMBER, COMMA, NUMBER, COMMA, STRING,
+                            CLOSING_BRACE ]));
 
       assert(testSequence("foo = { -- a comment
                                    --- some more
+                                   good =true,
                                    id = 'blah',
                                    foo = nil,\t
                                    baz = {}
                                  }      ",
                           [ IDENTIFIER, EQUALS, OPENING_BRACE,
+                            IDENTIFIER, EQUALS, BOOLEAN, COMMA,
                             IDENTIFIER, EQUALS, STRING, COMMA,
                             IDENTIFIER, EQUALS, NIL, COMMA,
                             IDENTIFIER, EQUALS, OPENING_BRACE, CLOSING_BRACE,

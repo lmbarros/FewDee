@@ -23,6 +23,9 @@ public enum ConfigValueType
    /// A string.
    STRING,
 
+   /// A Boolean value.
+   BOOLEAN,
+
    /// An associative array of $(D ConfigValue)s, indexed by $(D string)s.
    AA,
 
@@ -66,6 +69,13 @@ public struct ConfigValue
    {
       _type = ConfigValueType.NUMBER;
       _number = data;
+   }
+
+   /// Constructs a $(D ConfigValue) with a "Boolean" type.
+   public this(bool data)
+   {
+      _type = ConfigValueType.BOOLEAN;
+      _boolean = data;
    }
 
    /// Constructs a $(D ConfigValue) with an "associative array" type.
@@ -158,6 +168,10 @@ public struct ConfigValue
       {
          return isString && _string == value;
       }
+      else if(is(T == bool))
+      {
+         return isBoolean && _boolean == value;
+      }
       else if (isNumeric!T)
       {
          return isNumber && _number == value;
@@ -169,6 +183,7 @@ public struct ConfigValue
    {
       auto stringValue = ConfigValue("xyz");
       auto numberValue = ConfigValue(123);
+      auto booleanValue = ConfigValue(true);
 
       assert(stringValue == "xyz");
       assert(stringValue != "abc");
@@ -176,8 +191,16 @@ public struct ConfigValue
       assert(numberValue == 123);
       assert(numberValue != 999);
 
+      assert(booleanValue == true);
+      assert(booleanValue != false);
+
       assert(stringValue != 123);
+      assert(stringValue != false);
       assert(numberValue != "xyz");
+      assert(numberValue != true);
+      assert(booleanValue != "xyz");
+      assert(booleanValue != 1);
+      assert(booleanValue != 0);
    }
 
    /// Returns the type of this $(D ConfigValue).
@@ -193,6 +216,12 @@ public struct ConfigValue
    public @property bool isNumber() inout
    {
       return _type == ConfigValueType.NUMBER;
+   }
+
+   // Is this value a Boolean?
+   public @property bool isBoolean() inout
+   {
+      return _type == ConfigValueType.BOOLEAN;
    }
 
    // Is this value nil?
@@ -233,6 +262,17 @@ public struct ConfigValue
    body
    {
       return _number;
+   }
+
+   /// Gets the value assuming it is a Boolean.
+   public @property double asBoolean() inout
+   in
+   {
+      assert(_type == ConfigValueType.BOOLEAN);
+   }
+   body
+   {
+      return _boolean;
    }
 
    /// Gets the value assuming it is a table of values indexed by strings.
@@ -280,6 +320,7 @@ public struct ConfigValue
    {
       string _string;
       double _number;
+      bool _boolean;
       const(ConfigValue[string]) _aa;
       const(ConfigValue[]) _list;
    }
@@ -310,6 +351,15 @@ unittest
    assert(numberValue.isNumber);
    assert(numberValue.asNumber == aNumber);
    assert(numberValue == aNumber);
+
+   // Boolean
+   enum aBoolean = true;
+   auto booleanValue = ConfigValue(aBoolean);
+
+   assert(booleanValue.type == ConfigValueType.BOOLEAN);
+   assert(booleanValue.isBoolean);
+   assert(booleanValue.asBoolean == aBoolean);
+   assert(booleanValue == aBoolean);
 
    // AA
    const ConfigValue[string] aTable = [
@@ -404,6 +454,13 @@ body
          return res;
       }
 
+      case TokenType.BOOLEAN:
+      {
+         auto res = ConfigValue(tokens[0].asBoolean);
+         tokens = tokens[1..$];
+         return res;
+      }
+
       case TokenType.OPENING_BRACE:
          if (tokens.length < 2)
             throw new Exception("Table not closed near " ~ tokens[0].rawData);
@@ -442,6 +499,13 @@ unittest
       assert(numberData == -8.571);
       assert(tokensNumber == [ ]);
 
+      // Simple case: Boolean
+      auto tokensBoolean = [ Token(BOOLEAN, "true") ];
+      auto booleanData = parseValue(tokensBoolean);
+      assert(booleanData.isBoolean);
+      assert(booleanData == true);
+      assert(tokensBoolean == [ ]);
+
       // Some shortcuts for the next few tests
       auto openingBrace = Token(OPENING_BRACE, "{");
       auto closingBrace = Token(CLOSING_BRACE, "}");
@@ -475,10 +539,12 @@ unittest
          Token(IDENTIFIER, "one"), equals, Token(NUMBER, "1"), comma,
          Token(IDENTIFIER, "two"), equals, Token(NUMBER, "2"), comma,
          Token(IDENTIFIER, "foobar"), equals, Token(STRING, "'baz'"), comma,
+         Token(IDENTIFIER, "godMode"), equals, Token(BOOLEAN, "true"), comma,
          closingBrace ];
       auto aaData = parseValue(tokensAA);
       assert(aaData.isAA);
-      assert(aaData.length == 3);
+      assert(aaData.length == 4);
+
       assert("one" in aaData.asAA);
       assert(aaData["one"].isNumber);
       assert(aaData["one"] == 1);
@@ -488,6 +554,11 @@ unittest
       assert("foobar" in aaData.asAA);
       assert(aaData["foobar"].isString);
       assert(aaData["foobar"] == "baz");
+
+      assert("godMode" in aaData.asAA);
+      assert(aaData["godMode"].isBoolean);
+      assert(aaData["godMode"] == true);
+
       assert(tokensAA == [ ]);
    }
 }
@@ -612,6 +683,7 @@ body
  *    $(LI Strings. They can be written between single or double quotes. The
  *       more exotic string format supported by Lua are not supported
  *       here.)
+ *    $(LI Booleans. Either "true" or "false", it goes without saying.)
  *    $(LI Nil. You can use "nil" to represent something invalid; it is a kind
  *       of non-value.)
  *    $(LI Lua tables, with restrictions. Real Lua tables are insanely
@@ -654,6 +726,8 @@ body
  *    two = { 'dois', 'zwei', 'deux' },
  *    three = { 'três', 'drei', 'trois' }
  * }
+ *
+ * colorBlindMode = true
  * `)
  *
  * Parameters:
@@ -758,30 +832,36 @@ unittest
    assert("_v" in v4.asAA);
    assert(v4["_v"] == 1.3e-6);
 
-   // A nil value
-   auto v5 = parseConfig("sigh = nil");
+   // A Boolean value
+   auto v5 = parseConfig("fewDeeRules = true");
    assert(v5.isAA);
-   assert(v5.length == 1);
-   assert("sigh" in v5.asAA);
-   assert(v5["sigh"].isNil);
+   assert("fewDeeRules" in v5.asAA);
+   assert(v5["fewDeeRules"] == true);
 
-   // A list
-   auto v6 = parseConfig("myList = { +1.2, nil, 'foobar' }");
+   // A nil value
+   auto v6 = parseConfig("sigh = nil");
    assert(v6.isAA);
    assert(v6.length == 1);
-   assert("myList" in v6.asAA);
-   assert(v6["myList"][0] == 1.2);
-   assert(v6["myList"][1].isNil);
-   assert(v6["myList"][2] == "foobar");
+   assert("sigh" in v6.asAA);
+   assert(v6["sigh"].isNil);
 
-   // An associative array
-   auto v7 = parseConfig("myAA = { first = 1, second = 2, third = 'three' }");
+   // A list
+   auto v7 = parseConfig("myList = { +1.2, nil, 'foobar' }");
    assert(v7.isAA);
    assert(v7.length == 1);
-   assert("myAA" in v7.asAA);
-   assert(v7["myAA"]["first"] == 1);
-   assert(v7["myAA"]["second"] == 2);
-   assert(v7["myAA"]["third"] == "three");
+   assert("myList" in v7.asAA);
+   assert(v7["myList"][0] == 1.2);
+   assert(v7["myList"][1].isNil);
+   assert(v7["myList"][2] == "foobar");
+
+   // An associative array
+   auto v8 = parseConfig("myAA = { first = 1, second = 2, third = 'three' }");
+   assert(v8.isAA);
+   assert(v8.length == 1);
+   assert("myAA" in v8.asAA);
+   assert(v8["myAA"]["first"] == 1);
+   assert(v8["myAA"]["second"] == 2);
+   assert(v8["myAA"]["third"] == "three");
 }
 
 /// A few more tests with strings
@@ -803,6 +883,15 @@ unittest
    assert(parseConfig(`n= .01`)["n"] == .01);
    assert(parseConfig(`n =.01e5`)["n"] == .01e5);
    assert(parseConfig(`n =-.01E5`)["n"] == -.01e5);
+}
+
+/// A few more tests with Booleans
+unittest
+{
+   assert(parseConfig(`b = true`)["b"] == true);
+   assert(parseConfig(`b = false`)["b"] == false);
+   assert(parseConfig(`b = true--`)["b"] == true);
+   assert(parseConfig(`b = false--true`)["b"] == false);
 }
 
 /// More tests with lists
@@ -838,14 +927,14 @@ unittest
    auto v5 = parseConfig("
      x
      = {     'abc'
-       ,123.4,
+       ,false,
        --1.5,
        5.1--howdy!}
      }--} ");
    assert(v5["x"].isList);
    assert(v5["x"].length == 3);
    assert(v5["x"][0] == "abc");
-   assert(v5["x"][1] == 123.4);
+   assert(v5["x"][1] == false);
    assert(v5["x"][2] == 5.1);
 }
 
@@ -886,13 +975,13 @@ unittest
        ,y=123.4,
        --1.5,
        z             =
-       5.1--howdy!}
+       true--howdy!}
      }--} ");
    assert(v5["aa"].isAA);
    assert(v5["aa"].length == 3);
    assert(v5["aa"]["x"] == "abc");
    assert(v5["aa"]["y"] == 123.4);
-   assert(v5["aa"]["z"] == 5.1);
+   assert(v5["aa"]["z"] == true);
 }
 
 /// Try some comments and blanks
@@ -951,7 +1040,12 @@ unittest
           nestedAA = { foo = 'bar', baz = { oneMore = 'enough' } }
       }
 
-      list = { nil, { 'a', 'b', -11.1, }, { x = '0', y = 0, z = { 0 }, } }
+      list = {
+                nil,
+                { 'a', 'b', -11.1, },
+                { x = '0', y = 0, z = { 0 }, },
+                false,
+             }
  ");
 
    assert(v["aa"].isAA);
@@ -977,7 +1071,7 @@ unittest
    assert(v["aa"]["nestedAA"]["baz"]["oneMore"] == "enough");
 
    assert(v["list"].isList);
-   assert(v["list"].length == 3);
+   assert(v["list"].length == 4);
 
    assert(v["list"][0].isNil);
 
@@ -994,6 +1088,9 @@ unittest
    assert(v["list"][2]["z"].isList);
    assert(v["list"][2]["z"].length == 1);
    assert(v["list"][2]["z"][0] == 0);
+
+   assert(v["list"][3].isBoolean);
+   assert(v["list"][3] == false);
 }
 
 // Test if this really works at compile-time.
