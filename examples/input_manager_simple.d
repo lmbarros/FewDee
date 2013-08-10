@@ -20,6 +20,12 @@ private enum TheCommands
    NOTHING,
 }
 
+// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+private enum TheStates
+{
+   THROTTLE,
+}
+
 
 
 void main()
@@ -36,7 +42,7 @@ void main()
       // free it manually latter.
       Font font = new Font("data/bluehigl.ttf", 30);
 
-      // Helper function, to draw on the screen
+      // Helper function, to draw text on the screen
       void drawText(string text, float x, float y)
       {
          al_draw_text(font, al_map_rgb(255, 255, 255), x, y, ALLEGRO_ALIGN_LEFT,
@@ -44,11 +50,11 @@ void main()
       }
 
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      setupMappingConstants!TheCommands();
+      setupMappingConstants!(TheCommands, TheStates)();
 
-      InputManager.addCommand(TheCommands.JUMP, new DummyCommandTrigger());
-      InputManager.addCommand(TheCommands.FIRE, new DummyCommandTrigger());
-      InputManager.addState(TheCommands.STEERING, new DummyGameInputState());
+      InputManager.addCommand(TheCommands.JUMP, new DummyInputTrigger());
+      InputManager.addCommand(TheCommands.FIRE, new DummyInputTrigger());
+      // InputManager.addState(TheCommands.STEERING, new DummyInputState());
 
 
       /++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

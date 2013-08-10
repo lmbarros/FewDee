@@ -319,21 +319,35 @@ class InputState
     */
    public final TriggerID addTrigger(string key, InputTrigger trigger)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return InvalidTriggerID;
+      const id = _nextTriggerID++;
+      _triggers[key][id] = trigger;
+      return id;
    }
 
    /**
     * Removes a trigger from the internal collections of triggers.
     *
     * Parameters:
-    *    trigger = The ID of the trigger to remove. If there is no trigger with
-    *       this ID, nothing happens. (Corollary: you can safely pass $(D
+    *    triggerID = The ID of the trigger to remove. If there is no trigger
+    *       with this ID, nothing happens. (Corollary: you can safely pass $(D
     *       InvalidTriggerID) here; nothing will happen in this case.)
+    *
+    * Returns:
+    *    $(D true) if the trigger was removed; $(D false) if not (which means
+    *    that no trigger with the given ID was found).
     */
-   public final void removeTrigger(TriggerID trigger)
+   public final bool removeTrigger(TriggerID triggerID)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      foreach(key, triggers; _triggers)
+      {
+         if (triggerID in triggers)
+         {
+            triggers.remove(triggerID);
+            return true;
+         }
+      }
+
+      return false;
    }
 
    /**
@@ -348,40 +362,61 @@ class InputState
     * Parameters:
     *    key = The key of the collection of triggers that will be checked.
     *    event = The low-level event.
+    *    param = The parameters returned by the trigger that triggered are
+    *       retuned here. If multiple triggers trigger, the parameters of any of
+    *       them are returned here. If no trigger has triggered, this will not
+    *       have any meaningful information.
     *
     * Returns:
     *    $(D true) if any of the triggers in the collection with index $(D key)
     *    triggered.
     */
-   public final bool didTrigger(string key, in ref ALLEGRO_EVENT event)
+   public final bool didTrigger(string key, in ref ALLEGRO_EVENT event,
+                                out InputHandlerParam param)
+   in
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return false;
+      assert(key in _triggers);
+   }
+   body
+   {
+      bool didIt = false;
+      auto triggers = _triggers[key];
+      foreach(id, trigger; triggers)
+      {
+         if (trigger.didTrigger(event, param))
+            didIt = true;
+      }
+
+      return didIt;
    }
 
    /**
     * The internal collections of $(D InputTrigger)s.
     *
     * $(D _triggers["foo"]) yields the collection of triggers associated with
-    * the "foo" key. The collection is a $(D bool[InputTrigger]) in which only
-    * the keys are meaningful (that $(D bool) value is not used).
+    * the "foo" key. The collection is a map in which each trigger is indexed by
+    * its ID.
     */
-   private bool[InputTrigger][string] _triggers;
+   private InputTrigger[TriggerID][string] _triggers;
 
    /// The next trigger ID to be returned by $(D addTrigger()).
-   private TriggerID nextTrigger = InvalidTriggerID + 1;
+   private TriggerID _nextTriggerID = InvalidTriggerID + 1;
 }
 
 
 // associate command enum values to strings; necessary for the memento-style
 // features (mappings as strings).
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx better name; something sounding more global
-void setupMappingConstants(EnumCommands,EnumStates)()
-   if (is(Enum == enum))
+void setupMappingConstants(EnumCommands, EnumStates)()
+   if (is(EnumCommands == enum) && is(EnumStates == enum))
 {
    InputManager.clearCommandMappings();
-   foreach (member; EnumMembers!Enum)
+   foreach (member; EnumMembers!EnumCommands)
       InputManager.addCommandMapping(to!string(member), member);
+
+   InputManager.clearStateMappings();
+   foreach (member; EnumMembers!EnumStates)
+      InputManager.addStateMapping(to!string(member), member);
 }
 
 
@@ -405,17 +440,20 @@ class CommandListener: LowLevelEventHandler
 /**
  * The real implementation of the Input Manager. Users shall use this through
  * the $(D InputManager) class.
+ *
+ * Two kinds of input are supported by the Input Manager:
+ *
+ * $(OL
+ *    $(LI Commands. These are high-level game events, which are handled in a
+ *       similar fashion to other events in FewDee:
+ *       xxxxxxxxxxxxxxxxxxxxxxxxxx how? which methods are used? xxxxxxxx.)
+ *    $(LI Input States. Sometimes we don't want to handle input as events; we
+ *       just want to have some values that get updated in response to low-level
+ *       input events. An input event (see $(D InputState)) is just
+ *       that. xxxxxxxxxxxxxxxxxxxxx which methods?) )
  */
 private class InputManagerImpl: LowLevelEventHandler
 {
-   // returns base GameInputState...and the user downcasts... possibly
-   // encapsulating this in some global function/property.
-   public final @property const(InputState) state(int command) const
-   {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return null;
-   }
-
    // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    // rename "command" to "input event"?
 
@@ -428,6 +466,16 @@ private class InputManagerImpl: LowLevelEventHandler
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    }
+
+
+   // returns base GameInputState...and the user downcasts... possibly
+   // encapsulating this in some global function/property.
+   public final @property const(InputState) state(int command) const
+   {
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      return null;
+   }
+
 
    public final void addState(int command, InputState state)
    {
@@ -454,21 +502,57 @@ private class InputManagerImpl: LowLevelEventHandler
    }
 
    // mappings between command enum names and enum values
+   private final void clearStateMappings()
+   {
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   }
+
+   // mappings between command enum names and enum values
    private final void addCommandMapping(in string name, int value)
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    }
 
+   // mappings between command enum names and enum values
+   private final void addStateMapping(in string name, int value)
+   {
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   }
+
+   // commands = {
+   //    JUMP = {
+   //       -- List of triggers
+   //       { type = "fewdee.input_triggers.KeyDown", key = "A" },
+   //       { type = "fewdee.input_triggers.KeyDown", key = "Enter" },
+   //       { type = "fewdee.input_triggers.JoyDown", joy = 0, button = 2 },
+   //    },
+   //    FIRE = { } -- no triggers for this command
+   // }
+   //
+   // states = {
+   //    THROTTLE = {
+   //       type = "fewdee.input_states.FloatInputState",
+   //       min = 0.0,
+   //       max = 1.0,
+   //       default = 0.0,
+   //       setValue = {
+   //          -- list of triggers
+   //          { type = "fewdee.input_triggers.JoyAxis", joy = 0, axis = 1 },
+   //          { type = "fewdee.input_triggers.InterpolatingKeys", keys = { "0", "1", "2", "3", "4", "5" } },
+   //       }
+   //    }
+   // }
+
    // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    // Memento! Maybe a better name; 'state' is limited to mappings or so...
-   public final @property const(ConfigValue) state() inout
+   public final @property const(ConfigValue) memento() inout
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       return ConfigValue();
    }
 
    /// Ditto.
-   public final @property void state(const ConfigValue state)
+   public final @property void memento(const ConfigValue state)
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    }
