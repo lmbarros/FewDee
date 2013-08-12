@@ -50,7 +50,7 @@ void main()
       }
 
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      setupMappingConstants!(TheCommands, TheStates)();
+      initInputConstants!(TheCommands, TheStates)();
 
       InputManager.addCommand(TheCommands.JUMP, new DummyInputTrigger());
       InputManager.addCommand(TheCommands.FIRE, new DummyInputTrigger());

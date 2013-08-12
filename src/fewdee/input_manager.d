@@ -404,20 +404,62 @@ class InputState
 }
 
 
-// associate command enum values to strings; necessary for the memento-style
-// features (mappings as strings).
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx better name; something sounding more global
-void setupMappingConstants(EnumCommands, EnumStates)()
+
+/**
+ * Sets the $(InputManager) up so that it can properly work with the constants
+ * describing the high-level input commands and the input states used in your
+ * game.
+ *
+ * This must be called before using the $(InputManager). (Well, not really. This
+ * is only really necessary if you want to use its "memento-like" features (see
+ * the $(D memento) property). Anyway, calling this will not hurt, so do it
+ * always anyway.)
+ *
+ * This function assumes that you are using both commands and states. If you are
+ * using only commands or only states, there are other functions you can use
+ * instead.
+ *
+ * Parameters:
+ *    EnumCommands = The enumeration defining the constants used to identify
+ *       your high-level input commands.
+ *    EnumStates = The enumeration defining the constants used to identify
+ *       your input states.
+ *
+ * See_also: initInputCommandsConstants, initInputStatesConstants.
+ */
+void initInputConstants(EnumCommands, EnumStates)()
    if (is(EnumCommands == enum) && is(EnumStates == enum))
+{
+   initInputCommandsConstants!EnumCommands();
+   initInputStatesConstants!EnumStates();
+}
+
+
+/**
+ * Similar to $(D initInputConstants()), but usable when only input commands
+ * (and not input states) are needed.
+ */
+void initInputCommandsConstants(EnumCommands)()
+   if (is(EnumCommands == enum))
 {
    InputManager.clearCommandMappings();
    foreach (member; EnumMembers!EnumCommands)
       InputManager.addCommandMapping(to!string(member), member);
+}
 
+
+/**
+ * Similar to $(D initInputConstants()), but usable when only input states
+ * (and not input commands) are needed.
+ */
+void initInputStatesConstants(EnumStates)()
+   if (is(EnumStates == enum))
+{
    InputManager.clearStateMappings();
    foreach (member; EnumMembers!EnumStates)
       InputManager.addStateMapping(to!string(member), member);
 }
+
 
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
