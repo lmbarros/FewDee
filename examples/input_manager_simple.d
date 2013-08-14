@@ -52,8 +52,8 @@ void main()
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       initInputConstants!(TheCommands, TheStates)();
 
-      InputManager.addCommand(TheCommands.JUMP, new DummyInputTrigger());
-      InputManager.addCommand(TheCommands.FIRE, new DummyInputTrigger());
+      InputManager.addCommandTrigger(TheCommands.JUMP, new DummyInputTrigger());
+      InputManager.addCommandTrigger(TheCommands.FIRE, new DummyInputTrigger());
       // InputManager.addState(TheCommands.STEERING, new DummyInputState());
 
 

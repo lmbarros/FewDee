@@ -18,6 +18,7 @@ import std.traits;
 import allegro5.allegro;
 import fewdee.config;
 import fewdee.low_level_event_handler;
+import fewdee.internal.collections;
 import fewdee.internal.singleton;
 
 
@@ -319,9 +320,7 @@ class InputState
     */
    public final TriggerID addTrigger(string key, InputTrigger trigger)
    {
-      const id = _nextTriggerID++;
-      _triggers[key][id] = trigger;
-      return id;
+      return _triggers.add(key, trigger);
    }
 
    /**
@@ -338,16 +337,7 @@ class InputState
     */
    public final bool removeTrigger(TriggerID triggerID)
    {
-      foreach(key, triggers; _triggers)
-      {
-         if (triggerID in triggers)
-         {
-            triggers.remove(triggerID);
-            return true;
-         }
-      }
-
-      return false;
+      return _triggers.remove(triggerID);
    }
 
    /**
@@ -373,14 +363,9 @@ class InputState
     */
    public final bool didTrigger(string key, in ref ALLEGRO_EVENT event,
                                 out InputHandlerParam param)
-   in
-   {
-      assert(key in _triggers);
-   }
-   body
    {
       bool didIt = false;
-      auto triggers = _triggers[key];
+      auto triggers = _triggers.get(key);
       foreach(id, trigger; triggers)
       {
          if (trigger.didTrigger(event, param))
@@ -390,17 +375,10 @@ class InputState
       return didIt;
    }
 
-   /**
-    * The internal collections of $(D InputTrigger)s.
-    *
-    * $(D _triggers["foo"]) yields the collection of triggers associated with
-    * the "foo" key. The collection is a map in which each trigger is indexed by
-    * its ID.
-    */
-   private InputTrigger[TriggerID][string] _triggers;
-
-   /// The next trigger ID to be returned by $(D addTrigger()).
-   private TriggerID _nextTriggerID = InvalidTriggerID + 1;
+   /// The collection of $(D InputTrigger)s.
+   private
+      BucketedCollection!(InputTrigger, string, TriggerID, InvalidTriggerID + 1)
+         _triggers;
 }
 
 
@@ -480,6 +458,28 @@ class CommandListener: LowLevelEventHandler
 
 
 /**
+ * The type of functions (er, delegates) used to handle high-level commands.
+ *
+ * The function receives a single parameter: the event structure describing it
+ * in detail.
+ */
+public alias void delegate(in ref InputHandlerParam param) CommandHandler;
+
+/**
+ * An opaque identifier identifying a high-level command handler added to the
+ * Input Manager. It can be used to remove the handler.
+ */
+alias size_t CommandHandlerID;
+
+/**
+ * A $(D CommandHandlerID) that is guaranteed to be different to all real $(D
+ * CommandHandlerID)s. It is safe to pass this value to $(D
+ * InputManager.removeCommandHandler()); it will do nothing in this case.
+ */
+public immutable CommandHandlerID InvalidCommandHandlerID = 0;
+
+
+/**
  * The real implementation of the Input Manager. Users shall use this through
  * the $(D InputManager) class.
  *
@@ -492,21 +492,83 @@ class CommandListener: LowLevelEventHandler
  *    $(LI Input States. Sometimes we don't want to handle input as events; we
  *       just want to have some values that get updated in response to low-level
  *       input events. An input event (see $(D InputState)) is just
- *       that. xxxxxxxxxxxxxxxxxxxxx which methods?) )
+ *       that. xxxxxxxxxxxxxxxxxxxxx which methods?)
+ * )
  */
 private class InputManagerImpl: LowLevelEventHandler
 {
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   // rename "command" to "input event"?
-
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   // xxxxxxxxxxxxx Idea: as this (and addState()) is called, add to internal
-   // structures the "prototypes" that will be used to read mappings from a
-   // string. Problem: this requires a 'InputTrigger' as parameter, which is
-   // exactly what we want to hide/abstract away...
-   public final void addCommand(int command, InputTrigger trigger)
+   /**
+    * Adds a mapping between a high-level command and an $(D
+    * InputTrigger). After this call, whenever that $(D InputTrigger) triggers,
+    * that command will be issued.
+    *
+    * Parameters:
+    *    command = The high-level command. If you want to write understandable
+    *       code, this will be a value from an $(D enum) that lists all your
+    *       commands. (By the way, that's the same $(D enum) you passed to $(D
+    *       initInputConstants()) or $(D initInputCommandsConstants()) -- I
+    *       mean, you did the Right Thing and called one of them, didn't you?)
+    *    trigger = The input trigger.
+    *
+    * Returns:
+    *    An opaque ID that can be passed to $(D removeCommandTrigger()) if you
+    *    wish to remove this mapping.
+    */
+   public final TriggerID addCommandTrigger(int command, InputTrigger trigger)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      return _commandTriggers.add(command, trigger);
+   }
+
+   /**
+    * Removes a mapping previously added by $(D addCommandTrigger()).
+    *
+    * Parameters:
+    *    triggerID = The ID of the mapping you want to remove; that's what $(D
+    *       addCommandTrigger()) returned.
+    *
+    * Returns:
+    *    $(D true) if the mapping was removed; $(D false) if it was not (which
+    *    means that a mapping with the provided ID wasn't found).
+    */
+   public final bool removeCommandTrigger(TriggerID triggerID)
+   {
+      return _commandTriggers.remove(triggerID);
+   }
+
+   /**
+    * Adds a command handler, that gets called when a certain high-level command
+    * is issued.
+    *
+    * Parameters:
+    *    command = The high-level command to handle. (This usually comes from an
+    *       $(D enum)).
+    *    handler = The handler that will handle the high-level command.
+    *
+    * Returns:
+    *    An opaque ID that can be passed to $(D removeCommandHandler()) in order
+    *    to remove the command handler you just added.
+    */
+   public final CommandHandlerID addCommandHandler(
+      int command, CommandHandler handler)
+   {
+      return _commandHandlers.add(command, handler);
+   }
+
+   /**
+    * Removes a handler from the collection of high-level command handlers.
+    *
+    * Parameters:
+    *    handlerID = The ID of the handler to remove. If there is no handler
+    *       with this ID, nothing happens. (Corollary: you can safely pass $(D
+    *       InvalidCommandHandlerID) here; nothing will happen in this case.)
+    *
+    * Returns:
+    *    $(D true) if the handler was removed; $(D false) if not (which means
+    *    that no handler with the given ID was found).
+    */
+   public final bool removeCommandHandler(CommandHandlerID handlerID)
+   {
+      return _commandHandlers.remove(handlerID);
    }
 
 
@@ -611,6 +673,17 @@ private class InputManagerImpl: LowLevelEventHandler
       // update states
       // check if commands were triggered
    }
+
+   /// The collection of command triggers.
+   private
+      BucketedCollection!(InputTrigger, int, TriggerID, InvalidTriggerID + 1)
+         _commandTriggers;
+
+   /// The collection of command handlers.
+   private
+      BucketedCollection!(CommandHandler, int, CommandHandlerID,
+                          InvalidCommandHandlerID + 1)
+         _commandHandlers;
 }
 
 
