@@ -82,7 +82,7 @@ public struct BucketedCollection(ValueType, KeyType, IDType, IDType firstID)
     *
     * See_also: bucketSize
     */
-   public inout(ValueType[IDType]) get(KeyType bucket) inout
+   public final inout(ValueType[IDType]) get(KeyType bucket) inout
    in
    {
       assert(bucket in _elements);
@@ -93,13 +93,19 @@ public struct BucketedCollection(ValueType, KeyType, IDType, IDType firstID)
    }
 
    /// Returns the number of elements in a given bucket.
-   public size_t bucketSize(KeyType bucket)
+   public final size_t bucketSize(KeyType bucket)
    {
       auto theBucket = bucket in _elements;
       if (theBucket)
          return theBucket.length;
       else
          return 0;
+   }
+
+   /// Returns the keys of the currently existing buckets.
+   public final @property KeyType[] buckets() inout
+   {
+      return _elements.keys;
    }
 
    /// The next ID to be returned by $(D add()).
@@ -146,6 +152,13 @@ unittest
    assert(myStrings.bucketSize(Buckets.B) == 2);
    assert(myStrings.bucketSize(Buckets.C) == 0);
    assert(myStrings.bucketSize(Buckets.D) == 1);
+
+   // Test the 'buckets' property
+   const buckets = myStrings.buckets;
+   assert(buckets.length == 2);
+   assert(buckets[0] == Buckets.B || buckets[0] == Buckets.D);
+   assert(buckets[1] == Buckets.B || buckets[1] == Buckets.D);
+   assert(buckets[0] != buckets[1]);
 
    // Check if we have the expected elements
    const bucketB = myStrings.get(Buckets.B);

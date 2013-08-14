@@ -487,12 +487,13 @@ public immutable CommandHandlerID InvalidCommandHandlerID = 0;
  *
  * $(OL
  *    $(LI Commands. These are high-level game events, which are handled in a
- *       similar fashion to other events in FewDee:
- *       xxxxxxxxxxxxxxxxxxxxxxxxxx how? which methods are used? xxxxxxxx.)
+ *       similar fashion to other events in FewDee. Just use $(D
+ *       addCommandTrigger()) to map low-level events to high-level commands and
+ *       $(D addCommandHandler()) to add handlers.)
  *    $(LI Input States. Sometimes we don't want to handle input as events; we
  *       just want to have some values that get updated in response to low-level
  *       input events. An input event (see $(D InputState)) is just
- *       that. xxxxxxxxxxxxxxxxxxxxx which methods?)
+ *       that. Use $(D addState()) to add an input state to the Input Manager.)
  * )
  */
 private class InputManagerImpl: LowLevelEventHandler
@@ -571,19 +572,29 @@ private class InputManagerImpl: LowLevelEventHandler
       return _commandHandlers.remove(handlerID);
    }
 
+   /**
+    *
+    */
+   public final void addState(int stateID, InputState state)
+   in
+   {
+      assert(stateID !in _states);
+      assert(state !is null);
+   }
+   body
+   {
+      _states[stateID] = state;
+   }
 
    // returns base GameInputState...and the user downcasts... possibly
    // encapsulating this in some global function/property.
-   public final @property const(InputState) state(int command) const
+   public final @property const(InputState) state(int state) const
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return null;
-   }
-
-
-   public final void addState(int command, InputState state)
-   {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      const s = state in _states;
+      if (s)
+         return *s;
+      else
+         return null;
    }
 
    // To avoid triggering certain commands
@@ -597,7 +608,6 @@ private class InputManagerImpl: LowLevelEventHandler
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    }
-
 
    // mappings between command enum names and enum values
    private final void clearCommandMappings()
@@ -670,8 +680,22 @@ private class InputManagerImpl: LowLevelEventHandler
     */
    public final override void handleEvent(in ref ALLEGRO_EVENT event)
    {
-      // update states
-      // check if commands were triggered
+      foreach (state; _states)
+         state.update(event);
+
+      foreach (commandID; _commandTriggers.buckets)
+      {
+         foreach (trigger; _commandTriggers.get(commandID))
+         {
+            InputHandlerParam param;
+            if (trigger.didTrigger(event, param))
+            {
+               // Call handlers
+               foreach (handler; _commandHandlers.get(commandID))
+                  handler(param);
+            }
+         }
+      }
    }
 
    /// The collection of command triggers.
@@ -684,6 +708,9 @@ private class InputManagerImpl: LowLevelEventHandler
       BucketedCollection!(CommandHandler, int, CommandHandlerID,
                           InvalidCommandHandlerID + 1)
          _commandHandlers;
+
+   /// The collection of input states.
+   private InputState[int] _states;
 }
 
 
