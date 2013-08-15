@@ -573,7 +573,16 @@ private class InputManagerImpl: LowLevelEventHandler
    }
 
    /**
+    * Adds a new input state to the Input Manager.
     *
+    * Trying to add two states with the same "ID" (the constant that identifies
+    * it) is an error.
+    *
+    * Parameters:
+    *    stateID = The constant that identifies the state being added. This
+    *       should come from the same $(D enum) passed to $(D
+    *       initInputConstants()) or $(D initInputStatesConstants()).
+    *    state = The state object itself.
     */
    public final void addState(int stateID, InputState state)
    in
@@ -586,8 +595,23 @@ private class InputManagerImpl: LowLevelEventHandler
       _states[stateID] = state;
    }
 
-   // returns base GameInputState...and the user downcasts... possibly
-   // encapsulating this in some global function/property.
+   /**
+    * Returns a given input state.
+    *
+    * Notice that you'll need to downcast the returned $(D InputState) to the
+    * proper subclass in order to actually read the state. You may wish to
+    * encapsulate this call and the cast into something else to make your code
+    * cleaner. But, hey!, that's your code; this is just a suggestion.
+    *
+    * Parameters:
+    *    state = The constant identifying the state to query. This should come
+    *       from the same $(D enum) passed to $(D initInputConstants()) or $(D
+    *       initInputStatesConstants()).
+    *
+    * Returns:
+    *    The input state associated with $(state). If no input state was
+    *    associated with $(state), returns $(D null).
+    */
    public final @property const(InputState) state(int state) const
    {
       const s = state in _states;
@@ -597,16 +621,40 @@ private class InputManagerImpl: LowLevelEventHandler
          return null;
    }
 
-   // To avoid triggering certain commands
-   public final void enableCommands(int[] commands...)
-   {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   }
-
-   // To restart triggering certain commands
+   /**
+    * Disables some high-level commands.
+    *
+    * This will stop the input triggers of these commands to run, and therefore
+    * no commands of these types will be triggered.
+    *
+    * Parameters:
+    *    commands = The commands to disable.
+    *
+    * See_also: enableCommands
+    */
    public final void disableCommands(int[] commands...)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      foreach (command; commands)
+         _disabledCommands[command] = true;
+   }
+
+   /**
+    * Enables some commands.
+    *
+    * All commands are enabled by default. You only need to call this if you
+    * disabled the commands by calling $(D disableCommands()).
+    *
+    * It is OK to enable commands that are already enabled.
+    *
+    * Parameters:
+    *    commands = The commands to enable.
+    *
+    * See_also: disableCommands
+    */
+   public final void enableCommands(int[] commands...)
+   {
+      foreach (command; commands)
+         _disabledCommands.remove(command);
    }
 
    // mappings between command enum names and enum values
@@ -672,8 +720,9 @@ private class InputManagerImpl: LowLevelEventHandler
    }
 
    /**
-    * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     * Called when an event (any event) is received.
+    *
+    * Updates the input states and calls the command handlers.
     *
     * Parameters:
     *    event = The event received.
@@ -685,6 +734,11 @@ private class InputManagerImpl: LowLevelEventHandler
 
       foreach (commandID; _commandTriggers.buckets)
       {
+         // Ignore disabled commands
+         if (commandID in _disabledCommands)
+            break;
+
+         // Execute triggers, call handlers
          foreach (trigger; _commandTriggers.get(commandID))
          {
             InputHandlerParam param;
@@ -711,6 +765,13 @@ private class InputManagerImpl: LowLevelEventHandler
 
    /// The collection of input states.
    private InputState[int] _states;
+
+   /**
+    * The list of disabled high-level commands.
+    *
+    * The Boolean value is ignored; only the key matters here.
+    */
+   private bool[int] _disabledCommands;
 }
 
 
@@ -723,61 +784,3 @@ public class InputManager
 {
    mixin LowLockSingleton!InputManagerImpl;
 }
-
-
-
-
-/+++++++++++++++++++++++++++++++++++++++++
-
-// // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-// enum MyCmds ...;
-// AbstractedInput!MyCmds absInput;
-
-// absInput.addMapping(filter, MyCmds.JUMP);
-
-// absInput.addState();
-
-
-
-
-//  - "Configure commands" screen.
-//  - Select keyboard/joystick/whatever
-//  - 
-
-class Foo
-{
-   bool boolState(string key) const { return true; }
-}
-
-// subclass only if wants states?
-class MyAbsInp: AbstractedInput
-{
-   // name, type, default value
-   mixin(addBoolState("turbo", TRANSIENT, false));
-   mixin(addBoolState("landingGears", TOGGLE, true)); // support one key to turn on, one to turn off?
-   mixin(addBoolState("canopyOpen", TOGGLE, false)); // delayed? after issuing command, takes some time to change state.
-
-   mixin(addFloatState!double("thrust", 0.5, 0.0, 1.0)); // default value, min, max (auto-clipped, default is -float.max, float.max)
-   mixin(addDir8State("walkingDirection")); // NONE, N, NE, E, SE, S, SW, W, NW
-}
-
-
-auto mai = new MyAbsInp();
-
-id = mai.link(trigger, CMD_JUMP); // -> EventManager.postEvent(FEWDEE_EVENT_INPUT_EVENT); // or something like this
-
-
-id = mai.link!"turbo"(triggerKeyT);
-id = mai.link!"landingGears"(triggerKeyG);
-id = mai.link!"landingGears"(triggerKeyG, triggerKeyH); // different keys for true and false ---> well... there are always two commands. Like keyXDown turns true, keyXUp turns false
-id = mai.link!"thrust"(joyAxis(joy1, axis0));
-id = mai.link!"thrust"(key+, key-); // one key increments, other decrements
-id = mai.link!"thrust"(key+, key-);
-
-
-mai.unlink(id);
-
-if (mai.turbo)
-   vrumVrum();
-
-++++++++++++++++++++++++++++++++++/
