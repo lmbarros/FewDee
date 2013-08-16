@@ -657,28 +657,37 @@ private class InputManagerImpl: LowLevelEventHandler
          _disabledCommands.remove(command);
    }
 
-   // mappings between command enum names and enum values
+   /**
+    * Clears the mappings between the values and strings representing high-level
+    * commands.
+    */
    private final void clearCommandMappings()
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      _commandMappings.clear();
    }
 
-   // mappings between command enum names and enum values
+   /**
+    * Clears the mappings between the values and strings representing input
+    * states.
+    */
    private final void clearStateMappings()
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      _stateMappings.clear();
    }
 
-   // mappings between command enum names and enum values
+   /**
+    * Adds a mapping between a value and a string representing a high-level
+    * command.
+    */
    private final void addCommandMapping(in string name, int value)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      _commandMappings[name] = value;
    }
 
-   // mappings between command enum names and enum values
+   /// Adds a mapping between a value and a string representing an input state.
    private final void addStateMapping(in string name, int value)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      _stateMappings[name] = value;
    }
 
    // commands = {
@@ -772,6 +781,24 @@ private class InputManagerImpl: LowLevelEventHandler
     * The Boolean value is ignored; only the key matters here.
     */
    private bool[int] _disabledCommands;
+
+   /**
+    * Mapping of high-level command strings to their integer values.
+    *
+    * This is used by the memento-like mechanism, which needs to translate
+    * between the values in the $(D enum) that lists all the high-level commands
+    * and their representation as a string.
+    */
+   private BiMap!(int,string) _commandMappings;
+
+   /**
+    * Mapping of input state strings to their integer values.
+    *
+    * This is used by the memento-like mechanism, which needs to translate
+    * between the values in the $(D enum) that lists all the input states and
+    * their representation as a string.
+    */
+   private BiMap!(int,string) _stateMappings;
 }
 
 

@@ -190,3 +190,122 @@ unittest
    assert(myStrings.bucketSize(Buckets.C) == 0);
    assert(myStrings.bucketSize(Buckets.D) == 0);
 }
+
+
+/**
+ * A bidirectional associative array.
+ *
+ * Maps one type to another and another to one, so to speak.
+ *
+ * TODO: Should I worry about things like $(D const)s, $(D inout)s here? Right
+ *    now I am using this only with built-in types, so I guess I am OK. Sloppy,
+ *    but OK.
+ */
+public struct BiMap(TypeA, TypeB)
+{
+   /// Gets a mapping.
+   public final TypeB opIndex(TypeA valueA) inout
+   {
+      return _aToB[valueA];
+   }
+
+   /// Ditto.
+   public final TypeA opIndex(TypeB valueB) inout
+   {
+      return _bToA[valueB];
+   }
+
+   /// Adds a mapping.
+   public final TypeA opIndexAssign(TypeA valueA, TypeB valueB)
+   {
+      const oldA = valueB in _bToA;
+      const oldB = valueA in _aToB;
+
+      if (oldA)
+         _aToB.remove(*oldA);
+
+      if (oldB)
+         _bToA.remove(*oldB);
+
+      _aToB[valueA] = valueB;
+      _bToA[valueB] = valueA;
+
+      return valueA;
+   }
+
+   /// Ditto.
+   public final TypeB opIndexAssign(TypeB valueB, TypeA valueA)
+   {
+      const oldA = valueB in _bToA;
+      const oldB = valueA in _aToB;
+
+      if (oldA)
+         _aToB.remove(*oldA);
+
+      if (oldB)
+         _bToA.remove(*oldB);
+
+      _aToB[valueA] = valueB;
+      _bToA[valueB] = valueA;
+
+      return valueB;
+   }
+
+   /// Clears all the mappings.
+   public final void clear()
+   {
+      _aToB = typeof(_aToB).init;
+      _bToA = typeof(_bToA).init;
+   }
+
+   /// The number of mappings stored.
+   public final @property size_t length() inout
+   in
+   {
+      assert(_bToA.length == _aToB.length);
+   }
+   body
+   {
+      return _aToB.length;
+   }
+
+   /// Maps $(D TypeA)s to $(D TypeB)s.
+   private TypeB[TypeA] _aToB;
+
+   /// Maps $(D TypeB)s to $(D TypeA)s.
+   private TypeA[TypeB] _bToA;
+}
+
+unittest
+{
+   BiMap!(int, string) bm;
+
+   // Empty at the beginning
+   assert(bm.length == 0);
+
+   // Add some mappings
+   bm[1] = "one";
+   bm["two"] = 2;
+
+   assert(bm.length == 2);
+
+   // Check them
+   assert(bm[1] == "one");
+   assert(bm["one"] == 1);
+   assert(bm[2] == "two");
+   assert(bm["two"] == 2);
+
+   // Overwrite one mapping
+   bm[2] = "dois";
+   assert(bm.length == 2);
+
+   // Re-check mappings
+   assert(bm[1] == "one");
+   assert(bm["one"] == 1);
+   assert(bm[2] == "dois");
+   assert(bm["dois"] == 2);
+
+   // Clear all mappings
+   bm.clear();
+   assert(bm.length == 0);
+}
