@@ -4,8 +4,10 @@
  * Authors: Leandro Motta Barros
  */
 
+import std.conv;
 import std.exception;
 import std.stdio;
+import std.string;
 import fewdee.all;
 
 
@@ -16,14 +18,13 @@ private enum TheCommands
 {
    JUMP,
    FIRE,
-   STEERING,
    NOTHING,
 }
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 private enum TheStates
 {
-   THROTTLE,
+   WALK_DIR,
 }
 
 
@@ -46,7 +47,7 @@ void main()
       void drawText(string text, float x, float y)
       {
          al_draw_text(font, al_map_rgb(255, 255, 255), x, y, ALLEGRO_ALIGN_LEFT,
-                      text.ptr);
+                      text.toStringz);
       }
 
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -57,8 +58,6 @@ void main()
 
       InputManager.addCommandTrigger(TheCommands.JUMP, new JoyButtonDownTrigger(0));
       InputManager.addCommandTrigger(TheCommands.FIRE, new JoyButtonDownTrigger(1));
-
-      // InputManager.addState(TheCommands.STEERING, new DummyInputState());
 
       InputManager.addCommandHandler(
          TheCommands.JUMP,
@@ -75,42 +74,41 @@ void main()
          });
 
 
-      /++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      // State
 
-      // Add some more mappings. Notice that we are adding alternative mappings
-      // for the same commands. Specifically, pressing joystick buttons will
-      // cause 'JUMP' and 'FIRE' high-level commands.
-      abstractedInput.addMapping(joyButtonPress(0), TheCommands.JUMP);
-      abstractedInput.addMapping(joyButtonPress(1), TheCommands.FIRE);
+      auto dirState = new DirectionInputState();
+      InputManager.addState(TheStates.WALK_DIR, dirState);
 
-      // Up to this point, we just told the 'AbstractedInput' how to generate
-      // the high-level commands we want to handle from the low-level events
-      // that Allegro generates. We still have to tell 'AbstractedInput' what we
-      // want done when high-level commands are triggered. That's what we'll do
-      // next.
-      abstractedInput.addHandler(
-         TheCommands.JUMP,
-         delegate(in ref HighLevelCommandHandlerParam param)
-         {
-            writeln("JUMP!", param.sourceIsKeyboard ? " (keyboard)" : "");
-         });
+      @property DirectionInputState.Direction TheDirection()
+      {
+         return
+            (cast(DirectionInputState)(InputManager.state(TheStates.WALK_DIR)))
+            .direction;
+      }
 
-      abstractedInput.addHandler(
-         TheCommands.FIRE,
-         delegate(in ref HighLevelCommandHandlerParam param)
-         {
-            writeln("FIRE!", param.sourceIsKeyboard ? " (keyboard)" : "");
-         });
+      dirState.addStartNorthTrigger(new KeyDownTrigger(ALLEGRO_KEY_UP));
+      dirState.addStartNorthTrigger(new JoyAxisDecreaseTrigger(0, 1, -0.5));
 
-      // This is just to ensure that we can add a callback for which there is no
-      // associated mapping.
-      abstractedInput.addHandler(
-         TheCommands.NOTHING,
-         delegate(in ref HighLevelCommandHandlerParam param)
-         {
-            writeln("NOTHING!");
-         });
-         ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/
+      dirState.addStopNorthTrigger(new KeyUpTrigger(ALLEGRO_KEY_UP));
+      dirState.addStopNorthTrigger(new JoyAxisIncreaseTrigger(0, 1, -0.5));
+
+      dirState.addStartSouthTrigger(new KeyDownTrigger(ALLEGRO_KEY_DOWN));
+      dirState.addStartSouthTrigger(new JoyAxisIncreaseTrigger(0, 1, 0.5));
+
+      dirState.addStopSouthTrigger(new KeyUpTrigger(ALLEGRO_KEY_DOWN));
+      dirState.addStopSouthTrigger(new JoyAxisDecreaseTrigger(0, 1, 0.5));
+
+      dirState.addStartEastTrigger(new KeyDownTrigger(ALLEGRO_KEY_RIGHT));
+      dirState.addStartEastTrigger(new JoyAxisIncreaseTrigger(0, 0, 0.5));
+
+      dirState.addStopEastTrigger(new KeyUpTrigger(ALLEGRO_KEY_RIGHT));
+      dirState.addStopEastTrigger(new JoyAxisDecreaseTrigger(0, 0, 0.5));
+
+      dirState.addStartWestTrigger(new KeyDownTrigger(ALLEGRO_KEY_LEFT));
+      dirState.addStartWestTrigger(new JoyAxisDecreaseTrigger(0, 0, -0.5));
+
+      dirState.addStopWestTrigger(new KeyUpTrigger(ALLEGRO_KEY_LEFT));
+      dirState.addStopWestTrigger(new JoyAxisIncreaseTrigger(0, 0, -0.5));
 
       // Quit if ESC is pressed
       EventManager.addHandler(
@@ -129,6 +127,8 @@ void main()
             drawText("InputManager simple example", 30, 30);
             drawText("Generate some events and watch the console", 50, 60);
             drawText("Press ESC to quit", 50, 90);
+
+            drawText("Direction: " ~ to!string(TheDirection), 50, 150);
          });
 
       // Create a display

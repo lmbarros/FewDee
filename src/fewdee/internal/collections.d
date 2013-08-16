@@ -73,23 +73,22 @@ public struct BucketedCollection(ValueType, KeyType, IDType, IDType firstID)
     * Returns a bucket of elements.
     *
     * Parameters:
-    *    bucket = The desired bucket. You are responsible for guaranteeing that
-    *       at least one element exists in this bucket.
+    *    bucket = The desired bucket.
     *
     * Returns:
-    *    The requested bucket. These are the elements, indexed by their IDs. You
-    *    don't want to mess with the IDs. Use the elements only.
+    *    The requested bucket, or an empty data structure if no such bucket
+    *    exist.  These are the elements, indexed by their IDs. You don't want to
+    *    mess with the IDs. Use the elements only.
     *
     * See_also: bucketSize
     */
    public final inout(ValueType[IDType]) get(KeyType bucket) inout
-   in
    {
-      assert(bucket in _elements);
-   }
-   body
-   {
-      return _elements[bucket];
+      auto b = bucket in _elements;
+      if (b)
+         return *b;
+      else
+         return (ValueType[IDType]).init;
    }
 
    /// Returns the number of elements in a given bucket.
