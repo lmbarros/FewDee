@@ -69,7 +69,7 @@ public struct InputHandlerParam
 }
 
 /**
- * Obtains the event source.
+ * The event source.
  *
  * Technically, the event source is a bitfield, but in most practical cases only
  * one bit will be set.
@@ -77,6 +77,12 @@ public struct InputHandlerParam
 public @property InputSource source(const InputHandlerParam p)
 {
    return p._source;
+}
+
+/// Ditto.
+public @property void source(ref InputHandlerParam p, InputSource source)
+{
+   p._source = source;
 }
 
 /// Checks if the input source is a certain one.

@@ -52,24 +52,30 @@ void main()
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       initInputConstants!(TheCommands, TheStates)();
 
-      InputManager.addCommandTrigger(TheCommands.JUMP, new DummyInputTrigger());
-      InputManager.addCommandTrigger(TheCommands.FIRE, new DummyInputTrigger());
+      InputManager.addCommandTrigger(TheCommands.JUMP, new KeyDownTrigger(ALLEGRO_KEY_SPACE));
+      InputManager.addCommandTrigger(TheCommands.FIRE, new KeyDownTrigger(ALLEGRO_KEY_ALT));
+
+      InputManager.addCommandTrigger(TheCommands.JUMP, new JoyButtonDownTrigger(0));
+      InputManager.addCommandTrigger(TheCommands.FIRE, new JoyButtonDownTrigger(1));
+
       // InputManager.addState(TheCommands.STEERING, new DummyInputState());
+
+      InputManager.addCommandHandler(
+         TheCommands.JUMP,
+         delegate(in ref InputHandlerParam param)
+         {
+            writefln("JUMP! (%s)", param.source);
+         });
+
+      InputManager.addCommandHandler(
+         TheCommands.FIRE,
+         delegate(in ref InputHandlerParam param)
+         {
+            writefln("FIRE! (%s)", param.source);
+         });
 
 
       /++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      // Create the 'AbstractedInput'. It is created without mappings between
-      // low-level events and high-level commands, nor with any high-level event
-      // handlers. Adding those is our next step.
-      auto abstractedInput = new AbstractedInput!TheCommands();
-
-      // Here we create the first mapping between low-level events and
-      // high-level commands. In this case, we are saying that when the space
-      // bar is pressed, then a 'JUMP' command must be triggered.
-      abstractedInput.addMapping(keyPress(ALLEGRO_KEY_SPACE), TheCommands.JUMP);
-
-      // Like above: pressing "alt" triggers a 'FIRE' command.
-      abstractedInput.addMapping(keyPress(ALLEGRO_KEY_ALT), TheCommands.FIRE);
 
       // Add some more mappings. Notice that we are adding alternative mappings
       // for the same commands. Specifically, pressing joystick buttons will
