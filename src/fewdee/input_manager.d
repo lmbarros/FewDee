@@ -504,6 +504,10 @@ public immutable CommandHandlerID InvalidCommandHandlerID = 0;
  */
 private class InputManagerImpl: LowLevelEventHandler
 {
+   //
+   // High-Level Input Commands
+   //
+
    /**
     * Adds a mapping between a high-level command and an $(D
     * InputTrigger). After this call, whenever that $(D InputTrigger) triggers,
@@ -542,6 +546,11 @@ private class InputManagerImpl: LowLevelEventHandler
       return _commandTriggers.remove(triggerID);
    }
 
+   /// The collection of command triggers.
+   private
+      BucketedCollection!(InputTrigger, int, TriggerID, InvalidTriggerID + 1)
+         _commandTriggers;
+
    /**
     * Adds a command handler, that gets called when a certain high-level command
     * is issued.
@@ -577,6 +586,60 @@ private class InputManagerImpl: LowLevelEventHandler
    {
       return _commandHandlers.remove(handlerID);
    }
+
+   /// The collection of command handlers.
+   private
+      BucketedCollection!(CommandHandler, int, CommandHandlerID,
+                          InvalidCommandHandlerID + 1)
+         _commandHandlers;
+
+   /**
+    * Disables some high-level commands.
+    *
+    * This will stop the input triggers of these commands to run, and therefore
+    * no commands of these types will be triggered.
+    *
+    * Parameters:
+    *    commands = The commands to disable.
+    *
+    * See_also: enableCommands
+    */
+   public final void disableCommands(int[] commands...)
+   {
+      foreach (command; commands)
+         _disabledCommands[command] = true;
+   }
+
+   /**
+    * Enables some commands.
+    *
+    * All commands are enabled by default. You only need to call this if you
+    * disabled the commands by calling $(D disableCommands()).
+    *
+    * It is OK to enable commands that are already enabled.
+    *
+    * Parameters:
+    *    commands = The commands to enable.
+    *
+    * See_also: disableCommands
+    */
+   public final void enableCommands(int[] commands...)
+   {
+      foreach (command; commands)
+         _disabledCommands.remove(command);
+   }
+
+   /**
+    * The list of disabled high-level commands.
+    *
+    * The Boolean value is ignored; only the key matters here.
+    */
+   private bool[int] _disabledCommands;
+
+
+   //
+   // Input States
+   //
 
    /**
     * Adds a new input state to the Input Manager.
@@ -627,41 +690,13 @@ private class InputManagerImpl: LowLevelEventHandler
          return null;
    }
 
-   /**
-    * Disables some high-level commands.
-    *
-    * This will stop the input triggers of these commands to run, and therefore
-    * no commands of these types will be triggered.
-    *
-    * Parameters:
-    *    commands = The commands to disable.
-    *
-    * See_also: enableCommands
-    */
-   public final void disableCommands(int[] commands...)
-   {
-      foreach (command; commands)
-         _disabledCommands[command] = true;
-   }
+   /// The collection of input states.
+   private InputState[int] _states;
 
-   /**
-    * Enables some commands.
-    *
-    * All commands are enabled by default. You only need to call this if you
-    * disabled the commands by calling $(D disableCommands()).
-    *
-    * It is OK to enable commands that are already enabled.
-    *
-    * Parameters:
-    *    commands = The commands to enable.
-    *
-    * See_also: disableCommands
-    */
-   public final void enableCommands(int[] commands...)
-   {
-      foreach (command; commands)
-         _disabledCommands.remove(command);
-   }
+
+   //
+   // Memento-Like Interface
+   //
 
    /**
     * Clears the mappings between the values and strings representing high-level
@@ -696,6 +731,79 @@ private class InputManagerImpl: LowLevelEventHandler
       _stateMappings[name] = value;
    }
 
+   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   // Memento! Maybe a better name; 'state' is limited to mappings or so...
+   public final @property const(ConfigValue) memento() inout
+   {
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      return ConfigValue();
+   }
+
+   /// Ditto.
+   public final @property void memento(const ConfigValue state)
+   {
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   }
+
+   /**
+    * Mapping of high-level command strings to their integer values.
+    *
+    * This is used by the memento-like mechanism, which needs to translate
+    * between the values in the $(D enum) that lists all the high-level commands
+    * and their representation as a string.
+    */
+   private BiMap!(int,string) _commandMappings;
+
+   /**
+    * Mapping of input state strings to their integer values.
+    *
+    * This is used by the memento-like mechanism, which needs to translate
+    * between the values in the $(D enum) that lists all the input states and
+    * their representation as a string.
+    */
+   private BiMap!(int,string) _stateMappings;
+
+
+   //
+   // Event Handling
+   //
+
+   /**
+    * Called when an event (any event) is received.
+    *
+    * Updates the input states and calls the command handlers.
+    *
+    * Parameters:
+    *    event = The event received.
+    */
+   public final override void handleEvent(in ref ALLEGRO_EVENT event)
+   {
+      // Update states
+      foreach (state; _states)
+         state.update(event);
+
+      // Handle high-level commands
+      foreach (commandID; _commandTriggers.buckets)
+      {
+         // Ignore disabled commands
+         if (commandID in _disabledCommands)
+            break;
+
+         // Execute triggers, call handlers
+         foreach (trigger; _commandTriggers.get(commandID))
+         {
+            InputHandlerParam param;
+            if (trigger.didTrigger(event, param))
+            {
+               // Call handlers
+               foreach (handler; _commandHandlers.get(commandID))
+                  handler(param);
+            }
+         }
+      }
+   }
+
+
    // commands = {
    //    JUMP = {
    //       -- List of triggers
@@ -719,92 +827,6 @@ private class InputManagerImpl: LowLevelEventHandler
    //       }
    //    }
    // }
-
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   // Memento! Maybe a better name; 'state' is limited to mappings or so...
-   public final @property const(ConfigValue) memento() inout
-   {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return ConfigValue();
-   }
-
-   /// Ditto.
-   public final @property void memento(const ConfigValue state)
-   {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   }
-
-   /**
-    * Called when an event (any event) is received.
-    *
-    * Updates the input states and calls the command handlers.
-    *
-    * Parameters:
-    *    event = The event received.
-    */
-   public final override void handleEvent(in ref ALLEGRO_EVENT event)
-   {
-      foreach (state; _states)
-         state.update(event);
-
-      foreach (commandID; _commandTriggers.buckets)
-      {
-         // Ignore disabled commands
-         if (commandID in _disabledCommands)
-            break;
-
-         // Execute triggers, call handlers
-         foreach (trigger; _commandTriggers.get(commandID))
-         {
-            InputHandlerParam param;
-            if (trigger.didTrigger(event, param))
-            {
-               // Call handlers
-               foreach (handler; _commandHandlers.get(commandID))
-                  handler(param);
-            }
-         }
-      }
-   }
-
-   /// The collection of command triggers.
-   private
-      BucketedCollection!(InputTrigger, int, TriggerID, InvalidTriggerID + 1)
-         _commandTriggers;
-
-   /// The collection of command handlers.
-   private
-      BucketedCollection!(CommandHandler, int, CommandHandlerID,
-                          InvalidCommandHandlerID + 1)
-         _commandHandlers;
-
-   /// The collection of input states.
-   private InputState[int] _states;
-
-   /**
-    * The list of disabled high-level commands.
-    *
-    * The Boolean value is ignored; only the key matters here.
-    */
-   private bool[int] _disabledCommands;
-
-   /**
-    * Mapping of high-level command strings to their integer values.
-    *
-    * This is used by the memento-like mechanism, which needs to translate
-    * between the values in the $(D enum) that lists all the high-level commands
-    * and their representation as a string.
-    */
-   private BiMap!(int,string) _commandMappings;
-
-   /**
-    * Mapping of input state strings to their integer values.
-    *
-    * This is used by the memento-like mechanism, which needs to translate
-    * between the values in the $(D enum) that lists all the input states and
-    * their representation as a string.
-    */
-   private BiMap!(int,string) _stateMappings;
 }
 
 
