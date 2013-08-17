@@ -46,3 +46,6 @@ SDL 2 and Allegro 5 differ, and to what extent they are similar.
   - SDL 2 seems to use integer coordinates everywhere (via SDL_Rect,
     sometimes). Allegro uses float coodinates. This is an important
     difference!
+* Joystick
+  - SDL doesn't group joystick axes by "sticks", as in Allegro. There
+    is simply a list of axes.
