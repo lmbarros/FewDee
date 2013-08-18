@@ -717,22 +717,26 @@ private class InputManagerImpl: LowLevelEventHandler
       /**
        * An array with the button names of this joystick.
        *
-       * The indices in this array correspond to the integer values you use to
-       * represent buttons in other functions. For example, the button whose
-       * name is at index $(D 1) is the button $(D 1). The length of this array
-       * tells how many buttons the joystick has.
+       * Its length tells how many buttons the joystick has.
+       *
+       * Notice that FewDee functions taking integers to represent joystick
+       * buttons use $(D 0) to represent an "invalid button", and real buttons
+       * start at $(D 1). This means that $(D buttons[n]) is the name of the
+       * button that everywhere else is known as button $(D n+1).
        */
       public string[] buttons;
 
       /**
        * An array with the names of the joystick axes.
        *
-       * The indices in this array correspond to the integer values you use to
-       * represent axes in other functions. For example, the axis whose name is
-       * at index $(D 1) is the axis $(D 1).) The length of this array tells how
-       * many axes the joystick has.
+       * Its length tells how many axes the joystick has.
        *
-       * Unlike Allegro, FewDee doesn't group axes in sticks.
+       * Notice that, unlike Allegro, FewDee doesn't group axes in sticks.
+       *
+       * Also notice that FewDee functions taking integers to represent joystick
+       * axes use $(D 0) to represent an "invalid axis", and real axes start at
+       * $(D 1). This means that $(D axes[n]) is the name of the axis that
+       * everywhere else is known as axis $(D n+1).
        */
       public string[] axes;
 
