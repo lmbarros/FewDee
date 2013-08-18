@@ -15,8 +15,10 @@ module fewdee.input_manager;
 
 import std.conv;
 import std.traits;
+import std.typecons;
 import allegro5.allegro;
 import fewdee.config;
+import fewdee.engine;
 import fewdee.low_level_event_handler;
 import fewdee.internal.collections;
 import fewdee.internal.singleton;
@@ -504,6 +506,14 @@ public immutable CommandHandlerID InvalidCommandHandlerID = 0;
  */
 private class InputManagerImpl: LowLevelEventHandler
 {
+   /// Constructs the Input Manager.
+   public this()
+   {
+      if (Engine.requestedFeatures & Features.JOYSTICK)
+         rescanJoysticks();
+   }
+
+
    //
    // High-Level Input Commands
    //
@@ -692,6 +702,135 @@ private class InputManagerImpl: LowLevelEventHandler
 
    /// The collection of input states.
    private InputState[int] _states;
+
+
+   //
+   // Joysticks
+   //
+
+   /// Information about a joystick.
+   public struct JoyInfo
+   {
+      /// The joystick name
+      public string name;
+
+      /**
+       * An array with the button names of this joystick.
+       *
+       * The indices in this array correspond to the integer values you use to
+       * represent buttons in other functions. For example, the button whose
+       * name is at index $(D 1) is the button $(D 1). The length of this array
+       * tells how many buttons the joystick has.
+       */
+      public string[] buttons;
+
+      /**
+       * An array with the names of the joystick axes.
+       *
+       * The indices in this array correspond to the integer values you use to
+       * represent axes in other functions. For example, the axis whose name is
+       * at index $(D 1) is the axis $(D 1).) The length of this array tells how
+       * many axes the joystick has.
+       *
+       * Unlike Allegro, FewDee doesn't group axes in sticks.
+       */
+      public string[] axes;
+
+      /**
+       * A pair of integers used to identify a joystick axis; the first is
+       * interpreted as the Allegro joystick stick index; the second as the
+       * Allegro axis index.
+       */
+      private alias Tuple!(int,int) stickAxis;
+
+      /**
+       * Mapping between axes as used in Allegro (stick index plus axis index)
+       * and in FewDee (a single axis index).
+       */
+      private BiMap!(stickAxis, int) _axisToStickAndAxis;
+   }
+
+   /**
+    * Returns an array with information about all connected joysticks.
+    *
+    * Notice that joysticks may be connected or disconnected at any time, but
+    * the list returned by this function will be updated only after $(D
+    * rescanJoysticks()) is called.
+    *
+    * You may want to call this upon entering a "configure input" screen (and,
+    * perhaps, whenever the Allegro event $(D
+    * ALLEGRO_EVENT_JOYSTICK_CONFIGURATION) is triggered).
+    *
+    * See_also: rescanJoysticks
+    */
+   public final @property const(JoyInfo[]) joysticks() inout
+   {
+      return _joyData;
+   }
+
+   /**
+    * Rescans the system looking for joysticks.
+    *
+    * Returns:
+    *    An array describing the joysticks found.
+    */
+   public final const(JoyInfo[]) rescanJoysticks()
+   {
+      if (al_reconfigure_joysticks() || _joyData.length == 0)
+      {
+         const numJoys = al_get_num_joysticks();
+         _joyData.length = numJoys;
+
+         foreach (i; 0..numJoys)
+         {
+            // Name
+            auto joy = al_get_joystick(i);
+            _joyData[i].name = to!string(al_get_joystick_name(joy));
+
+            // Buttons
+            const numButtons = al_get_joystick_num_buttons(joy);
+            _joyData[i].buttons.length = numButtons;
+            foreach(j; 0..numButtons)
+            {
+               _joyData[i].buttons[j] =
+                  to!string(al_get_joystick_button_name(joy, j));
+            }
+
+            // Axes
+            const numSticks = al_get_joystick_num_sticks(joy);
+            _joyData[i].axes.length = 0;
+            _joyData[i]._axisToStickAndAxis.clear();
+
+            foreach(j; 0..numSticks)
+            {
+               const numAxes = al_get_joystick_num_axes(joy, j);
+               const stickName = to!string(al_get_joystick_stick_name(joy, j));
+
+               foreach(k; 0..numAxes)
+               {
+                  _joyData[i].axes ~= stickName ~ "/"
+                     ~ to!string(al_get_joystick_axis_name(joy, j, k));
+
+                  const serial = _joyData[i].axes.length - 1;
+                  _joyData[i]._axisToStickAndAxis[serial] =
+                     JoyInfo.stickAxis(j, k);
+               }
+            }
+         }
+      }
+
+      return _joyData;
+   }
+
+   /**
+    * An array describing the joysticks found in the system.
+    *
+    * This is updated only when $(D rescanJoysticks()) is called.
+    */
+   private JoyInfo[] _joyData;
+
+   /// Given an $(D ALLEGRO_JOYSTICK*), yields the joystick "sequential number".
+   private int[ALLEGRO_JOYSTICK*] _joyIndex;
 
 
    //
