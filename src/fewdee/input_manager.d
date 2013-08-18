@@ -36,20 +36,20 @@ import fewdee.internal.singleton;
  */
 public enum InputSource
 {
-   INVALID = 0,         /// An invalid input source.
-   GUI = 1 << 1,        /// The event was generated via GUI widgets
-   KEYBOARD = 1 << 2,   /// The keyboard.
-   MOUSE = 1 << 3,      /// The mouse.
-   JOYSTICK0 = 1 << 4,  /// The first joystick.
-   JOYSTICK1 = 1 << 5,  /// The second joystick.
-   JOYSTICK2 = 1 << 6,  /// The third joystick.
-   JOYSTICK3 = 1 << 7,  /// The fourth joystick.
-   JOYSTICK4 = 1 << 8,  /// The fifth joystick.
-   JOYSTICK5 = 1 << 9,  /// The sixth joystick.
-   JOYSTICK6 = 1 << 10, /// The seventh joystick.
-   JOYSTICK7 = 1 << 11, /// The eight joystick.
-   JOYSTICK8 = 1 << 12, /// The ninth joystick.
-   JOYSTICK9 = 1 << 13, /// The tenth joystick.
+   INVALID = 0,          /// An invalid input source.
+   GUI = 1 << 1,         /// The event was generated via GUI widgets
+   KEYBOARD = 1 << 2,    /// The keyboard.
+   MOUSE = 1 << 3,       /// The mouse.
+   JOYSTICK1 = 1 << 4,   /// The first joystick.
+   JOYSTICK2 = 1 << 5,   /// The second joystick.
+   JOYSTICK3 = 1 << 6,   /// The third joystick.
+   JOYSTICK4 = 1 << 7,   /// The fourth joystick.
+   JOYSTICK5 = 1 << 8,   /// The fifth joystick.
+   JOYSTICK6 = 1 << 9,   /// The sixth joystick.
+   JOYSTICK7 = 1 << 10,  /// The seventh joystick.
+   JOYSTICK8 = 1 << 11,  /// The eight joystick.
+   JOYSTICK9 = 1 << 12,  /// The ninth joystick.
+   JOYSTICK10 = 1 << 13, /// The tenth joystick.
 }
 
 
@@ -106,12 +106,6 @@ public bool isSourceMouse(const InputHandlerParam p)
 }
 
 /// Ditto.
-public bool isSourceJoy0(const InputHandlerParam p)
-{
-   return p._source == InputSource.JOYSTICK0;
-}
-
-/// Ditto.
 public bool isSourceJoy1(const InputHandlerParam p)
 {
    return p._source == InputSource.JOYSTICK1;
@@ -163,6 +157,12 @@ public bool isSourceJoy8(const InputHandlerParam p)
 public bool isSourceJoy9(const InputHandlerParam p)
 {
    return p._source == InputSource.JOYSTICK9;
+}
+
+/// Ditto.
+public bool isSourceJoy10(const InputHandlerParam p)
+{
+   return p._source == InputSource.JOYSTICK10;
 }
 
 
@@ -761,9 +761,10 @@ private class InputManagerImpl: LowLevelEventHandler
     * the list returned by this function will be updated only after $(D
     * rescanJoysticks()) is called.
     *
-    * You may want to call this upon entering a "configure input" screen (and,
-    * perhaps, whenever the Allegro event $(D
-    * ALLEGRO_EVENT_JOYSTICK_CONFIGURATION) is triggered).
+    * Also notice that FewDee functions taking integers to represent joysticks
+    * use $(D 0) to represent an "invalid joystick", and real joysticks start at
+    * $(D 1). This means that $(D InputManager.joysticks[n]) is the joystick
+    * that everywhere else is known as joystick $(D n+1).
     *
     * See_also: rescanJoysticks
     */
@@ -774,6 +775,10 @@ private class InputManagerImpl: LowLevelEventHandler
 
    /**
     * Rescans the system looking for joysticks.
+    *
+    * You may want to call this upon entering a "configure input" screen (and,
+    * perhaps, whenever the Allegro event $(D
+    * ALLEGRO_EVENT_JOYSTICK_CONFIGURATION) is triggered).
     *
     * Returns:
     *    An array describing the joysticks found.
@@ -789,6 +794,7 @@ private class InputManagerImpl: LowLevelEventHandler
          {
             // Name
             auto joy = al_get_joystick(i);
+            _joyIndex[joy] = i + 1;
             _joyData[i].name = to!string(al_get_joystick_name(joy));
 
             // Buttons
@@ -827,13 +833,26 @@ private class InputManagerImpl: LowLevelEventHandler
    }
 
    /**
+    * Returns the joystick ID (sequential number, starting from one) that
+    * corresponds to a given joystick.
+    */
+   package final int joystickID(const ALLEGRO_JOYSTICK* joy) inout
+   {
+      return _joyIndex[joy];
+   }
+
+   /**
     * An array describing the joysticks found in the system.
     *
     * This is updated only when $(D rescanJoysticks()) is called.
     */
    private JoyInfo[] _joyData;
 
-   /// Given an $(D ALLEGRO_JOYSTICK*), yields the joystick "sequential number".
+   /**
+    * Given an $(D ALLEGRO_JOYSTICK*), yields the joystick "sequential number".
+    *
+    * This is updated only when $(D rescanJoysticks()) is called.
+    */
    private int[ALLEGRO_JOYSTICK*] _joyIndex;
 
 

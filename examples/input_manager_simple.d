@@ -56,8 +56,11 @@ void main()
       InputManager.addCommandTrigger(TheCommands.JUMP, new KeyDownTrigger(ALLEGRO_KEY_SPACE));
       InputManager.addCommandTrigger(TheCommands.FIRE, new KeyDownTrigger(ALLEGRO_KEY_ALT));
 
-      InputManager.addCommandTrigger(TheCommands.JUMP, new JoyButtonDownTrigger(0));
-      InputManager.addCommandTrigger(TheCommands.FIRE, new JoyButtonDownTrigger(1));
+      InputManager.addCommandTrigger(TheCommands.JUMP, new JoyButtonDownTrigger(1, 1));
+      InputManager.addCommandTrigger(TheCommands.FIRE, new JoyButtonDownTrigger(1, 2));
+
+      InputManager.addCommandTrigger(TheCommands.JUMP, new JoyButtonDownTrigger(2, 1));
+      InputManager.addCommandTrigger(TheCommands.FIRE, new JoyButtonDownTrigger(2, 2));
 
       InputManager.addCommandHandler(
          TheCommands.JUMP,

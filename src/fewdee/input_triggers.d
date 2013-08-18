@@ -14,17 +14,26 @@ import fewdee.input_manager;
 /// An input trigger that triggers when a certain keyboard key is pressed.
 class KeyDownTrigger: InputTrigger
 {
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   public this()
-   {
-   }
+   /**
+    * The default constructor; if you use it, you must set the trigger
+    * parameters manually (either via the appropriate properties, or using $(D
+    * memento)).
+    */
+   public this() { }
 
-   // xxxxxxxx As config string only? No, I guess... xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   /**
+    * Constructs the trigger.
+    *
+    * Parameters:
+    *    keyCode = The keycode (an $(D ALLEGRO_KEY_*) constant) this trigger is
+    *       listening to.
+    */
    public this(int keyCode)
    {
       _keyCode = keyCode;
    }
 
+   // Inherit docs.
    public override bool didTrigger(in ref ALLEGRO_EVENT event,
                                    out InputHandlerParam param)
    {
@@ -38,16 +47,17 @@ class KeyDownTrigger: InputTrigger
       return false;
    }
 
+   // Inherit docs.
    public override @property const(ConfigValue) memento()
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       return ConfigValue();
    }
 
+   // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      // nothing...
    }
 
    /**
@@ -71,20 +81,31 @@ class KeyDownTrigger: InputTrigger
    private int _keyCode = ALLEGRO_KEY_MAX;
 }
 
+
+
 /// An input trigger that triggers when a certain keyboard key is released.
 class KeyUpTrigger: InputTrigger
 {
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   public this()
-   {
-   }
+   /**
+    * The default constructor; if you use it, you must set the trigger
+    * parameters manually (either via the appropriate properties, or using $(D
+    * memento)).
+    */
+   public this() { }
 
-   // xxxxxxxx As config string only? No, I guess... xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   /**
+    * Constructs the trigger.
+    *
+    * Parameters:
+    *    keyCode = The keycode (an $(D ALLEGRO_KEY_*) constant) this trigger is
+    *       listening to.
+    */
    public this(int keyCode)
    {
       _keyCode = keyCode;
    }
 
+   // Inherit docs.
    public override bool didTrigger(in ref ALLEGRO_EVENT event,
                                    out InputHandlerParam param)
    {
@@ -98,16 +119,17 @@ class KeyUpTrigger: InputTrigger
       return false;
    }
 
+   // Inherit docs.
    public override @property const(ConfigValue) memento()
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       return ConfigValue();
    }
 
+   // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      // nothing...
    }
 
    /**
@@ -132,46 +154,85 @@ class KeyUpTrigger: InputTrigger
 }
 
 
+
 /// An input trigger that triggers when a certain joystick button is pressed.
 class JoyButtonDownTrigger: InputTrigger
 {
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   public this()
-   {
-   }
+   /**
+    * The default constructor; if you use it, you must set the trigger
+    * parameters manually (either via the appropriate properties, or using $(D
+    * memento)).
+    */
+   public this() { }
 
-   // xxxxxxxx As config string only? No, I guess... xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   public this(int button)
+   /**
+    * Constructs the trigger.
+    *
+    * Parameters:
+    *    joy = The joystick to listen to. Valid joysticks are numbered from $(D
+    *       1) ($(D 0) is reserved to mean "invalid joystick").
+    *    button = The button to listen to. Valid buttons are numbered from $(D
+    *       0) ($(D 0) is reserved to mean "invalid button").
+    */
+   public this(int joy, int button)
    {
+      _joy = joy;
       _button = button;
    }
 
+   // Inherit docs.
    public override bool didTrigger(in ref ALLEGRO_EVENT event,
                                    out InputHandlerParam param)
    {
       if (event.type == ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN
-          && event.joystick.button == _button)
+          && InputManager.joystickID(event.joystick.id) == _joy
+          && event.joystick.button == _button - 1)
       {
-         param.source = InputSource.JOYSTICK0; // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+         param.source =
+            cast(InputSource)((InputSource.JOYSTICK1 << (_joy - 1)));
          return true;
       }
 
       return false;
    }
 
+   // Inherit docs.
    public override @property const(ConfigValue) memento()
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       return ConfigValue();
    }
 
+   // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      // nothing...
    }
 
-   /// The joystick button this trigger is watching.
+   /**
+    * The joystick this trigger is watching.
+    *
+    * $(D 0) means "invalid joystick".
+    */
+   public final @property int joy() inout
+   {
+      return _joy;
+   }
+
+   /// Ditto.
+   public final @property void joy(int joy)
+   {
+      _joy = joy;
+   }
+
+   /// Ditto.
+   private int _joy = 0;
+
+   /**
+    * The joystick button this trigger is watching.
+    *
+    * $(D 0) means "invalid button".
+    */
    public final @property int button() inout
    {
       return _button;
@@ -184,8 +245,19 @@ class JoyButtonDownTrigger: InputTrigger
    }
 
    /// Ditto.
-   private int _button = -1; // xxxxxxxxxx meaning of -1? xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   private int _button = 0;
 }
+
+
+
+// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+// xxxxxx maybe: JoyAxis{Enter,Leave}{Pos,Neg} (axis, threshold = 0.5) // only axis, no stick+axis (SDL compatibility)
+
+// as in "key up" and "key down".
+// JoyPosAxisDown
+// JoyPosAxisUp
+// JoyNegAxisDown
+// JoyUpAxisNeg
 
 
 // xxxxxxxxx bad name xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -195,10 +267,12 @@ class JoyButtonDownTrigger: InputTrigger
  */
 class JoyAxisIncreaseTrigger: InputTrigger
 {
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   public this()
-   {
-   }
+   /**
+    * The default constructor; if you use it, you must set the trigger
+    * parameters manually (either via the appropriate properties, or using $(D
+    * memento)).
+    */
+   public this() { }
 
    // xxxxxxxx As config string only? No, I guess... xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    public this(int stick, int axis, float threshold)
@@ -208,6 +282,7 @@ class JoyAxisIncreaseTrigger: InputTrigger
       _threshold = threshold;
    }
 
+   // Inherit docs.
    public override bool didTrigger(in ref ALLEGRO_EVENT event,
                                    out InputHandlerParam param)
    {
@@ -221,7 +296,7 @@ class JoyAxisIncreaseTrigger: InputTrigger
 
          if (prevValue <= _threshold && currValue > _threshold)
          {
-            param.source = InputSource.JOYSTICK0; // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            param.source = InputSource.JOYSTICK1; // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             return true;
          }
       }
@@ -229,16 +304,17 @@ class JoyAxisIncreaseTrigger: InputTrigger
       return false;
    }
 
+   // Inherit docs.
    public override @property const(ConfigValue) memento()
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       return ConfigValue();
    }
 
+   // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      // nothing...
    }
 
    /// The joystick stick this trigger is watching.
@@ -298,10 +374,12 @@ class JoyAxisIncreaseTrigger: InputTrigger
  */
 class JoyAxisDecreaseTrigger: InputTrigger
 {
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   public this()
-   {
-   }
+   /**
+    * The default constructor; if you use it, you must set the trigger
+    * parameters manually (either via the appropriate properties, or using $(D
+    * memento)).
+    */
+   public this() { }
 
    // xxxxxxxx As config string only? No, I guess... xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    public this(int stick, int axis, float threshold)
@@ -311,6 +389,7 @@ class JoyAxisDecreaseTrigger: InputTrigger
       _threshold = threshold;
    }
 
+   // Inherit docs.
    public override bool didTrigger(in ref ALLEGRO_EVENT event,
                                    out InputHandlerParam param)
    {
@@ -324,7 +403,7 @@ class JoyAxisDecreaseTrigger: InputTrigger
 
          if (prevValue >= _threshold && currValue < _threshold)
          {
-            param.source = InputSource.JOYSTICK0; // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            param.source = InputSource.JOYSTICK1; // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             return true;
          }
       }
@@ -332,16 +411,17 @@ class JoyAxisDecreaseTrigger: InputTrigger
       return false;
    }
 
+   // Inherit docs.
    public override @property const(ConfigValue) memento()
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       return ConfigValue();
    }
 
+   // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      // nothing...
    }
 
    /// The joystick stick this trigger is watching.
