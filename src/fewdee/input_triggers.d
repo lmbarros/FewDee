@@ -11,57 +11,21 @@ import fewdee.config;
 import fewdee.input_manager;
 
 
-/// An input trigger that triggers when a certain keyboard key is pressed.
-class KeyDownTrigger: InputTrigger
+//
+// Helper mixin templates
+//
+
+/// Boilerplate code for input triggers using a key code.
+mixin template KeyCodeMixin()
 {
-   /**
-    * The default constructor; if you use it, you must set the trigger
-    * parameters manually (either via the appropriate properties, or using $(D
-    * memento)).
-    */
-   public this() { }
-
-   /**
-    * Constructs the trigger.
-    *
-    * Parameters:
-    *    keyCode = The keycode (an $(D ALLEGRO_KEY_*) constant) this trigger is
-    *       listening to.
-    */
-   public this(int keyCode)
+   /// Is this trigger watching a given Allegro key code?
+   private final bool isSameKeyCode(int keyCode)
    {
-      _keyCode = keyCode;
-   }
-
-   // Inherit docs.
-   public override bool didTrigger(in ref ALLEGRO_EVENT event,
-                                   out InputHandlerParam param)
-   {
-      if (event.type == ALLEGRO_EVENT_KEY_DOWN
-          && event.keyboard.keycode == _keyCode)
-      {
-         param.source = InputSource.KEYBOARD;
-         return true;
-      }
-
-      return false;
-   }
-
-   // Inherit docs.
-   public override @property const(ConfigValue) memento()
-   {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return ConfigValue();
-   }
-
-   // Inherit docs.
-   public override @property void memento(const ConfigValue state)
-   {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      return _keyCode == keyCode;
    }
 
    /**
-    * The key code this trigger is watching (an $(D ALLEGRO_KEY_*) constant).
+    * The key code this trigger is watching; an $(D ALLEGRO_KEY_*) constant.
     *
     * If equals to $(D ALLEGRO_KEY_MAX), this means that no real key is being
     * "watched", and the trigger will never trigger.
@@ -82,137 +46,25 @@ class KeyDownTrigger: InputTrigger
 }
 
 
-
-/// An input trigger that triggers when a certain keyboard key is released.
-class KeyUpTrigger: InputTrigger
+/// Boilerplate code for input triggers using a joystick.
+mixin template JoyMixin()
 {
-   /**
-    * The default constructor; if you use it, you must set the trigger
-    * parameters manually (either via the appropriate properties, or using $(D
-    * memento)).
-    */
-   public this() { }
-
-   /**
-    * Constructs the trigger.
-    *
-    * Parameters:
-    *    keyCode = The keycode (an $(D ALLEGRO_KEY_*) constant) this trigger is
-    *       listening to.
-    */
-   public this(int keyCode)
+   /// Returns the $(D InputSource) corresponding to $(D _joy).
+   private final @property InputSource source()
    {
-      _keyCode = keyCode;
+      return cast(InputSource)(InputSource.JOY0 << _joy);
    }
 
-   // Inherit docs.
-   public override bool didTrigger(in ref ALLEGRO_EVENT event,
-                                   out InputHandlerParam param)
+   /// Is this trigger watching a given Allegro joystick?
+   private final bool isSameJoy(const ALLEGRO_JOYSTICK* allegroJoy)
    {
-      if (event.type == ALLEGRO_EVENT_KEY_UP
-          && event.keyboard.keycode == _keyCode)
-      {
-         param.source = InputSource.KEYBOARD;
-         return true;
-      }
-
-      return false;
-   }
-
-   // Inherit docs.
-   public override @property const(ConfigValue) memento()
-   {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return ConfigValue();
-   }
-
-   // Inherit docs.
-   public override @property void memento(const ConfigValue state)
-   {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   }
-
-   /**
-    * The key code this trigger is watching (an $(D ALLEGRO_KEY_*) constant).
-    *
-    * If equals to $(D ALLEGRO_KEY_MAX), this means that no real key is being
-    * "watched", and the trigger will never trigger.
-    */
-   public final @property int keyCode() inout
-   {
-      return _keyCode;
-   }
-
-   /// Ditto.
-   public final @property void keyCode(int keyCode)
-   {
-      _keyCode = keyCode;
-   }
-
-   /// Ditto.
-   private int _keyCode = ALLEGRO_KEY_MAX;
-}
-
-
-
-/// An input trigger that triggers when a certain joystick button is pressed.
-class JoyButtonDownTrigger: InputTrigger
-{
-   /**
-    * The default constructor; if you use it, you must set the trigger
-    * parameters manually (either via the appropriate properties, or using $(D
-    * memento)).
-    */
-   public this() { }
-
-   /**
-    * Constructs the trigger.
-    *
-    * Parameters:
-    *    joy = The joystick to listen to. Valid joysticks are numbered from $(D
-    *       1) ($(D 0) is reserved to mean "invalid joystick").
-    *    button = The button to listen to. Valid buttons are numbered from $(D
-    *       0) ($(D 0) is reserved to mean "invalid button").
-    */
-   public this(int joy, int button)
-   {
-      _joy = joy;
-      _button = button;
-   }
-
-   // Inherit docs.
-   public override bool didTrigger(in ref ALLEGRO_EVENT event,
-                                   out InputHandlerParam param)
-   {
-      if (event.type == ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN
-          && InputManager.joystickID(event.joystick.id) == _joy
-          && event.joystick.button == _button - 1)
-      {
-         param.source =
-            cast(InputSource)((InputSource.JOYSTICK1 << (_joy - 1)));
-         return true;
-      }
-
-      return false;
-   }
-
-   // Inherit docs.
-   public override @property const(ConfigValue) memento()
-   {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return ConfigValue();
-   }
-
-   // Inherit docs.
-   public override @property void memento(const ConfigValue state)
-   {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      return InputManager.joyID(allegroJoy) == _joy;
    }
 
    /**
     * The joystick this trigger is watching.
     *
-    * $(D 0) means "invalid joystick".
+    * A value of $(D -1) means "invalid joystick".
     */
    public final @property int joy() inout
    {
@@ -226,47 +78,104 @@ class JoyButtonDownTrigger: InputTrigger
    }
 
    /// Ditto.
-   private int _joy = 0;
+   private int _joy = -1;
+}
+
+
+/**
+ * Boilerplate code for input triggers using a joystick axis.
+ *
+ * Assumes $(D JoyMixin) is also mixed whenever it is mixed.
+ */
+mixin template JoyAxisMixin()
+{
+   /// Is this trigger watching a given Allegro stick/axis pair?
+   private final bool isSameAxis(int stick, int axis)
+   {
+      return InputManager.joyAxisID(joy, stick, axis) == joyAxis;
+   }
+
+   /**
+    * The joystick axis this trigger is watching; this is a FewDee-style
+    * "sequential ID", not the Allegro-style "stick plus axis" scheme.
+    *
+    * A value of $(D -1) means "invalid joystick".
+    */
+   public final @property int joyAxis() inout
+   {
+      return _joyAxis;
+   }
+
+   /// Ditto.
+   public final @property void joyAxis(int axis)
+   {
+      _joyAxis = axis;
+   }
+
+   /// Ditto.
+   private int _joyAxis = -1;
+}
+
+
+/// Boilerplate code for input triggers using a joystick button.
+mixin template JoyButtonMixin()
+{
+   /// Is this trigger watching a given Allegro button?
+   private final bool isSameJoyButton(int button)
+   {
+      return _joyButton == button;
+   }
 
    /**
     * The joystick button this trigger is watching.
     *
-    * $(D 0) means "invalid button".
+    * $(D -1) means "invalid button".
     */
-   public final @property int button() inout
+   public final @property int joyButton() inout
    {
-      return _button;
+      return _joyButton;
    }
 
    /// Ditto.
-   public final @property void button(int button)
+   public final @property void joyButton(int button)
    {
-      _button = button;
+      _joyButton = button;
    }
 
    /// Ditto.
-   private int _button = 0;
+   private int _joyButton = -1;
+}
+
+
+mixin template ThresholdMixin(float initValue)
+{
+   /// The threshold that must be crossed to trigger.
+   public final @property float threshold() inout
+   {
+      return _threshold;
+   }
+
+   /// Ditto.
+   public final @property void threshold(float threshold)
+   {
+      _threshold = threshold;
+   }
+
+   /// Ditto.
+   private float _threshold = initValue;
 }
 
 
 
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-// xxxxxx maybe: JoyAxis{Enter,Leave}{Pos,Neg} (axis, threshold = 0.5) // only axis, no stick+axis (SDL compatibility)
+//
+// Keyboard-based input triggers
+//
 
-// as in "key up" and "key down".
-// JoyPosAxisDown
-// JoyPosAxisUp
-// JoyNegAxisDown
-// JoyUpAxisNeg
-
-
-// xxxxxxxxx bad name xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-/**
- * An input trigger that triggers when a certain joystick axis' value crosses a
- * certain threshold value while increasing.
- */
-class JoyAxisIncreaseTrigger: InputTrigger
+/// An input trigger that triggers when a certain keyboard key is pressed.
+class KeyDownTrigger: InputTrigger
 {
+   mixin KeyCodeMixin;
+
    /**
     * The default constructor; if you use it, you must set the trigger
     * parameters manually (either via the appropriate properties, or using $(D
@@ -274,12 +183,194 @@ class JoyAxisIncreaseTrigger: InputTrigger
     */
    public this() { }
 
-   // xxxxxxxx As config string only? No, I guess... xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   public this(int stick, int axis, float threshold)
+   /**
+    * Constructs the trigger.
+    *
+    * Parameters:
+    *    keyCode = The keycode (an $(D ALLEGRO_KEY_*) constant) this trigger is
+    *       listening to.
+    */
+   public this(int keyCode)
    {
-      _stick = stick;
-      _axis = axis;
-      _threshold = threshold;
+      this.keyCode = keyCode;
+   }
+
+   // Inherit docs.
+   public override bool didTrigger(in ref ALLEGRO_EVENT event,
+                                   out InputHandlerParam param)
+   {
+      if (event.type == ALLEGRO_EVENT_KEY_DOWN
+          && isSameKeyCode(event.keyboard.keycode))
+      {
+         param.source = InputSource.KEYBOARD;
+         return true;
+      }
+
+      return false;
+   }
+
+   // Inherit docs.
+   public override @property const(ConfigValue) memento()
+   {
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      return ConfigValue();
+   }
+
+   // Inherit docs.
+   public override @property void memento(const ConfigValue state)
+   {
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   }
+}
+
+
+
+/// An input trigger that triggers when a certain keyboard key is released.
+class KeyUpTrigger: InputTrigger
+{
+   mixin KeyCodeMixin;
+
+   /**
+    * The default constructor; if you use it, you must set the trigger
+    * parameters manually (either via the appropriate properties, or using $(D
+    * memento)).
+    */
+   public this() { }
+
+   /**
+    * Constructs the trigger.
+    *
+    * Parameters:
+    *    keyCode = The keycode (an $(D ALLEGRO_KEY_*) constant) this trigger is
+    *       listening to.
+    */
+   public this(int keyCode)
+   {
+      this.keyCode = keyCode;
+   }
+
+   // Inherit docs.
+   public override bool didTrigger(in ref ALLEGRO_EVENT event,
+                                   out InputHandlerParam param)
+   {
+      if (event.type == ALLEGRO_EVENT_KEY_UP
+          && isSameKeyCode(event.keyboard.keycode))
+      {
+         param.source = InputSource.KEYBOARD;
+         return true;
+      }
+
+      return false;
+   }
+
+   // Inherit docs.
+   public override @property const(ConfigValue) memento()
+   {
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      return ConfigValue();
+   }
+
+   // Inherit docs.
+   public override @property void memento(const ConfigValue state)
+   {
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   }
+}
+
+
+
+//
+// Joystick-based input triggers
+//
+
+/// An input trigger that triggers when a certain joystick button is pressed.
+class JoyButtonDownTrigger: InputTrigger
+{
+   mixin JoyMixin;
+   mixin JoyButtonMixin;
+
+   /**
+    * The default constructor; if you use it, you must set the trigger
+    * parameters manually (either via the appropriate properties, or using $(D
+    * memento)).
+    */
+   public this() { }
+
+   /**
+    * Constructs the trigger.
+    *
+    * Parameters:
+    *    joy = The joystick to listen to.
+    *    button = The button to listen to.
+    */
+   public this(int joy, int button)
+   {
+      this.joy = joy;
+      this.joyButton = button;
+   }
+
+   // Inherit docs.
+   public override bool didTrigger(in ref ALLEGRO_EVENT event,
+                                   out InputHandlerParam param)
+   {
+      if (event.type == ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN
+          && isSameJoy(event.joystick.id)
+          && isSameJoyButton(event.joystick.button))
+      {
+         param.source = source;
+         return true;
+      }
+
+      return false;
+   }
+
+   // Inherit docs.
+   public override @property const(ConfigValue) memento()
+   {
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      return ConfigValue();
+   }
+
+   // Inherit docs.
+   public override @property void memento(const ConfigValue state)
+   {
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   }
+}
+
+
+/**
+ * An input trigger that triggers when a certain joystick axis goes beyond a
+ * certain threshold in the positive direction.
+ *
+ * Think of this is a "key down" event, but for a joystick axis.
+ */
+class JoyPosAxisDownTrigger: InputTrigger
+{
+   mixin JoyMixin;
+   mixin JoyAxisMixin;
+   mixin ThresholdMixin!0.5;
+
+   /**
+    * The default constructor; if you use it, you must set the trigger
+    * parameters manually (either via the appropriate properties, or using $(D
+    * memento)).
+    */
+   public this() { }
+
+   /**
+    * Constructs the trigger.
+    *
+    * Parameters:
+    *    joy = The desired joystick.
+    *    axis = The desired axis.
+    *    threshold = The threshold that must be crossed to trigger.
+    */
+   public this(int joy, int axis, float threshold = 0.5)
+   {
+      this.joy = joy;
+      this.joyAxis = axis;
+      this.threshold = threshold;
    }
 
    // Inherit docs.
@@ -287,16 +378,16 @@ class JoyAxisIncreaseTrigger: InputTrigger
                                    out InputHandlerParam param)
    {
       if (event.type == ALLEGRO_EVENT_JOYSTICK_AXIS
-          && event.joystick.stick == _stick
-          && event.joystick.axis == _axis)
+          && isSameJoy(event.joystick.id)
+          && isSameAxis(event.joystick.stick, event.joystick.axis))
       {
          const currValue = event.joystick.pos;
          const prevValue = _prevValue;
          _prevValue = currValue;
 
-         if (prevValue <= _threshold && currValue > _threshold)
+         if (prevValue <= threshold && currValue > threshold)
          {
-            param.source = InputSource.JOYSTICK1; // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            param.source = source;
             return true;
          }
       }
@@ -317,63 +408,23 @@ class JoyAxisIncreaseTrigger: InputTrigger
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    }
 
-   /// The joystick stick this trigger is watching.
-   public final @property int stick() inout
-   {
-      return _stick;
-   }
-
-   /// Ditto.
-   public final @property void stick(int stick)
-   {
-      _stick = stick;
-   }
-
-   /// Ditto.
-   private int _stick = -1; // xxxxxxxxxx meaning of -1? xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-   /// The joystick axis this trigger is watching.
-   public final @property int axis() inout
-   {
-      return _axis;
-   }
-
-   /// Ditto.
-   public final @property void axis(int axis)
-   {
-      _axis = axis;
-   }
-
-   /// Ditto.
-   private int _axis = -1; // xxxxxxxxxx meaning of -1? xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-   /// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   public final @property float threshold() inout
-   {
-      return _threshold;
-   }
-
-   /// Ditto.
-   public final @property void threshold(float threshold)
-   {
-      _threshold = threshold;
-   }
-
-   /// Ditto.
-   private float _threshold = -1; // xxxxxxxxxx meaning of -1? xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   /// The axis value the last time $(D didTrigger()) was called.
    private float _prevValue = 0.0;
 }
 
 
-// xxxxxxxxx bad name xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 /**
- * An input trigger that triggers when a certain joystick axis' value crosses a
- * certain threshold value while decreasing.
+ * An input trigger that triggers when a certain joystick axis comes back from a
+ * certain threshold in the positive direction.
+ *
+ * Think of this is a "key up" event, but for a joystick axis.
  */
-class JoyAxisDecreaseTrigger: InputTrigger
+class JoyPosAxisUpTrigger: InputTrigger
 {
+   mixin JoyMixin;
+   mixin JoyAxisMixin;
+   mixin ThresholdMixin!0.5;
+
    /**
     * The default constructor; if you use it, you must set the trigger
     * parameters manually (either via the appropriate properties, or using $(D
@@ -381,12 +432,19 @@ class JoyAxisDecreaseTrigger: InputTrigger
     */
    public this() { }
 
-   // xxxxxxxx As config string only? No, I guess... xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   public this(int stick, int axis, float threshold)
+   /**
+    * Constructs the trigger.
+    *
+    * Parameters:
+    *    joy = The desired joystick.
+    *    axis = The desired axis.
+    *    threshold = The threshold that must be crossed to trigger.
+    */
+   public this(int joy, int axis, float threshold = 0.5)
    {
-      _stick = stick;
-      _axis = axis;
-      _threshold = threshold;
+      this.joy = joy;
+      this.joyAxis = axis;
+      this.threshold = threshold;
    }
 
    // Inherit docs.
@@ -394,16 +452,16 @@ class JoyAxisDecreaseTrigger: InputTrigger
                                    out InputHandlerParam param)
    {
       if (event.type == ALLEGRO_EVENT_JOYSTICK_AXIS
-          && event.joystick.stick == _stick
-          && event.joystick.axis == _axis)
+          && isSameJoy(event.joystick.id)
+          && isSameAxis(event.joystick.stick, event.joystick.axis))
       {
          const currValue = event.joystick.pos;
          const prevValue = _prevValue;
          _prevValue = currValue;
 
-         if (prevValue >= _threshold && currValue < _threshold)
+         if (prevValue > threshold && currValue <= threshold)
          {
-            param.source = InputSource.JOYSTICK1; // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            param.source = source;
             return true;
          }
       }
@@ -424,51 +482,154 @@ class JoyAxisDecreaseTrigger: InputTrigger
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    }
 
-   /// The joystick stick this trigger is watching.
-   public final @property int stick() inout
+   /// The axis value the last time $(D didTrigger()) was called.
+   private float _prevValue = 0.0;
+}
+
+
+/**
+ * An input trigger that triggers when a certain joystick axis goes beyond a
+ * certain threshold in the negative direction.
+ *
+ * Think of this is a "key down" event, but for a joystick axis.
+ */
+class JoyNegAxisDownTrigger: InputTrigger
+{
+   mixin JoyMixin;
+   mixin JoyAxisMixin;
+   mixin ThresholdMixin!(-0.5);
+
+   /**
+    * The default constructor; if you use it, you must set the trigger
+    * parameters manually (either via the appropriate properties, or using $(D
+    * memento)).
+    */
+   public this() { }
+
+   /**
+    * Constructs the trigger.
+    *
+    * Parameters:
+    *    joy = The desired joystick.
+    *    axis = The desired axis.
+    *    threshold = The threshold that must be crossed to trigger.
+    */
+   public this(int joy, int axis, float threshold = -0.5)
    {
-      return _stick;
+      this.joy = joy;
+      this.joyAxis = axis;
+      this.threshold = threshold;
    }
 
-   /// Ditto.
-   public final @property void stick(int stick)
+   // Inherit docs.
+   public override bool didTrigger(in ref ALLEGRO_EVENT event,
+                                   out InputHandlerParam param)
    {
-      _stick = stick;
+      if (event.type == ALLEGRO_EVENT_JOYSTICK_AXIS
+          && isSameJoy(event.joystick.id)
+          && isSameAxis(event.joystick.stick, event.joystick.axis))
+      {
+         const currValue = event.joystick.pos;
+         const prevValue = _prevValue;
+         _prevValue = currValue;
+
+         if (prevValue >= threshold && currValue < threshold)
+         {
+            param.source = source;
+            return true;
+         }
+      }
+
+      return false;
    }
 
-   /// Ditto.
-   private int _stick = -1; // xxxxxxxxxx meaning of -1? xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-   /// The joystick axis this trigger is watching.
-   public final @property int axis() inout
+   // Inherit docs.
+   public override @property const(ConfigValue) memento()
    {
-      return _axis;
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      return ConfigValue();
    }
 
-   /// Ditto.
-   public final @property void axis(int axis)
+   // Inherit docs.
+   public override @property void memento(const ConfigValue state)
    {
-      _axis = axis;
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    }
 
-   /// Ditto.
-   private int _axis = -1; // xxxxxxxxxx meaning of -1? xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   /// The axis value the last time $(D didTrigger()) was called.
+   private float _prevValue = 0.0;
+}
 
-   /// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   public final @property float threshold() inout
+
+/**
+ * An input trigger that triggers when a certain joystick axis comes back from a
+ * certain threshold in the negative direction.
+ *
+ * Think of this is a "key up" event, but for a joystick axis.
+ */
+class JoyNegAxisUpTrigger: InputTrigger
+{
+   mixin JoyMixin;
+   mixin JoyAxisMixin;
+   mixin ThresholdMixin!(-0.5);
+
+   /**
+    * The default constructor; if you use it, you must set the trigger
+    * parameters manually (either via the appropriate properties, or using $(D
+    * memento)).
+    */
+   public this() { }
+
+   /**
+    * Constructs the trigger.
+    *
+    * Parameters:
+    *    joy = The desired joystick.
+    *    axis = The desired axis.
+    *    threshold = The threshold that must be crossed to trigger.
+    */
+   public this(int joy, int axis, float threshold = -0.5)
    {
-      return _threshold;
+      this.joy = joy;
+      this.joyAxis = axis;
+      this.threshold = threshold;
    }
 
-   /// Ditto.
-   public final @property void threshold(float threshold)
+   // Inherit docs.
+   public override bool didTrigger(in ref ALLEGRO_EVENT event,
+                                   out InputHandlerParam param)
    {
-      _threshold = threshold;
+      if (event.type == ALLEGRO_EVENT_JOYSTICK_AXIS
+          && isSameJoy(event.joystick.id)
+          && isSameAxis(event.joystick.stick, event.joystick.axis))
+      {
+         const currValue = event.joystick.pos;
+         const prevValue = _prevValue;
+         _prevValue = currValue;
+
+         if (prevValue < threshold && currValue >= threshold)
+         {
+            param.source = source;
+            return true;
+         }
+      }
+
+      return false;
    }
 
-   /// Ditto.
-   private float _threshold = -1; // xxxxxxxxxx meaning of -1? xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   // Inherit docs.
+   public override @property const(ConfigValue) memento()
+   {
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      return ConfigValue();
+   }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   // Inherit docs.
+   public override @property void memento(const ConfigValue state)
+   {
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   }
+
+   /// The axis value the last time $(D didTrigger()) was called.
    private float _prevValue = 0.0;
 }

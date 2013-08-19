@@ -36,20 +36,20 @@ import fewdee.internal.singleton;
  */
 public enum InputSource
 {
-   INVALID = 0,          /// An invalid input source.
-   GUI = 1 << 1,         /// The event was generated via GUI widgets
-   KEYBOARD = 1 << 2,    /// The keyboard.
-   MOUSE = 1 << 3,       /// The mouse.
-   JOYSTICK1 = 1 << 4,   /// The first joystick.
-   JOYSTICK2 = 1 << 5,   /// The second joystick.
-   JOYSTICK3 = 1 << 6,   /// The third joystick.
-   JOYSTICK4 = 1 << 7,   /// The fourth joystick.
-   JOYSTICK5 = 1 << 8,   /// The fifth joystick.
-   JOYSTICK6 = 1 << 9,   /// The sixth joystick.
-   JOYSTICK7 = 1 << 10,  /// The seventh joystick.
-   JOYSTICK8 = 1 << 11,  /// The eight joystick.
-   JOYSTICK9 = 1 << 12,  /// The ninth joystick.
-   JOYSTICK10 = 1 << 13, /// The tenth joystick.
+   INVALID = 0,        /// An invalid input source.
+   GUI = 1 << 1,       /// The event was generated via GUI widgets
+   KEYBOARD = 1 << 2,  /// The keyboard.
+   MOUSE = 1 << 3,     /// The mouse.
+   JOY0 = 1 << 4,      /// The first joystick.
+   JOY1 = 1 << 5,      /// The second joystick.
+   JOY2 = 1 << 6,      /// The third joystick.
+   JOY3 = 1 << 7,      /// The fourth joystick.
+   JOY4 = 1 << 8,      /// The fifth joystick.
+   JOY5 = 1 << 9,      /// The sixth joystick.
+   JOY6 = 1 << 10,     /// The seventh joystick.
+   JOY7 = 1 << 11,     /// The eight joystick.
+   JOY8 = 1 << 12,     /// The ninth joystick.
+   JOY9 = 1 << 13,     /// The tenth joystick.
 }
 
 
@@ -62,7 +62,7 @@ public enum InputSource
  * it. (Check the "See also" section.)
  *
  * See_also: source, isSourceGUI, isSourceKeyboard, isSourceMouse,
- *    isSourceJoystick0
+ *    isSourceJoy0
  */
 public struct InputHandlerParam
 {
@@ -106,63 +106,63 @@ public bool isSourceMouse(const InputHandlerParam p)
 }
 
 /// Ditto.
+public bool isSourceJoy0(const InputHandlerParam p)
+{
+   return p._source == InputSource.JOY0;
+}
+
+/// Ditto.
 public bool isSourceJoy1(const InputHandlerParam p)
 {
-   return p._source == InputSource.JOYSTICK1;
+   return p._source == InputSource.JOY1;
 }
 
 /// Ditto.
 public bool isSourceJoy2(const InputHandlerParam p)
 {
-   return p._source == InputSource.JOYSTICK2;
+   return p._source == InputSource.JOY2;
 }
 
 /// Ditto.
 public bool isSourceJoy3(const InputHandlerParam p)
 {
-   return p._source == InputSource.JOYSTICK3;
+   return p._source == InputSource.JOY3;
 }
 
 /// Ditto.
 public bool isSourceJoy4(const InputHandlerParam p)
 {
-   return p._source == InputSource.JOYSTICK4;
+   return p._source == InputSource.JOY4;
 }
 
 /// Ditto.
 public bool isSourceJoy5(const InputHandlerParam p)
 {
-   return p._source == InputSource.JOYSTICK5;
+   return p._source == InputSource.JOY5;
 }
 
 /// Ditto.
 public bool isSourceJoy6(const InputHandlerParam p)
 {
-   return p._source == InputSource.JOYSTICK6;
+   return p._source == InputSource.JOY6;
 }
 
 /// Ditto.
 public bool isSourceJoy7(const InputHandlerParam p)
 {
-   return p._source == InputSource.JOYSTICK7;
+   return p._source == InputSource.JOY7;
 }
 
 /// Ditto.
 public bool isSourceJoy8(const InputHandlerParam p)
 {
-   return p._source == InputSource.JOYSTICK8;
+   return p._source == InputSource.JOY8;
 }
 
 /// Ditto.
 public bool isSourceJoy9(const InputHandlerParam p)
 {
-   return p._source == InputSource.JOYSTICK9;
-}
-
-/// Ditto.
-public bool isSourceJoy10(const InputHandlerParam p)
-{
-   return p._source == InputSource.JOYSTICK10;
+   return p._source == InputSource.JOY9;
 }
 
 
@@ -719,10 +719,9 @@ private class InputManagerImpl: LowLevelEventHandler
        *
        * Its length tells how many buttons the joystick has.
        *
-       * Notice that FewDee functions taking integers to represent joystick
-       * buttons use $(D 0) to represent an "invalid button", and real buttons
-       * start at $(D 1). This means that $(D buttons[n]) is the name of the
-       * button that everywhere else is known as button $(D n+1).
+       * The array is sorted so that the array indices are the same as the
+       * integer values identifying joystick buttons that are passed to other
+       * FewDee functions.
        */
       public string[] buttons;
 
@@ -733,10 +732,9 @@ private class InputManagerImpl: LowLevelEventHandler
        *
        * Notice that, unlike Allegro, FewDee doesn't group axes in sticks.
        *
-       * Also notice that FewDee functions taking integers to represent joystick
-       * axes use $(D 0) to represent an "invalid axis", and real axes start at
-       * $(D 1). This means that $(D axes[n]) is the name of the axis that
-       * everywhere else is known as axis $(D n+1).
+       * The array is sorted so that the array indices are the same as the
+       * integer values identifying joystick axes that are passed to other
+       * FewDee functions.
        */
       public string[] axes;
 
@@ -761,10 +759,8 @@ private class InputManagerImpl: LowLevelEventHandler
     * the list returned by this function will be updated only after $(D
     * rescanJoysticks()) is called.
     *
-    * Also notice that FewDee functions taking integers to represent joysticks
-    * use $(D 0) to represent an "invalid joystick", and real joysticks start at
-    * $(D 1). This means that $(D InputManager.joysticks[n]) is the joystick
-    * that everywhere else is known as joystick $(D n+1).
+    * The array is sorted so that the array indices are the same as the integer
+    * values identifying joysticks that are passed to other FewDee functions.
     *
     * See_also: rescanJoysticks
     */
@@ -794,7 +790,7 @@ private class InputManagerImpl: LowLevelEventHandler
          {
             // Name
             auto joy = al_get_joystick(i);
-            _joyIndex[joy] = i + 1;
+            _joyIndex[joy] = i;
             _joyData[i].name = to!string(al_get_joystick_name(joy));
 
             // Buttons
@@ -833,12 +829,29 @@ private class InputManagerImpl: LowLevelEventHandler
    }
 
    /**
-    * Returns the joystick ID (sequential number, starting from one) that
+    * Returns the joystick ID (sequential number, starting from zero) that
     * corresponds to a given joystick.
     */
-   package final int joystickID(const ALLEGRO_JOYSTICK* joy) inout
+   package final int joyID(const ALLEGRO_JOYSTICK* joy) inout
    {
       return _joyIndex[joy];
+   }
+
+   /**
+    * Returns the joystick axis ID (sequential number, starting from zero) that
+    * corresponds to a given joystick, stick and axis.
+    *
+    * Parameters:
+    *    joy = The FewDee "sequential ID" of desired joystick.
+    *    stick = The Allegro stick ID.
+    *    axis = The Allegro axis ID.
+    *
+    * Returns:
+    *    The FewDee sequential "axis ID".
+    */
+   package final int joyAxisID(int joy, int stick, int axis) inout
+   {
+      return _joyData[joy]._axisToStickAndAxis[JoyInfo.stickAxis(stick, axis)];
    }
 
    /**

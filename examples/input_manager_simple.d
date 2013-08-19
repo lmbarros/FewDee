@@ -56,11 +56,11 @@ void main()
       InputManager.addCommandTrigger(TheCommands.JUMP, new KeyDownTrigger(ALLEGRO_KEY_SPACE));
       InputManager.addCommandTrigger(TheCommands.FIRE, new KeyDownTrigger(ALLEGRO_KEY_ALT));
 
-      InputManager.addCommandTrigger(TheCommands.JUMP, new JoyButtonDownTrigger(1, 1));
-      InputManager.addCommandTrigger(TheCommands.FIRE, new JoyButtonDownTrigger(1, 2));
+      InputManager.addCommandTrigger(TheCommands.JUMP, new JoyButtonDownTrigger(0, 0));
+      InputManager.addCommandTrigger(TheCommands.FIRE, new JoyButtonDownTrigger(0, 1));
 
-      InputManager.addCommandTrigger(TheCommands.JUMP, new JoyButtonDownTrigger(2, 1));
-      InputManager.addCommandTrigger(TheCommands.FIRE, new JoyButtonDownTrigger(2, 2));
+      InputManager.addCommandTrigger(TheCommands.JUMP, new JoyButtonDownTrigger(1, 0));
+      InputManager.addCommandTrigger(TheCommands.FIRE, new JoyButtonDownTrigger(1, 1));
 
       InputManager.addCommandHandler(
          TheCommands.JUMP,
@@ -90,28 +90,28 @@ void main()
       }
 
       dirState.addStartNorthTrigger(new KeyDownTrigger(ALLEGRO_KEY_UP));
-      dirState.addStartNorthTrigger(new JoyAxisDecreaseTrigger(0, 1, -0.5));
+      dirState.addStartNorthTrigger(new JoyNegAxisDownTrigger(0, 1));
 
       dirState.addStopNorthTrigger(new KeyUpTrigger(ALLEGRO_KEY_UP));
-      dirState.addStopNorthTrigger(new JoyAxisIncreaseTrigger(0, 1, -0.5));
+      dirState.addStopNorthTrigger(new JoyNegAxisUpTrigger(0, 1));
 
       dirState.addStartSouthTrigger(new KeyDownTrigger(ALLEGRO_KEY_DOWN));
-      dirState.addStartSouthTrigger(new JoyAxisIncreaseTrigger(0, 1, 0.5));
+      dirState.addStartSouthTrigger(new JoyPosAxisDownTrigger(0, 1));
 
       dirState.addStopSouthTrigger(new KeyUpTrigger(ALLEGRO_KEY_DOWN));
-      dirState.addStopSouthTrigger(new JoyAxisDecreaseTrigger(0, 1, 0.5));
+      dirState.addStopSouthTrigger(new JoyPosAxisUpTrigger(0, 1));
 
       dirState.addStartEastTrigger(new KeyDownTrigger(ALLEGRO_KEY_RIGHT));
-      dirState.addStartEastTrigger(new JoyAxisIncreaseTrigger(0, 0, 0.5));
+      dirState.addStartEastTrigger(new JoyPosAxisDownTrigger(0, 0));
 
       dirState.addStopEastTrigger(new KeyUpTrigger(ALLEGRO_KEY_RIGHT));
-      dirState.addStopEastTrigger(new JoyAxisDecreaseTrigger(0, 0, 0.5));
+      dirState.addStopEastTrigger(new JoyPosAxisUpTrigger(0, 0));
 
       dirState.addStartWestTrigger(new KeyDownTrigger(ALLEGRO_KEY_LEFT));
-      dirState.addStartWestTrigger(new JoyAxisDecreaseTrigger(0, 0, -0.5));
+      dirState.addStartWestTrigger(new JoyNegAxisDownTrigger(0, 0));
 
       dirState.addStopWestTrigger(new KeyUpTrigger(ALLEGRO_KEY_LEFT));
-      dirState.addStopWestTrigger(new JoyAxisIncreaseTrigger(0, 0, -0.5));
+      dirState.addStopWestTrigger(new JoyNegAxisUpTrigger(0, 0));
 
       // Quit if ESC is pressed
       EventManager.addHandler(
