@@ -43,16 +43,27 @@ class BooleanInputState: InputState
 }
 
 
+/// The directions a $(D DirectionInputState) can be in.
+public enum StateDir
+{
+   NONE, /// No direction; could be interpreted as "centered" or "neutral".
+   N,    /// North (up).
+   NE,   /// Northeast (up-right)
+   E,    /// East (right)
+   SE,   /// Southeast (down-right)
+   S,    /// South (down)
+   SW,   /// Southwest (down-left)
+   W,    /// West (left)
+   NW    /// Northwest (up-left)
+}
 
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+/**
+ * A state representing an eight-way directional control; this is usually mapped
+ * to the keyboard arrow keys or a joystick D-pad.
+ */
 class DirectionInputState: InputState
 {
-   // xxxxxx global? (to make client code shorter) xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   public enum Direction
-   {
-      NONE, N, NE, E, SE, S, SW, W, NW
-   }
-
+   // Inherit docs.
    public override void update(in ref ALLEGRO_EVENT event)
    {
       InputHandlerParam param;
@@ -70,36 +81,41 @@ class DirectionInputState: InputState
       if (_n)
       {
          if (_e)
-            _direction = Direction.NE;
+            _direction = StateDir.NE;
          else if (_w)
-            _direction = Direction.NW;
+            _direction = StateDir.NW;
          else
-            _direction = Direction.N;
+            _direction = StateDir.N;
       }
       else if (_s)
       {
          if (_e)
-            _direction = Direction.SE;
+            _direction = StateDir.SE;
          else if (_w)
-            _direction = Direction.SW;
+            _direction = StateDir.SW;
          else
-            _direction = Direction.S;
+            _direction = StateDir.S;
       }
       else if (_e)
       {
-         _direction = Direction.E;
+         _direction = StateDir.E;
       }
       else if (_w)
       {
-         _direction = Direction.W;
+         _direction = StateDir.W;
       }
       else
       {
-         _direction = Direction.NONE;
+         _direction = StateDir.NONE;
       }
    }
 
-   final public @property Direction direction() inout
+   /**
+    * The current direction.
+    *
+    * Most of the time, this is what you are looking for.
+    */
+   final public @property StateDir direction() inout
    {
       return _direction;
    }
@@ -115,8 +131,22 @@ class DirectionInputState: InputState
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   // wraps a common use case
+   /**
+    * Configures the state for a common case: using set of four keyboard keys to
+    * control the direction.
+    *
+    * By default, the keys used are the keyboard arrow keys.
+    *
+    * Parameters:
+    *    northKeyCode = The key code of the key used to move north (up).
+    *    southKeyCode = The key code of the key used to move south (down).
+    *    eastKeyCode = The key code of the key used to move east (right).
+    *    westKeyCode = The key code of the key used to move west (left).
+    *
+    * Returns:
+    *    An array with all the IDs of all triggers added to this state. This can
+    *    be passed to $(D removeTrigger()) in order to remove these triggers.
+    */
    public final TriggerID[] useKeyTriggers(
       int northKeyCode = ALLEGRO_KEY_UP, int southKeyCode = ALLEGRO_KEY_DOWN,
       int eastKeyCode = ALLEGRO_KEY_RIGHT, int westKeyCode = ALLEGRO_KEY_LEFT)
@@ -136,8 +166,26 @@ class DirectionInputState: InputState
       return [ t1, t2, t3, t4, t5, t6, t7, t8 ];
    }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   // wraps a common use case
+   /**
+    * Configures the state for a common case: using joystick axes to control the
+    * direction.
+    *
+    * By default, the first and second joystick axes are used as the horizontal
+    * and vertical axes, respectively.
+    *
+    * Parameters:
+    *    joy = The joystick to use.
+    *    xAxis = The axis to be used as the horizontal axis.
+    *    yAxis = The axis to be used as the vertical axis.
+    *    invertX = Invert the horizontal axis?
+    *    invertY = Invert the vertical axis?
+    *    threshold = The axis value threshold that must be crossed to trigger a
+    *       directional control.
+    *
+    * Returns:
+    *    An array with all the IDs of all triggers added to this state. This can
+    *    be passed to $(D removeTrigger()) in order to remove these triggers.
+    */
    public final TriggerID[] useJoyAxesTriggers(
       int joy, int xAxis = 0, int yAxis = 1,
       bool invertX = false, bool invertY = false, float threshold = 0.5)
@@ -190,59 +238,74 @@ class DirectionInputState: InputState
       return [ t1, t2, t3, t4, t5, t6, t7, t8 ];
    }
 
-
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   /**
+    * Adds a trigger that indicates that a certain movement started or finished.
+    *
+    * Parameters:
+    *    trigger: The trigger to add.
+    *
+    * Returns:
+    *    The ID that can be used to remove this trigger.
+    */
    public final TriggerID addStartNorthTrigger(InputTrigger trigger)
    {
       return addTrigger("startNorth", trigger);
    }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   /// Ditto.
    public final TriggerID addStartSouthTrigger(InputTrigger trigger)
    {
       return addTrigger("startSouth", trigger);
    }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   /// Ditto.
    public final TriggerID addStartEastTrigger(InputTrigger trigger)
    {
       return addTrigger("startEast", trigger);
    }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   /// Ditto.
    public final TriggerID addStartWestTrigger(InputTrigger trigger)
    {
       return addTrigger("startWest", trigger);
    }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   /// Ditto.
    public final TriggerID addStopNorthTrigger(InputTrigger trigger)
    {
       return addTrigger("stopNorth", trigger);
    }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   /// Ditto.
    public final TriggerID addStopSouthTrigger(InputTrigger trigger)
    {
       return addTrigger("stopSouth", trigger);
    }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   /// Ditto.
    public final TriggerID addStopEastTrigger(InputTrigger trigger)
    {
       return addTrigger("stopEast", trigger);
    }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   /// Ditto.
    public final TriggerID addStopWestTrigger(InputTrigger trigger)
    {
       return addTrigger("stopWest", trigger);
    }
 
+   /// Are we moving northward?
    private bool _n = false;
-   private bool _s = false;
-   private bool _e = false;
-   private bool _w = false;
-   private Direction _direction = Direction.NONE;
-}
 
+   /// Are we moving southward?
+   private bool _s = false;
+
+   /// Are we moving eastward?
+   private bool _e = false;
+
+   /// Are we moving westward?
+   private bool _w = false;
+
+   /// The current direction.
+   private StateDir _direction = StateDir.NONE;
+}

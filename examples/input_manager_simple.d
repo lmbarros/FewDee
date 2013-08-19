@@ -82,7 +82,7 @@ void main()
       auto dirState = new DirectionInputState();
       InputManager.addState(TheStates.WALK_DIR, dirState);
 
-      @property DirectionInputState.Direction TheDirection()
+      @property StateDir TheDirection()
       {
          return
             (cast(DirectionInputState)(InputManager.state(TheStates.WALK_DIR)))

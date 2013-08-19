@@ -349,6 +349,20 @@ class InputState
    }
 
    /**
+    * Removes a set of triggers from the internal collections of triggers.
+    *
+    * This is equivalent to calling $(removeTrigger()) for each ID sequentially.
+    *
+    * Parameters:
+    *    triggerIDs = The IDs of the triggers to remove.
+    */
+   public final void removeTrigger(TriggerID[] triggerIDs)
+   {
+      foreach (id; triggerIDs)
+         _triggers.remove(id);
+   }
+
+   /**
     * Checks if a given low-level event triggers any of the $(D InputTrigger)s
     * in one of the internal collection of triggers.
     *
