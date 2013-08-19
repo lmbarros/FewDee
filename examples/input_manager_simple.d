@@ -89,29 +89,8 @@ void main()
             .direction;
       }
 
-      dirState.addStartNorthTrigger(new KeyDownTrigger(ALLEGRO_KEY_UP));
-      dirState.addStartNorthTrigger(new JoyNegAxisDownTrigger(0, 1));
-
-      dirState.addStopNorthTrigger(new KeyUpTrigger(ALLEGRO_KEY_UP));
-      dirState.addStopNorthTrigger(new JoyNegAxisUpTrigger(0, 1));
-
-      dirState.addStartSouthTrigger(new KeyDownTrigger(ALLEGRO_KEY_DOWN));
-      dirState.addStartSouthTrigger(new JoyPosAxisDownTrigger(0, 1));
-
-      dirState.addStopSouthTrigger(new KeyUpTrigger(ALLEGRO_KEY_DOWN));
-      dirState.addStopSouthTrigger(new JoyPosAxisUpTrigger(0, 1));
-
-      dirState.addStartEastTrigger(new KeyDownTrigger(ALLEGRO_KEY_RIGHT));
-      dirState.addStartEastTrigger(new JoyPosAxisDownTrigger(0, 0));
-
-      dirState.addStopEastTrigger(new KeyUpTrigger(ALLEGRO_KEY_RIGHT));
-      dirState.addStopEastTrigger(new JoyPosAxisUpTrigger(0, 0));
-
-      dirState.addStartWestTrigger(new KeyDownTrigger(ALLEGRO_KEY_LEFT));
-      dirState.addStartWestTrigger(new JoyNegAxisDownTrigger(0, 0));
-
-      dirState.addStopWestTrigger(new KeyUpTrigger(ALLEGRO_KEY_LEFT));
-      dirState.addStopWestTrigger(new JoyNegAxisUpTrigger(0, 0));
+      dirState.useKeyTriggers(); // arrow keys (default)
+      dirState.useJoyAxesTriggers(0); // first joy, default axes
 
       // Quit if ESC is pressed
       EventManager.addHandler(

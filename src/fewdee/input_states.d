@@ -9,6 +9,7 @@ module fewdee.input_states;
 import allegro5.allegro;
 import fewdee.config;
 import fewdee.input_manager;
+import fewdee.input_triggers;
 
 
 
@@ -113,6 +114,82 @@ class DirectionInputState: InputState
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    }
+
+   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   // wraps a common use case
+   public final TriggerID[] useKeyTriggers(
+      int northKeyCode = ALLEGRO_KEY_UP, int southKeyCode = ALLEGRO_KEY_DOWN,
+      int eastKeyCode = ALLEGRO_KEY_RIGHT, int westKeyCode = ALLEGRO_KEY_LEFT)
+   {
+      auto t1 = addStartNorthTrigger(new KeyDownTrigger(northKeyCode));
+      auto t2 = addStopNorthTrigger(new KeyUpTrigger(northKeyCode));
+
+      auto t3 = addStartSouthTrigger(new KeyDownTrigger(southKeyCode));
+      auto t4 = addStopSouthTrigger(new KeyUpTrigger(southKeyCode));
+
+      auto t5 = addStartEastTrigger(new KeyDownTrigger(eastKeyCode));
+      auto t6 = addStopEastTrigger(new KeyUpTrigger(eastKeyCode));
+
+      auto t7 = addStartWestTrigger(new KeyDownTrigger(westKeyCode));
+      auto t8 = addStopWestTrigger(new KeyUpTrigger(westKeyCode));
+
+      return [ t1, t2, t3, t4, t5, t6, t7, t8 ];
+   }
+
+   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   // wraps a common use case
+   public final TriggerID[] useJoyAxesTriggers(
+      int joy, int xAxis = 0, int yAxis = 1,
+      bool invertX = false, bool invertY = false, float threshold = 0.5)
+   in
+   {
+      assert (threshold > 0.0);
+   }
+   body
+   {
+      auto t1 = addStartNorthTrigger(
+         invertY
+         ? new JoyPosAxisDownTrigger(joy, yAxis, threshold)
+         : new JoyNegAxisDownTrigger(joy, yAxis, -threshold));
+
+      auto t2 = addStopNorthTrigger(
+         invertY
+         ? new JoyPosAxisUpTrigger(joy, yAxis, threshold)
+         : new JoyNegAxisUpTrigger(joy, yAxis, -threshold));
+
+      auto t3 = addStartSouthTrigger(
+         invertY
+         ? new JoyNegAxisDownTrigger(joy, yAxis, -threshold)
+         : new JoyPosAxisDownTrigger(joy, yAxis, threshold));
+
+      auto t4 = addStopSouthTrigger(
+         invertY
+         ? new JoyNegAxisUpTrigger(joy, yAxis, -threshold)
+         : new JoyPosAxisUpTrigger(joy, yAxis, threshold));
+
+      auto t5 = addStartEastTrigger(
+         invertX
+         ? new JoyNegAxisDownTrigger(joy, xAxis, -threshold)
+         : new JoyPosAxisDownTrigger(joy, xAxis, threshold));
+
+      auto t6 = addStopEastTrigger(
+         invertX
+         ? new JoyNegAxisUpTrigger(joy, xAxis, -threshold)
+         : new JoyPosAxisUpTrigger(joy, xAxis, threshold));
+
+      auto t7 = addStartWestTrigger(
+         invertX
+         ? new JoyPosAxisDownTrigger(joy, xAxis, threshold)
+         : new JoyNegAxisDownTrigger(joy, xAxis, -threshold));
+
+      auto t8 = addStopWestTrigger(
+         invertX
+         ? new JoyPosAxisUpTrigger(joy, xAxis, threshold)
+         : new JoyNegAxisUpTrigger(joy, xAxis, -threshold));
+
+      return [ t1, t2, t3, t4, t5, t6, t7, t8 ];
+   }
+
 
    // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    public final TriggerID addStartNorthTrigger(InputTrigger trigger)
