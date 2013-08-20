@@ -228,6 +228,101 @@ class InputTrigger
 
    /// Ditto.
    public abstract @property void memento(const ConfigValue state);
+
+   /**
+    * Returns the class name of this class' class info.
+    *
+    * This is a string ready to be passed to $(D Object.factory()).
+    */
+   protected final @property string className() inout
+   {
+      return typeof(this).classinfo.name;
+   }
+
+   /// Initializes $(D _keyCodesStrings).
+   private static this()
+   {
+      auto m = _keyCodesStrings;
+      m["A"] = ALLEGRO_KEY_A; m["B"] = ALLEGRO_KEY_B; m["C"] = ALLEGRO_KEY_C;
+      m["D"] = ALLEGRO_KEY_D; m["E"] = ALLEGRO_KEY_E; m["F"] = ALLEGRO_KEY_F;
+      m["G"] = ALLEGRO_KEY_G; m["H"] = ALLEGRO_KEY_H; m["I"] = ALLEGRO_KEY_I;
+      m["J"] = ALLEGRO_KEY_J; m["K"] = ALLEGRO_KEY_K; m["L"] = ALLEGRO_KEY_L;
+      m["M"] = ALLEGRO_KEY_M; m["N"] = ALLEGRO_KEY_N; m["O"] = ALLEGRO_KEY_O;
+      m["P"] = ALLEGRO_KEY_P; m["Q"] = ALLEGRO_KEY_Q; m["R"] = ALLEGRO_KEY_R;
+      m["S"] = ALLEGRO_KEY_S; m["T"] = ALLEGRO_KEY_T; m["U"] = ALLEGRO_KEY_U;
+      m["V"] = ALLEGRO_KEY_V; m["W"] = ALLEGRO_KEY_W; m["X"] = ALLEGRO_KEY_X;
+      m["Y"] = ALLEGRO_KEY_Y; m["Z"] = ALLEGRO_KEY_Z; m["0"] = ALLEGRO_KEY_0;
+      m["1"] = ALLEGRO_KEY_1; m["2"] = ALLEGRO_KEY_2; m["3"] = ALLEGRO_KEY_3;
+      m["4"] = ALLEGRO_KEY_4; m["5"] = ALLEGRO_KEY_5; m["6"] = ALLEGRO_KEY_6;
+      m["7"] = ALLEGRO_KEY_7; m["8"] = ALLEGRO_KEY_8; m["9"] = ALLEGRO_KEY_9;
+      m["PAD_0"] = ALLEGRO_KEY_PAD_0; m["PAD_1"] = ALLEGRO_KEY_PAD_1;
+      m["PAD_2"] = ALLEGRO_KEY_PAD_2; m["PAD_3"] = ALLEGRO_KEY_PAD_3;
+      m["PAD_4"] = ALLEGRO_KEY_PAD_4; m["PAD_5"] = ALLEGRO_KEY_PAD_5;
+      m["PAD_6"] = ALLEGRO_KEY_PAD_6; m["PAD_7"] = ALLEGRO_KEY_PAD_7;
+      m["PAD_8"] = ALLEGRO_KEY_PAD_8; m["PAD_9"] = ALLEGRO_KEY_PAD_9;
+      m["F1"] = ALLEGRO_KEY_F1; m["F2"] = ALLEGRO_KEY_F2;
+      m["F3"] = ALLEGRO_KEY_F3; m["F4"] = ALLEGRO_KEY_F4;
+      m["F5"] = ALLEGRO_KEY_F5; m["F6"] = ALLEGRO_KEY_F6;
+      m["F7"] = ALLEGRO_KEY_F7; m["F8"] = ALLEGRO_KEY_F8;
+      m["F9"] = ALLEGRO_KEY_F9; m["F10"] = ALLEGRO_KEY_F10;
+      m["F11"] = ALLEGRO_KEY_F11; m["F12"] = ALLEGRO_KEY_F12;
+      m["ESCAPE"] = ALLEGRO_KEY_ESCAPE; m["TILDE"] = ALLEGRO_KEY_TILDE;
+      m["MINUS"] = ALLEGRO_KEY_MINUS; m["EQUALS"] = ALLEGRO_KEY_EQUALS;
+      m["BACKSPACE"] = ALLEGRO_KEY_BACKSPACE; m["TAB"] = ALLEGRO_KEY_TAB;
+      m["OPENBRACE"] = ALLEGRO_KEY_OPENBRACE;
+      m["CLOSEBRACE"] = ALLEGRO_KEY_CLOSEBRACE;
+      m["ENTER"] = ALLEGRO_KEY_ENTER; m["SEMICOLON"] = ALLEGRO_KEY_SEMICOLON;
+      m["QUOTE"] = ALLEGRO_KEY_QUOTE; m["BACKSLASH"] = ALLEGRO_KEY_BACKSLASH;
+      m["BACKSLASH2"] = ALLEGRO_KEY_BACKSLASH2; m["COMMA"] = ALLEGRO_KEY_COMMA;
+      m["FULLSTOP"] = ALLEGRO_KEY_FULLSTOP; m["SLASH"] = ALLEGRO_KEY_SLASH;
+      m["SPACE"] = ALLEGRO_KEY_SPACE; m["INSERT"] = ALLEGRO_KEY_INSERT;
+      m["DELETE"] = ALLEGRO_KEY_DELETE; m["HOME"] = ALLEGRO_KEY_HOME;
+      m["END"] = ALLEGRO_KEY_END; m["PGUP"] = ALLEGRO_KEY_PGUP;
+      m["PGDN"] = ALLEGRO_KEY_PGDN; m["LEFT"] = ALLEGRO_KEY_LEFT;
+      m["RIGHT"] = ALLEGRO_KEY_RIGHT; m["UP"] = ALLEGRO_KEY_UP;
+      m["DOWN"] = ALLEGRO_KEY_DOWN; m["PAD_SLASH"] = ALLEGRO_KEY_PAD_SLASH;
+      m["PAD_ASTERISK"] = ALLEGRO_KEY_PAD_ASTERISK;
+      m["PAD_MINUS"] = ALLEGRO_KEY_PAD_MINUS;
+      m["PAD_PLUS"] = ALLEGRO_KEY_PAD_PLUS;
+      m["PAD_DELETE"] = ALLEGRO_KEY_PAD_DELETE;
+      m["PAD_ENTER"] = ALLEGRO_KEY_PAD_ENTER;
+      m["PRINTSCREEN"] = ALLEGRO_KEY_PRINTSCREEN;
+      m["PAUSE"] = ALLEGRO_KEY_PAUSE;
+      m["ABNT_C1"] = ALLEGRO_KEY_ABNT_C1; m["YEN"] = ALLEGRO_KEY_YEN;
+      m["KANA"] = ALLEGRO_KEY_KANA; m["CONVERT"] = ALLEGRO_KEY_CONVERT;
+      m["NOCONVERT"] = ALLEGRO_KEY_NOCONVERT; m["AT"] = ALLEGRO_KEY_AT;
+      m["CIRCUMFLEX"] =ALLEGRO_KEY_CIRCUMFLEX; m["COLON2"] = ALLEGRO_KEY_COLON2;
+      m["KANJI"] = ALLEGRO_KEY_KANJI; m["PAD_EQUALS"] = ALLEGRO_KEY_PAD_EQUALS;
+      m["BACKQUOTE"] = ALLEGRO_KEY_BACKQUOTE;
+      m["SEMICOLON2"] = ALLEGRO_KEY_SEMICOLON2;
+      m["COMMAND"] = ALLEGRO_KEY_COMMAND;
+   }
+
+   /**
+    * Converts the string representation of a key code to the corresponding
+    * Allegro key code.
+    *
+    * An Allegro key code $(D ALLEGRO_KEY_FOO) is equivalent to the string $(D
+    * "FOO").
+    */
+   protected static final int stringToKeyCode(string s)
+   {
+      return _keyCodesStrings[s];
+   }
+
+   /**
+    * Converts an Allegro key code to its string representation.
+    *
+    * An Allegro key code $(D ALLEGRO_KEY_FOO) is equivalent to the string $(D
+    * "FOO").
+    */
+   protected static final string keyCodeToString(int c)
+   {
+      return _keyCodesStrings[c];
+   }
+
+   /// Mappings between Allegro key codes and their string representations.
+   private static BiMap!(string, int) _keyCodesStrings;
 }
 
 
