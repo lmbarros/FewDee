@@ -92,6 +92,30 @@ public struct ConfigValue
       _list = data;
    }
 
+   /// Assigns a string to this $(D ConfigValue).
+   public final string opAssign(string data)
+   {
+      _type = ConfigValueType.STRING;
+      _string = data;
+      return data;
+   }
+
+   /// Assigns a number to this $(D ConfigValue).
+   public final double opAssign(double data)
+   {
+      _type = ConfigValueType.NUMBER;
+      _number = data;
+      return data;
+   }
+
+   /// Assigns a Boolean value to this $(D ConfigValue).
+   public final bool opAssign(bool data)
+   {
+      _type = ConfigValueType.BOOLEAN;
+      _boolean = data;
+      return data;
+   }
+
    /**
     * Assuming a $(D ConfigValue) of type $(D ConfigValueType.LIST), returns the
     * value at a given index.
