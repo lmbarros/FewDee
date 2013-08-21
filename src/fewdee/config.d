@@ -79,14 +79,14 @@ public struct ConfigValue
    }
 
    /// Constructs a $(D ConfigValue) with an "associative array" type.
-   public this(const ConfigValue[string] data)
+   public this(ConfigValue[string] data)
    {
       _type = ConfigValueType.AA;
       _aa = data;
    }
 
    /// Constructs a $(D ConfigValue) with a "list" type.
-   public this(const ConfigValue[] data)
+   public this(ConfigValue[] data)
    {
       _type = ConfigValueType.LIST;
       _list = data;
@@ -108,6 +108,14 @@ public struct ConfigValue
       return data;
    }
 
+   /// Assigns a number to this $(D ConfigValue).
+   public final int opAssign(int data)
+   {
+      _type = ConfigValueType.NUMBER;
+      _number = data;
+      return data;
+   }
+
    /// Assigns a Boolean value to this $(D ConfigValue).
    public final bool opAssign(bool data)
    {
@@ -116,14 +124,35 @@ public struct ConfigValue
       return data;
    }
 
+   /// Assigns an associative array to this $(D ConfigValue).
+   public final ConfigValue[string]opAssign(ConfigValue[string] data)
+   {
+      _type = ConfigValueType.AA;
+      _aa = data;
+      return data;
+   }
+
+   /// Assigns a list to this $(D ConfigValue).
+   public final ConfigValue[] opAssign(ConfigValue[] data)
+   {
+      _type = ConfigValueType.LIST;
+      _list = data;
+      return data;
+   }
+
    /**
     * Assuming a $(D ConfigValue) of type $(D ConfigValueType.LIST), returns the
     * value at a given index.
     *
+    * When using the non-const version and using an index that is larger than
+    * the list length, the list resized (with default-constructed
+    * $D(ConfigValue)s as the new items) and the new item at $(D index) is
+    * returned.
+    *
     * Using this yields code like $(D value[0]), which is more readable than $(D
     * value.asList[0]).
     */
-   public const(ConfigValue) opIndex(size_t index) inout
+   public ref const(ConfigValue) opIndex(size_t index) const
    in
    {
       assert(
@@ -138,14 +167,32 @@ public struct ConfigValue
       return _list[index];
    }
 
+   /// Ditto.
+   public ref ConfigValue opIndex(size_t index)
+   in
+   {
+      assert(
+         _type == ConfigValueType.LIST,
+         "Trying to index with an integer a ConfigValue that is not a list");
+   }
+   body
+   {
+      if (index >= _list.length)
+         _list.length = index + 1;
+      return _list[index];
+   }
+
    /**
     * Assuming a $(D ConfigValue) of type $(D ConfigValueType.AA), returns the
     * value associated with a given key.
     *
+    * When using the non-const version, if there is no value associated with $(D
+    * key), associate a brand new $(D ConfigValue) with $(D key) and return it.
+    *
     * Using this yields code like $(D value["key"]), which is more readable than
     * $(D value.asAA["key"]).
     */
-   public const(ConfigValue) opIndex(string key) inout
+   public ref const(ConfigValue) opIndex(string key) const
    in
    {
       assert(_type == ConfigValueType.AA,
@@ -156,6 +203,28 @@ public struct ConfigValue
    body
    {
       return _aa[key];
+   }
+
+   // Ditto.
+   public ref ConfigValue opIndex(string key)
+   in
+   {
+      assert(_type == ConfigValueType.AA,
+             "Trying to index with a string a ConfigValue that is not an "
+             "associative array");
+   }
+   body
+   {
+      auto p = key in _aa;
+      if (p)
+      {
+         return *p;
+      }
+      else
+      {
+         _aa[key] = ConfigValue();
+         return _aa[key];
+      }
    }
 
    /**
@@ -328,6 +397,20 @@ public struct ConfigValue
          || (_type == ConfigValueType.AA && asAA.length == 0);
    }
 
+   /// Make this an empty list.
+   public final void makeList()
+   {
+      ConfigValue[] list;
+      this = list;
+   }
+
+   /// Make this an empty associative array.
+   public final void makeAA()
+   {
+      ConfigValue[string] aa;
+      this = aa;
+   }
+
 
    /// The type of this $(D ConfigValue); "nil" by default.
    private ConfigValueType _type;
@@ -345,8 +428,8 @@ public struct ConfigValue
       string _string;
       double _number;
       bool _boolean;
-      const(ConfigValue[string]) _aa;
-      const(ConfigValue[]) _list;
+      ConfigValue[string] _aa;
+      ConfigValue[] _list;
    }
 }
 
@@ -386,7 +469,7 @@ unittest
    assert(booleanValue == aBoolean);
 
    // AA
-   const ConfigValue[string] aTable = [
+   ConfigValue[string] aTable = [
       "foo": ConfigValue(1.1),
       "bar": ConfigValue("baz")
    ];
@@ -404,7 +487,7 @@ unittest
    assert(tableValue["bar"].asString == "baz");
 
    // List
-   const aList = [ ConfigValue(-0.3), ConfigValue("blah") ];
+   auto aList = [ ConfigValue(-0.3), ConfigValue("blah") ];
    auto listValue = ConfigValue(aList);
 
    assert(listValue.type == ConfigValueType.LIST);
@@ -428,12 +511,12 @@ unittest
    assert(!fullListValue.isEmptyTable);
 
    // Empty list
-   const ConfigValue[] aList;
+   ConfigValue[] aList;
    auto emptyListValue = ConfigValue(aList);
    assert(emptyListValue.isEmptyTable);
 
    // Non-empty AA
-   const ConfigValue[string] aTable = [
+   ConfigValue[string] aTable = [
       "foo": ConfigValue(1.1),
       "bar": ConfigValue("baz")
    ];
@@ -441,7 +524,7 @@ unittest
    assert(!fullAAValue.isEmptyTable);
 
    // Empty AA
-   const ConfigValue[string] anEmptyTable;
+   ConfigValue[string] anEmptyTable;
    auto emptyAAValue = ConfigValue(anEmptyTable);
    assert(emptyAAValue.isEmptyTable);
 }
@@ -1135,4 +1218,91 @@ unittest
 
    enum val = fun("u_u = { foo = { nil, 4, 'foo', -3e-2}, bar = 627.478} ----");
    assert(val == 4);
+}
+
+// Creating 'ConfigValue's from code
+unittest
+{
+   ConfigValue c;
+
+   // Number, simple case
+   c = 2.345;
+   assert(c.isNumber);
+   assert(c == 2.345);
+
+   // Numbers that used to be interpreted as Booleans
+   c = 1;
+   assert(c.isNumber);
+   assert(c == 1);
+
+   c = 0;
+   assert(c.isNumber);
+   assert(c == 0);
+
+   // String
+   c = "hello";
+   assert(c.isString);
+   assert(c == "hello");
+
+   // Boolean
+   c = true;
+   assert(c.isBoolean);
+   assert(c == true);
+
+   // Associative array
+   ConfigValue[string] aa;
+   aa["x"] = 1;
+   aa["y"] = "yay!";
+   aa["z"] = false;
+
+   c = aa;
+   assert(c.isAA);
+   assert(c.length == 3);
+   assert(c["x"] == 1);
+   assert(c["y"] == "yay!");
+   assert(c["z"] == false);
+
+   // List
+   ConfigValue[] list =
+      [ ConfigValue(-8.2), ConfigValue(true), ConfigValue("bab!") ];
+   c = list;
+   assert(c.isList);
+   assert(c.length == 3);
+   assert(c[0] == -8.2);
+   assert(c[1] == true);
+   assert(c[2] == "bab!");
+}
+
+// Creating 'ConfigValue's from code, emphasis on list
+unittest
+{
+   ConfigValue c;
+   c.makeList();
+
+   c[0] = -987.6;
+   c[1] = true;
+   c[2] = "abc";
+
+   assert(c.isList);
+   assert(c.length == 3);
+   assert(c[0] == -987.6);
+   assert(c[1] == true);
+   assert(c[2] == "abc");
+}
+
+// Creating 'ConfigValue's from code, emphasis on associative array
+unittest
+{
+   ConfigValue c;
+   c.makeAA();
+
+   c["A"] = -987.6;
+   c["b"] = true;
+   c["cee"] = "abc";
+
+   assert(c.isAA);
+   assert(c.length == 3);
+   assert(c["A"] == -987.6);
+   assert(c["b"] == true);
+   assert(c["cee"] == "abc");
 }
