@@ -57,6 +57,46 @@ public enum ConfigValueType
  */
 public struct ConfigValue
 {
+   /**
+    * Copy-constructs a $(D ConfigValue).
+    *
+    * Deep copies lists and associative arrays.
+    */
+   public this(const(ConfigValue) data)
+   {
+      _type = data._type;
+      final switch(_type)
+      {
+         case ConfigValueType.NIL:
+            break;
+
+         case ConfigValueType.NUMBER:
+            _number = data._number;
+            break;
+
+         case ConfigValueType.STRING:
+            _string = data._string;
+            break;
+
+         case ConfigValueType.BOOLEAN:
+            _boolean = data._boolean;
+            break;
+
+         case ConfigValueType.AA:
+            makeAA();
+            foreach(k, v; data._aa)
+               _aa[k] = ConfigValue(v);
+            break;
+
+         case ConfigValueType.LIST:
+            makeList();
+            _list.length = data._list.length;
+            foreach(i, v; data._list)
+               _list[i] = ConfigValue(v);
+            break;
+      }
+   }
+
    /// Constructs a $(D ConfigValue) with a "string" type.
    public this(string data)
    {
