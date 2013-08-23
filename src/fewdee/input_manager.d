@@ -435,7 +435,7 @@ class InputState
     * Parameters:
     *    triggerIDs = The IDs of the triggers to remove.
     */
-   public final void removeTrigger(TriggerID[] triggerIDs)
+   public final void removeTriggers(TriggerID[] triggerIDs)
    {
       foreach (id; triggerIDs)
          _triggers.remove(id);
