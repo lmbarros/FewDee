@@ -8,6 +8,16 @@
  * that you can easily support multiple input devices or even allow
  * user-customization of the input.
  *
+ * This module may feel over-engineered: using it involves so many classes that
+ * it fells like Java. In fact, I started with a considerably simpler design,
+ * which failed miserably when I tried to use it in a little game prototype I
+ * developed with an early version of FewDee. Wondering about this failure, I
+ * made a list of what I considered essential for the kind of effective
+ * abstracted input mechanism I wanted to use. This design is the simplest one I
+ * could devise that respected all my requisites. Anyway, if you think it is $(I
+ * too) convoluted, you don't have to use it at all -- its usage is completely
+ * optional.
+ *
  * Authors: Leandro Motta Barros
  */
 
