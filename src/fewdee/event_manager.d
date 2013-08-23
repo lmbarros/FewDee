@@ -16,15 +16,19 @@ import fewdee.internal.singleton;
 
 
 /**
- * The type of functions (er, delegates) used to handle events. The functions
- * receives a single parameter: the event structure describing it in detail.
+ * The type of functions (er, delegates) used to handle events.
+ *
+ * The function receives a single parameter: the event structure describing it
+ * in detail.
  */
 public alias void delegate(in ref ALLEGRO_EVENT event) EventHandler;
 
 
 /**
  * An opaque identifier identifying an $(D EventHandler) added to the Event
- * Manager. It can be used to remove the handler from the list of handler.
+ * Manager.
+ *
+ * It can be used to remove the handler from the list of handlers.
  */
 public alias size_t EventHandlerID;
 
@@ -40,6 +44,12 @@ public immutable EventHandlerID InvalidEventHandlerID = 0;
 /**
  * The real implementation of the Event Manager. Users shall use this through
  * the $(D EventManager) class.
+ *
+ * The Event Manager allows you to do low-level event handling. You may wish to
+ * check the $(D InputManager), which provides higher-level features for
+ * handling user input.
+ *
+ * See_also: InputManager
  */
 private class EventManagerImpl
 {
