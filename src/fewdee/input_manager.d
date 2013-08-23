@@ -441,6 +441,12 @@ class InputState
          _triggers.remove(id);
    }
 
+   /// Removes all triggers.
+   public final void clearTriggers()
+   {
+      _triggers = typeof(_triggers).init;
+   }
+
    /**
     * Checks if a given low-level event triggers any of the $(D InputTrigger)s
     * in one of the internal collection of triggers.
@@ -474,6 +480,29 @@ class InputState
       }
 
       return didIt;
+   }
+
+   /**
+    * Returns the class name of this class' class info.
+    *
+    * This is a string ready to be passed to $(D Object.factory()).
+    */
+   protected final @property string className() inout
+   {
+      return this.classinfo.name;
+   }
+
+   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   protected final ConfigValue serializeTriggers(string key)
+   {
+      ConfigValue res;
+      res.makeList();
+
+      auto triggers = _triggers.get(key);
+      foreach(trigger; triggers)
+         res[res.length] = ConfigValue(trigger.memento);
+
+      return res;
    }
 
    /// The collection of $(D InputTrigger)s.

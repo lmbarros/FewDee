@@ -6,6 +6,7 @@
 
 module fewdee.input_states;
 
+import std.exception;
 import allegro5.allegro;
 import fewdee.config;
 import fewdee.input_manager;
@@ -39,7 +40,6 @@ class BooleanInputState: InputState
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       // add to list of triggers
    }
-
 }
 
 
@@ -120,15 +120,38 @@ class DirectionInputState: InputState
       return _direction;
    }
 
+   // Inherit docs.
    public override @property const(ConfigValue) memento()
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return ConfigValue();
+      ConfigValue c;
+      c.makeAA();
+      c["class"] = className;
+
+      foreach(key; _triggerKeys)
+         c[key] = serializeTriggers(key);
+
+      return c;
    }
 
+   // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      // xxxxxxx TODO: Check if the expected fields are all there. xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      clearTriggers();
+
+      foreach (key; _triggerKeys)
+      {
+         foreach (cfgTrigger; state[key].asList)
+         {
+            auto objTrigger =
+               cast(InputTrigger)(Object.factory(cfgTrigger["class"].asString));
+
+            enforce(objTrigger !is null);
+
+            objTrigger.memento = cfgTrigger;
+            addTrigger(key, objTrigger);
+         }
+      }
    }
 
    /**
@@ -293,6 +316,11 @@ class DirectionInputState: InputState
    {
       return addTrigger("stopWest", trigger);
    }
+
+   /// The keys of the triggers used by this state.
+   private static immutable _triggerKeys = [
+      "startNorth", "startSouth", "startEast", "startWest",
+      "stopNorth", "stopSouth", "stopEast", "stopWest" ];
 
    /// Are we moving northward?
    private bool _n = false;

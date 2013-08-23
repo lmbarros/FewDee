@@ -6,9 +6,34 @@
 
 module fewdee.input_triggers;
 
+import std.conv;
+import std.exception;
 import allegro5.allegro;
 import fewdee.config;
 import fewdee.input_manager;
+
+
+//
+// Helper functions
+//
+
+/**
+ * Is this $(D ConfigValue) an associative array and does it have a string field
+ * named $(D s)?
+ */
+private bool hasString(const ConfigValue c, string s)
+{
+   return c.isAA && s in c.asAA && c[s].isString;
+}
+
+/**
+ * Is this $(D ConfigValue) an associative array and does it have a number field
+ * named $(D s)?
+ */
+private bool hasNumber(const ConfigValue c, string s)
+{
+   return c.isAA && s in c.asAA && c[s].isNumber;
+}
 
 
 //
@@ -212,14 +237,21 @@ class KeyDownTrigger: InputTrigger
    // Inherit docs.
    public override @property const(ConfigValue) memento()
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return ConfigValue();
+      ConfigValue c;
+      c.makeAA();
+      c["class"] = className;
+      c["keyCode"] = keyCodeToString(keyCode);
+
+      return c;
    }
 
    // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      enforce(state.hasString("class"));
+      enforce(state.hasString("keyCode"));
+      enforce(state["class"] == className);
+      keyCode = stringToKeyCode(state["keyCode"].asString);
    }
 }
 
@@ -266,14 +298,21 @@ class KeyUpTrigger: InputTrigger
    // Inherit docs.
    public override @property const(ConfigValue) memento()
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return ConfigValue();
+      ConfigValue c;
+      c.makeAA();
+      c["class"] = className;
+      c["keyCode"] = keyCodeToString(keyCode);
+
+      return c;
    }
 
    // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      enforce(state.hasString("class"));
+      enforce(state.hasString("keyCode"));
+      enforce(state["class"] == className);
+      keyCode = stringToKeyCode(state["keyCode"].asString);
    }
 }
 
@@ -327,14 +366,24 @@ class JoyButtonDownTrigger: InputTrigger
    // Inherit docs.
    public override @property const(ConfigValue) memento()
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      ConfigValue c;
+      c.makeAA();
+      c["class"] = className;
+      c["joy"] = joy;
+      c["joyButton"] = joyButton;
+
       return ConfigValue();
    }
 
    // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      enforce(state.hasString("class"));
+      enforce(state.hasNumber("joy"));
+      enforce(state.hasNumber("joyButton"));
+      enforce(state["class"] == className);
+      joy = to!int(state["joy"].asNumber);
+      joyButton = to!int(state["joyButton"].asNumber);
    }
 }
 
@@ -398,14 +447,27 @@ class JoyPosAxisDownTrigger: InputTrigger
    // Inherit docs.
    public override @property const(ConfigValue) memento()
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return ConfigValue();
+      ConfigValue c;
+      c.makeAA();
+      c["class"] = className;
+      c["joy"] = joy;
+      c["joyAxis"] = joyAxis;
+      c["threshold"] = threshold;
+
+      return c;
    }
 
    // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      enforce(state.hasString("class"));
+      enforce(state.hasNumber("joy"));
+      enforce(state.hasNumber("joyAxis"));
+      enforce(state.hasNumber("threshold"));
+      enforce(state["class"] == className);
+      joy = to!int(state["joy"].asNumber);
+      joyAxis = to!int(state["joyAxis"].asNumber);
+      threshold = state["threshold"].asNumber;
    }
 
    /// The axis value the last time $(D didTrigger()) was called.
@@ -472,14 +534,27 @@ class JoyPosAxisUpTrigger: InputTrigger
    // Inherit docs.
    public override @property const(ConfigValue) memento()
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return ConfigValue();
+      ConfigValue c;
+      c.makeAA();
+      c["class"] = className;
+      c["joy"] = joy;
+      c["joyAxis"] = joyAxis;
+      c["threshold"] = threshold;
+
+      return c;
    }
 
    // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      enforce(state.hasString("class"));
+      enforce(state.hasNumber("joy"));
+      enforce(state.hasNumber("joyAxis"));
+      enforce(state.hasNumber("threshold"));
+      enforce(state["class"] == className);
+      joy = to!int(state["joy"].asNumber);
+      joyAxis = to!int(state["joyAxis"].asNumber);
+      threshold = state["threshold"].asNumber;
    }
 
    /// The axis value the last time $(D didTrigger()) was called.
@@ -546,14 +621,27 @@ class JoyNegAxisDownTrigger: InputTrigger
    // Inherit docs.
    public override @property const(ConfigValue) memento()
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return ConfigValue();
+      ConfigValue c;
+      c.makeAA();
+      c["class"] = className;
+      c["joy"] = joy;
+      c["joyAxis"] = joyAxis;
+      c["threshold"] = threshold;
+
+      return c;
    }
 
    // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      enforce(state.hasString("class"));
+      enforce(state.hasNumber("joy"));
+      enforce(state.hasNumber("joyAxis"));
+      enforce(state.hasNumber("threshold"));
+      enforce(state["class"] == className);
+      joy = to!int(state["joy"].asNumber);
+      joyAxis = to!int(state["joyAxis"].asNumber);
+      threshold = state["threshold"].asNumber;
    }
 
    /// The axis value the last time $(D didTrigger()) was called.
@@ -620,14 +708,27 @@ class JoyNegAxisUpTrigger: InputTrigger
    // Inherit docs.
    public override @property const(ConfigValue) memento()
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return ConfigValue();
+      ConfigValue c;
+      c.makeAA();
+      c["class"] = className;
+      c["joy"] = joy;
+      c["joyAxis"] = joyAxis;
+      c["threshold"] = threshold;
+
+      return c;
    }
 
    // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      enforce(state.hasString("class"));
+      enforce(state.hasNumber("joy"));
+      enforce(state.hasNumber("joyAxis"));
+      enforce(state.hasNumber("threshold"));
+      enforce(state["class"] == className);
+      joy = to!int(state["joy"].asNumber);
+      joyAxis = to!int(state["joyAxis"].asNumber);
+      threshold = state["threshold"].asNumber;
    }
 
    /// The axis value the last time $(D didTrigger()) was called.
