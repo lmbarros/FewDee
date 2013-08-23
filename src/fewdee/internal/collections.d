@@ -268,6 +268,18 @@ public struct BiMap(TypeA, TypeB)
       return _aToB.length;
    }
 
+   /// $(D in) operator.
+   public TypeA* opBinaryRight(string op: "in")(TypeB valueB)
+   {
+      return valueB in _bToA;
+   }
+
+   /// Ditto.
+   public TypeB* opBinaryRight(string op: "in")(TypeA valueA)
+   {
+      return valueA in _aToB;
+   }
+
    /// Maps $(D TypeA)s to $(D TypeB)s.
    private TypeB[TypeA] _aToB;
 

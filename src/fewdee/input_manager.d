@@ -267,7 +267,9 @@ class InputTrigger
             "UP", "DOWN", "PAD_SLASH", "PAD_ASTERISK", "PAD_MINUS", "PAD_PLUS",
             "PAD_DELETE", "PAD_ENTER", "PRINTSCREEN", "PAUSE", "ABNT_C1",
             "KANA", "CONVERT", "NOCONVERT", "AT", "CIRCUMFLEX", "COLON2",
-            "KANJI", "PAD_EQUALS", "BACKQUOTE", "SEMICOLON2", "COMMAND" ];
+            "KANJI", "PAD_EQUALS", "BACKQUOTE", "SEMICOLON2", "COMMAND",
+            "LSHIFT", "RSHIFT", "LCTRL", "RCTRL", "ALT", "ALTGR", "LWIN",
+            "RWIN", "MENU", "SCROLLLOCK", "NUMLOCK", "CAPSLOCK" ];
 
          string code;
          foreach (key; keys)
@@ -288,10 +290,22 @@ class InputTrigger
     *
     * An Allegro key code $(D ALLEGRO_KEY_FOO) is equivalent to the string $(D
     * "FOO").
+    *
+    * Parameters:
+    *    s = The string.
+    *
+    * Returns:
+    *    The key code corresponding to $(D s); $(D ALLEGRO_KEY_MAX) if $(D s) is
+    *    an invalid string (that is, a string that doesn't correspond to a key
+    *    code).
     */
    protected static final int stringToKeyCode(string s)
    {
-      return _keyCodesStrings[s];
+      auto p = s in _keyCodesStrings;
+      if (p)
+         return *p;
+      else
+         return ALLEGRO_KEY_MAX;
    }
 
    /**
@@ -299,15 +313,50 @@ class InputTrigger
     *
     * An Allegro key code $(D ALLEGRO_KEY_FOO) is equivalent to the string $(D
     * "FOO").
+    *
+    * Parameters:
+    *    c = The key code.
+    *
+    * Returns:
+    *    The string version of $(D c); and empty string if $(D c) is an invalid
+    *    key code.
     */
    protected static final string keyCodeToString(int c)
    {
-      return _keyCodesStrings[c];
+      auto p = c in _keyCodesStrings;
+      if (p)
+         return *p;
+      else
+         return "";
    }
 
    /// Mappings between Allegro key codes and their string representations.
    private static BiMap!(string, int) _keyCodesStrings;
 }
+
+unittest
+{
+   // Valid strings
+   assert(InputTrigger.stringToKeyCode("A") == ALLEGRO_KEY_A);
+   assert(InputTrigger.stringToKeyCode("6") == ALLEGRO_KEY_6);
+   assert(InputTrigger.stringToKeyCode("RIGHT") == ALLEGRO_KEY_RIGHT);
+   assert(InputTrigger.stringToKeyCode("RCTRL") == ALLEGRO_KEY_RCTRL);
+
+   // Valid key codes
+   assert(InputTrigger.keyCodeToString(ALLEGRO_KEY_U) == "U");
+   assert(InputTrigger.keyCodeToString(ALLEGRO_KEY_PAD_5) == "PAD_5");
+   assert(InputTrigger.keyCodeToString(ALLEGRO_KEY_UP) == "UP");
+   assert(InputTrigger.keyCodeToString(ALLEGRO_KEY_LSHIFT) == "LSHIFT");
+
+   // Invalid strings
+   assert(InputTrigger.stringToKeyCode("") == ALLEGRO_KEY_MAX);
+   assert(InputTrigger.stringToKeyCode("MWHUAHUAHUA!") == ALLEGRO_KEY_MAX);
+
+   // Invalid key codes
+   assert(InputTrigger.keyCodeToString(ALLEGRO_KEY_MAX) == "");
+   assert(InputTrigger.keyCodeToString(ALLEGRO_KEY_MAX + 10) == "");
+}
+
 
 
 /**
