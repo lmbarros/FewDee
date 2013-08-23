@@ -246,7 +246,7 @@ class InputTrigger
     */
    protected final @property string className() inout
    {
-      return typeof(this).classinfo.name;
+      return this.classinfo.name;
    }
 
    /// Initializes $(D _keyCodesStrings).
