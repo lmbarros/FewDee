@@ -372,7 +372,7 @@ class JoyButtonDownTrigger: InputTrigger
       c["joy"] = joy;
       c["joyButton"] = joyButton;
 
-      return ConfigValue();
+      return c;
    }
 
    // Inherit docs.
