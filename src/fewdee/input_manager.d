@@ -234,7 +234,7 @@ class InputTrigger
     * of this $(D InputTrigger) and write to it to restore a previous
     * configuration.
     */
-   public abstract @property const(ConfigValue) memento();
+   public abstract @property ConfigValue memento() inout;
 
    /// Ditto.
    public abstract @property void memento(const ConfigValue state);
@@ -432,7 +432,7 @@ class InputState
     * of this $(D InputState) and write to it to restore a previous
     * configuration.
     */
-   public abstract @property const(ConfigValue) memento();
+   public abstract @property ConfigValue memento() inout;
 
    /// Ditto.
    public abstract @property void memento(const ConfigValue state);
@@ -542,7 +542,7 @@ class InputState
    }
 
    // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   protected final ConfigValue serializeTriggers(string key)
+   protected final ConfigValue serializeTriggers(string key) inout
    {
       ConfigValue res;
       res.makeList();
@@ -1079,7 +1079,7 @@ private class InputManagerImpl: LowLevelEventHandler
 
    // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    // Memento! Maybe a better name; 'state' is limited to mappings or so...
-   public final @property const(ConfigValue) memento() inout
+   public final @property ConfigValue memento() inout
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       return ConfigValue();

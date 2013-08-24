@@ -23,7 +23,7 @@ class BooleanInputState: InputState
       return true;
    }
 
-   public override @property const(ConfigValue) memento()
+   public override @property ConfigValue memento() inout
    {
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       return ConfigValue();
@@ -121,7 +121,7 @@ class DirectionInputState: InputState
    }
 
    // Inherit docs.
-   public override @property const(ConfigValue) memento()
+   public override @property ConfigValue memento() inout
    {
       ConfigValue c;
       c.makeAA();

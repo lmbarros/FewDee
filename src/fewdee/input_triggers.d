@@ -235,7 +235,7 @@ class KeyDownTrigger: InputTrigger
    }
 
    // Inherit docs.
-   public override @property const(ConfigValue) memento()
+   public override @property ConfigValue memento() inout
    {
       ConfigValue c;
       c.makeAA();
@@ -296,7 +296,7 @@ class KeyUpTrigger: InputTrigger
    }
 
    // Inherit docs.
-   public override @property const(ConfigValue) memento()
+   public override @property ConfigValue memento() inout
    {
       ConfigValue c;
       c.makeAA();
@@ -364,7 +364,7 @@ class JoyButtonDownTrigger: InputTrigger
    }
 
    // Inherit docs.
-   public override @property const(ConfigValue) memento()
+   public override @property ConfigValue memento() inout
    {
       ConfigValue c;
       c.makeAA();
@@ -445,7 +445,7 @@ class JoyPosAxisDownTrigger: InputTrigger
    }
 
    // Inherit docs.
-   public override @property const(ConfigValue) memento()
+   public override @property ConfigValue memento() inout
    {
       ConfigValue c;
       c.makeAA();
@@ -532,7 +532,7 @@ class JoyPosAxisUpTrigger: InputTrigger
    }
 
    // Inherit docs.
-   public override @property const(ConfigValue) memento()
+   public override @property ConfigValue memento() inout
    {
       ConfigValue c;
       c.makeAA();
@@ -619,7 +619,7 @@ class JoyNegAxisDownTrigger: InputTrigger
    }
 
    // Inherit docs.
-   public override @property const(ConfigValue) memento()
+   public override @property ConfigValue memento() inout
    {
       ConfigValue c;
       c.makeAA();
@@ -706,7 +706,7 @@ class JoyNegAxisUpTrigger: InputTrigger
    }
 
    // Inherit docs.
-   public override @property const(ConfigValue) memento()
+   public override @property ConfigValue memento() inout
    {
       ConfigValue c;
       c.makeAA();
