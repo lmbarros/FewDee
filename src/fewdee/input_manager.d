@@ -24,6 +24,7 @@
 module fewdee.input_manager;
 
 import std.conv;
+import std.exception;
 import std.traits;
 import std.typecons;
 import allegro5.allegro;
@@ -1081,14 +1082,79 @@ private class InputManagerImpl: LowLevelEventHandler
    // Memento! Maybe a better name; 'state' is limited to mappings or so...
    public final @property ConfigValue memento() inout
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return ConfigValue();
+      ConfigValue c;
+      c.makeAA();
+
+      ConfigValue commands;
+      commands.makeAA();
+      c["commands"] = commands;
+
+      ConfigValue states;
+      states.makeAA();
+      c["states"] = states;
+
+      // Commands
+      const commandIDs = _commandTriggers.buckets();
+
+      foreach (commandID; commandIDs)
+      {
+         const strCommandID = _commandMappings[commandID];
+         c["commands"][strCommandID].makeList();
+         int i = 0;
+         foreach(trigger; _commandTriggers.get(commandID))
+            c["commands"][strCommandID][i++] = trigger.memento;
+      }
+
+      // States
+      foreach (stateID, state; _states)
+      {
+         const strStateID = _stateMappings[stateID];
+         c["states"][strStateID] = state.memento;
+      }
+
+      // Here we go!
+      return c;
    }
 
    /// Ditto.
    public final @property void memento(const ConfigValue state)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      // xxxxxxx TODO: Check if the expected fields are all there. xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      clearCommandTriggersAndStates();
+
+      // Command triggers
+      foreach (strCommandID; state["commands"].asAA.keys)
+      {
+         const commandID = _commandMappings[strCommandID];
+
+         foreach (cfgTrigger; state["commands"][strCommandID].asList)
+         {
+            import std.stdio; writefln("[%s] => %s", strCommandID, cfgTrigger);
+
+            auto objTrigger =
+               cast(InputTrigger)(Object.factory(cfgTrigger["class"].asString));
+
+            enforce(objTrigger !is null);
+
+            objTrigger.memento = cfgTrigger;
+            addCommandTrigger(commandID, objTrigger);
+         }
+      }
+
+      // States
+      foreach (strStateID; state["states"].asAA.keys)
+      {
+         const stateID = _stateMappings[strStateID];
+
+         const cfgState = state["states"][strStateID];
+         auto objState =
+            cast(InputState)(Object.factory(cfgState["class"].asString));
+
+         enforce(objState !is null);
+
+         objState.memento = cfgState;
+         addState(stateID, objState);
+      }
    }
 
    /**
@@ -1150,29 +1216,16 @@ private class InputManagerImpl: LowLevelEventHandler
    }
 
 
-   // commands = {
-   //    JUMP = {
-   //       -- List of triggers
-   //       { type = "fewdee.input_triggers.KeyDown", key = "A" },
-   //       { type = "fewdee.input_triggers.KeyDown", key = "Enter" },
-   //       { type = "fewdee.input_triggers.JoyDown", joy = 0, button = 2 },
-   //    },
-   //    FIRE = { } -- no triggers for this command
-   // }
    //
-   // states = {
-   //    THROTTLE = {
-   //       type = "fewdee.input_states.FloatInputState",
-   //       min = 0.0,
-   //       max = 1.0,
-   //       default = 0.0,
-   //       setValue = {
-   //          -- list of triggers
-   //          { type = "fewdee.input_triggers.JoyAxis", joy = 0, axis = 1 },
-   //          { type = "fewdee.input_triggers.InterpolatingKeys", keys = { "0", "1", "2", "3", "4", "5" } },
-   //       }
-   //    }
-   // }
+   // Assorted utilities
+   //
+
+   /// Clears all command triggers and states.
+   public final void clearCommandTriggersAndStates()
+   {
+      _commandTriggers = typeof(_commandTriggers).init;
+      _states = typeof(_states).init;
+   }
 }
 
 
