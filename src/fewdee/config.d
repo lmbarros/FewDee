@@ -398,7 +398,7 @@ public struct ConfigValue
    }
 
    /// Gets the value assuming it is a Boolean.
-   public @property double asBoolean() inout
+   public @property bool asBoolean() inout
    in
    {
       assert(_type == ConfigValueType.BOOLEAN);
