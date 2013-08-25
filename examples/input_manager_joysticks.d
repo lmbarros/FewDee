@@ -4,8 +4,6 @@
  * Authors: Leandro Motta Barros
  */
 
-// import std.conv;
-// import std.exception;
 import std.array;
 import std.stdio;
 import std.string;
@@ -45,7 +43,11 @@ void main()
                exitPlease = true;
          });
 
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      // Allegro sends an ALLEGRO_EVENT_JOYSTICK_CONFIGURATION event when it
+      // detects that joysticks are connected or disconnected. In response to
+      // this event, we call InputManager.rescanJoysticks(), which will rescan
+      // the system for joysticks and update the internal data structures that
+      // contain the joystick information.
       EventManager.addHandler(
          ALLEGRO_EVENT_JOYSTICK_CONFIGURATION,
          delegate(in ref ALLEGRO_EVENT event)
@@ -54,7 +56,8 @@ void main()
             InputManager.rescanJoysticks();
          });
 
-      // Draw!
+      // Draw! Reads joystick information in InputManager.joysticks and displays
+      // it on the window.
       EventManager.addHandler(
          FEWDEE_EVENT_DRAW,
          delegate(in ref ALLEGRO_EVENT event)
