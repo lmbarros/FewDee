@@ -1,6 +1,11 @@
 /**
  * A collection of ready-to-use $(D InputState)s.
  *
+ * TODO: There is quite a bit of code replication here. Triggers for handling
+ *    key/button up/down events, in particular, are very similar to each
+ *    other. Making _triggerKeys a private property would also allow to add a
+ *    deserializeTriggers() method.
+ *
  * Authors: Leandro Motta Barros
  */
 
@@ -14,32 +19,211 @@ import fewdee.input_triggers;
 
 
 
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+/**
+ * A state that be either true or false, as the name suggests.
+ */
 class BooleanInputState: InputState
 {
+   // Inherit docs.
+   public override void update(in ref ALLEGRO_EVENT event)
+   {
+      InputHandlerParam param;
+
+      if (didTrigger("setTrue", event, param))
+         _value = true;
+
+      if (didTrigger("setFalse", event, param))
+         _value = false;
+
+      if (didTrigger("toggle", event, param))
+         _value = !_value;
+   }
+
+   /// Returns the state value.
    final public @property bool value()
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return true;
+      return _value;
    }
 
+   /**
+    * The default state value.
+    *
+    * Setting it, also sets the current state value.
+    */
+   final public @property void defaultDalue(bool value)
+   {
+      _defaultValue = value;
+      _value = value;
+   }
+
+   /// Ditto.
+   final public @property bool defaultDalue()
+   {
+      return _defaultValue;
+   }
+
+   // Inherit docs.
    public override @property ConfigValue memento() inout
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      return ConfigValue();
+      ConfigValue c;
+      c.makeAA();
+      c["class"] = className;
+      c["defaultValue"] = _defaultValue;
+
+      foreach(key; _triggerKeys)
+         c[key] = serializeTriggers(key);
+
+      return c;
    }
 
+   // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      // xxxxxxx TODO: Check if the expected fields are all there. xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      clearTriggers();
+
+      _defaultValue = state["defaultValue"].asBoolean;
+
+      foreach (key; _triggerKeys)
+      {
+         foreach (cfgTrigger; state[key].asList)
+         {
+            auto objTrigger =
+               cast(InputTrigger)(Object.factory(cfgTrigger["class"].asString));
+
+            enforce(objTrigger !is null);
+
+            objTrigger.memento = cfgTrigger;
+            addTrigger(key, objTrigger);
+         }
+      }
    }
 
-   // xxxxxxxxxxx and the same for false...
-   public final void addTrueTrigger(InputTrigger trigger)
+   /**
+    * Adds an $(D InputTrigger) that, when triggered, sets the state to $(D
+    * true).
+    */
+   public final TriggerID addSetTrueTrigger(InputTrigger trigger)
    {
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      // add to list of triggers
+      return addTrigger("setTrue", trigger);
    }
+
+   /**
+    * Adds an $(D InputTrigger) that, when triggered, sets the state to $(D
+    * false).
+    */
+   public final TriggerID addSetFalseTrigger(InputTrigger trigger)
+   {
+      return addTrigger("setFalse", trigger);
+   }
+
+   /// Adds an $(D InputTrigger) that, when triggered, toggles state.
+   public final TriggerID addToggleTrigger(InputTrigger trigger)
+   {
+      return addTrigger("toggle", trigger);
+   }
+
+   /**
+    * Configures the state for a common case: toggling the state while a given
+    * key is kept pressed.
+    *
+    * Parameters:
+    *    keyCode = The key to use.
+    *
+    * Returns:
+    *    An array with all the IDs of all triggers added to this state. This can
+    *    be passed to $(D removeTriggers()) in order to remove these triggers.
+    */
+   public final TriggerID[] useToggleWhileKeyPressed(int keyCode)
+   {
+      auto t1 = addToggleTrigger(new KeyDownTrigger(keyCode));
+      auto t2 = addToggleTrigger(new KeyUpTrigger(keyCode));
+
+      return [ t1, t2 ];
+   }
+
+   /**
+    * Configures the state for a common case: toggling the state while a given
+    * joystick button is kept pressed.
+    *
+    * Parameters:
+    *    joy = The joystick to use.
+    *    button = The button to use.
+    *
+    * Returns:
+    *    An array with all the IDs of all triggers added to this state. This can
+    *    be passed to $(D removeTriggers()) in order to remove these triggers.
+    */
+   public final TriggerID[] useToggleWhileJoyButtonPressed(int joy, int button)
+   {
+      auto t1 = addToggleTrigger(new JoyButtonDownTrigger(joy, button));
+      auto t2 = addToggleTrigger(new JoyButtonUpTrigger(joy, button));
+
+      return [ t1, t2 ];
+   }
+
+   /**
+    * Configures the state for a common case: one key sets state to $(D true),
+    * other key sets to $(D false).
+    *
+    * Parameters:
+    *    trueKeyCode = The key that sets the state to $(D true).
+    *    falseKeyCode = The key that sets the state to $(D false).
+    *
+    * Returns:
+    *    An array with all the IDs of all triggers added to this state. This can
+    *    be passed to $(D removeTriggers()) in order to remove these triggers.
+    */
+   public final TriggerID[] useKeys(int trueKeyCode, int falseKeyCode)
+   {
+      auto t1 = addSetTrueTrigger(new KeyDownTrigger(trueKeyCode));
+      auto t2 = addSetFalseTrigger(new KeyDownTrigger(falseKeyCode));
+
+      return [ t1, t2 ];
+   }
+
+   /**
+    * Configures the state for a common case: toggling the state with a given
+    * key press.
+    *
+    * Parameters:
+    *    keyCode = The key to use.
+    *
+    * Returns:
+    *    The IDs of the trigger added to this state. This can be passed to $(D
+    *    removeTrigger()) in order to remove it.
+    */
+   public final TriggerID useToggleWithKeyPress(int keyCode)
+   {
+      return addToggleTrigger(new KeyDownTrigger(keyCode));
+   }
+
+   /**
+    * Configures the state for a common case: toggling the state with a given
+    * joystick button press.
+    *
+    * Parameters:
+    *    joy = The joystick to use.
+    *    button = The button to use.
+    *
+    * Returns:
+    *    The IDs of the trigger added to this state. This can be passed to $(D
+    *    removeTrigger()) in order to remove it.
+    */
+   public final TriggerID useToggleWithJoyButtonPress(int joy, int button)
+   {
+      return addToggleTrigger(new JoyButtonDownTrigger(joy, button));
+   }
+
+   /// The keys of the triggers used by this state.
+   private static immutable _triggerKeys = [
+      "setTrue", "setFalse", "triggers" ];
+
+   /// The default state value.
+   private bool _defaultValue = false;
+
+   /// The state value.
+   private bool _value = false;
 }
 
 
@@ -168,7 +352,7 @@ class DirectionInputState: InputState
     *
     * Returns:
     *    An array with all the IDs of all triggers added to this state. This can
-    *    be passed to $(D removeTrigger()) in order to remove these triggers.
+    *    be passed to $(D removeTriggers()) in order to remove these triggers.
     */
    public final TriggerID[] useKeyTriggers(
       int northKeyCode = ALLEGRO_KEY_UP, int southKeyCode = ALLEGRO_KEY_DOWN,
@@ -207,7 +391,7 @@ class DirectionInputState: InputState
     *
     * Returns:
     *    An array with all the IDs of all triggers added to this state. This can
-    *    be passed to $(D removeTrigger()) in order to remove these triggers.
+    *    be passed to $(D removeTriggers()) in order to remove these triggers.
     */
    public final TriggerID[] useJoyAxesTriggers(
       int joy, int xAxis = 0, int yAxis = 1,

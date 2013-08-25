@@ -388,6 +388,72 @@ class JoyButtonDownTrigger: InputTrigger
 }
 
 
+/// An input trigger that triggers when a certain joystick button is released.
+class JoyButtonUpTrigger: InputTrigger
+{
+   mixin JoyMixin;
+   mixin JoyButtonMixin;
+
+   /**
+    * The default constructor; if you use it, you must set the trigger
+    * parameters manually (either via the appropriate properties, or using $(D
+    * memento)).
+    */
+   public this() { }
+
+   /**
+    * Constructs the trigger.
+    *
+    * Parameters:
+    *    joy = The joystick to listen to.
+    *    button = The button to listen to.
+    */
+   public this(int joy, int button)
+   {
+      this.joy = joy;
+      this.joyButton = button;
+   }
+
+   // Inherit docs.
+   public override bool didTrigger(in ref ALLEGRO_EVENT event,
+                                   out InputHandlerParam param)
+   {
+      if (event.type == ALLEGRO_EVENT_JOYSTICK_BUTTON_UP
+          && isSameJoy(event.joystick.id)
+          && isSameJoyButton(event.joystick.button))
+      {
+         param.source = source;
+         return true;
+      }
+
+      return false;
+   }
+
+   // Inherit docs.
+   public override @property ConfigValue memento() inout
+   {
+      ConfigValue c;
+      c.makeAA();
+      c["class"] = className;
+      c["joy"] = joy;
+      c["joyButton"] = joyButton;
+
+      return c;
+   }
+
+   // Inherit docs.
+   public override @property void memento(const ConfigValue state)
+   {
+      enforce(state.hasString("class"));
+      enforce(state.hasNumber("joy"));
+      enforce(state.hasNumber("joyButton"));
+      enforce(state["class"] == className);
+      joy = to!int(state["joy"].asNumber);
+      joyButton = to!int(state["joyButton"].asNumber);
+   }
+}
+
+
 /**
  * An input trigger that triggers when a certain joystick axis goes beyond a
  * certain threshold in the positive direction.
