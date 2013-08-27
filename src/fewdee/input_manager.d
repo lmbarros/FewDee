@@ -30,6 +30,7 @@ import std.typecons;
 import allegro5.allegro;
 import fewdee.config;
 import fewdee.engine;
+import fewdee.input_helpers;
 import fewdee.low_level_event_handler;
 import fewdee.internal.collections;
 import fewdee.internal.singleton;
@@ -1119,7 +1120,9 @@ private class InputManagerImpl: LowLevelEventHandler
    /// Ditto.
    public final @property void memento(const ConfigValue state)
    {
-      // xxxxxxx TODO: Check if the expected fields are all there. xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      enforce(hasString(state, "commands"));
+      enforce(hasString(state, "states"));
+
       clearCommandTriggersAndStates();
 
       // Command triggers
@@ -1129,14 +1132,7 @@ private class InputManagerImpl: LowLevelEventHandler
 
          foreach (cfgTrigger; state["commands"][strCommandID].asList)
          {
-            import std.stdio; writefln("[%s] => %s", strCommandID, cfgTrigger);
-
-            auto objTrigger =
-               cast(InputTrigger)(Object.factory(cfgTrigger["class"].asString));
-
-            enforce(objTrigger !is null);
-
-            objTrigger.memento = cfgTrigger;
+            auto objTrigger = makeInputTrigger(cfgTrigger);
             addCommandTrigger(commandID, objTrigger);
          }
       }
@@ -1145,14 +1141,8 @@ private class InputManagerImpl: LowLevelEventHandler
       foreach (strStateID; state["states"].asAA.keys)
       {
          const stateID = _stateMappings[strStateID];
-
          const cfgState = state["states"][strStateID];
-         auto objState =
-            cast(InputState)(Object.factory(cfgState["class"].asString));
-
-         enforce(objState !is null);
-
-         objState.memento = cfgState;
+         auto objState = makeInputState(cfgState);
          addState(stateID, objState);
       }
    }

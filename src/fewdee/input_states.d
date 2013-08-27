@@ -14,6 +14,7 @@ module fewdee.input_states;
 import std.exception;
 import allegro5.allegro;
 import fewdee.config;
+import fewdee.input_helpers;
 import fewdee.input_manager;
 import fewdee.input_triggers;
 
@@ -79,7 +80,8 @@ class BooleanInputState: InputState
    // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
-      // xxxxxxx TODO: Check if the expected fields are all there. xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      enforce(hasBoolean(state, "defaultValue"));
+
       clearTriggers();
 
       _defaultValue = state["defaultValue"].asBoolean;
@@ -88,12 +90,7 @@ class BooleanInputState: InputState
       {
          foreach (cfgTrigger; state[key].asList)
          {
-            auto objTrigger =
-               cast(InputTrigger)(Object.factory(cfgTrigger["class"].asString));
-
-            enforce(objTrigger !is null);
-
-            objTrigger.memento = cfgTrigger;
+            auto objTrigger = makeInputTrigger(cfgTrigger);
             addTrigger(key, objTrigger);
          }
       }
@@ -320,19 +317,13 @@ class DirectionInputState: InputState
    // Inherit docs.
    public override @property void memento(const ConfigValue state)
    {
-      // xxxxxxx TODO: Check if the expected fields are all there. xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       clearTriggers();
 
       foreach (key; _triggerKeys)
       {
          foreach (cfgTrigger; state[key].asList)
          {
-            auto objTrigger =
-               cast(InputTrigger)(Object.factory(cfgTrigger["class"].asString));
-
-            enforce(objTrigger !is null);
-
-            objTrigger.memento = cfgTrigger;
+            auto objTrigger = makeInputTrigger(cfgTrigger);
             addTrigger(key, objTrigger);
          }
       }

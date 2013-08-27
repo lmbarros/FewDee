@@ -10,30 +10,8 @@ import std.conv;
 import std.exception;
 import allegro5.allegro;
 import fewdee.config;
+import fewdee.input_helpers;
 import fewdee.input_manager;
-
-
-//
-// Helper functions
-//
-
-/**
- * Is this $(D ConfigValue) an associative array and does it have a string field
- * named $(D s)?
- */
-private bool hasString(const ConfigValue c, string s)
-{
-   return c.isAA && s in c.asAA && c[s].isString;
-}
-
-/**
- * Is this $(D ConfigValue) an associative array and does it have a number field
- * named $(D s)?
- */
-private bool hasNumber(const ConfigValue c, string s)
-{
-   return c.isAA && s in c.asAA && c[s].isNumber;
-}
 
 
 //
