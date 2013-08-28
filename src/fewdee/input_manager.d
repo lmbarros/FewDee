@@ -429,6 +429,10 @@ class InputState
     * A representation of all the configuration of this $(D InputState) (like
     * what its default value, which triggers are being used, and so on).
     *
+    * Notice that the state itself is not stored in the memento. (By "state
+    * itself" I mean the value or values that are automatically updated as the
+    * user generates input events).
+    *
     * This implements something akin to the Memento pattern. You can read this
     * property to obtain a somewhat opaque representation of the configuration
     * of this $(D InputState) and write to it to restore a previous
@@ -543,8 +547,18 @@ class InputState
       return this.classinfo.name;
    }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   protected final ConfigValue serializeTriggers(string key) inout
+   /**
+    * Encodes all the data concerning the input triggers associated with a given
+    * key in a $(D ConfigValue), in the fashion expected by $(D memento).
+    *
+    * Parameters:
+    *    key = The key of the desired triggers.
+    *
+    * Returns:
+    *    The trigger data, ready to use by subclasses implementing the $(D
+    *    memento) property.
+    */
+   protected final ConfigValue mementoizeTriggers(string key) inout
    {
       ConfigValue res;
       res.makeList();
@@ -1079,8 +1093,15 @@ private class InputManagerImpl: LowLevelEventHandler
       _stateMappings[name] = value;
    }
 
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   // Memento! Maybe a better name; 'state' is limited to mappings or so...
+   /**
+    * A representation of the configuration of the $(D InputManager) related to
+    * input commands and input states.
+    *
+    * This implements something akin to the Memento pattern. You can read this
+    * property to obtain a somewhat opaque representation of the configuration
+    * of the $(D InputManager) and write to it to restore a previous
+    * configuration.
+    */
    public final @property ConfigValue memento() inout
    {
       ConfigValue c;

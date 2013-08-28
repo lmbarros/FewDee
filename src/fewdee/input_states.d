@@ -4,7 +4,7 @@
  * TODO: There is quite a bit of code replication here. Triggers for handling
  *    key/button up/down events, in particular, are very similar to each
  *    other. Making _triggerKeys a private property would also allow to add a
- *    deserializeTriggers() method.
+ *    demementoizeTriggers() method.
  *
  * Authors: Leandro Motta Barros
  */
@@ -72,7 +72,7 @@ class BooleanInputState: InputState
       c["defaultValue"] = _defaultValue;
 
       foreach(key; _triggerKeys)
-         c[key] = serializeTriggers(key);
+         c[key] = mementoizeTriggers(key);
 
       return c;
    }
@@ -309,7 +309,7 @@ class DirectionInputState: InputState
       c["class"] = className;
 
       foreach(key; _triggerKeys)
-         c[key] = serializeTriggers(key);
+         c[key] = mementoizeTriggers(key);
 
       return c;
    }
