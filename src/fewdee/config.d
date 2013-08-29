@@ -1387,16 +1387,23 @@ body
 {
    string doStringify(const ConfigValue value, int indentLevel)
    {
-      @property string indentString()
+      string indentString(int level)
+      in
+      {
+         assert(level >= 0);
+      }
+      body
       {
          string res = "";
-         foreach (i; 0..indentLevel)
+         foreach (i; 0..level)
             res ~= "   ";
          return res;
       }
 
       auto nl = prettyPrint ? "\n" : "";
-      auto indent = prettyPrint ? indentString : "";
+      auto inThis = prettyPrint ? indentString(indentLevel) : "";
+      auto inPrev = prettyPrint ? indentString(indentLevel-1) : "";
+      auto space = prettyPrint ? " " : "";
 
       final switch(value.type)
       {
@@ -1422,22 +1429,23 @@ body
 
          case ConfigValueType.AA:
          {
-            // xxxxxxxxxxxxxxx spaces if pretty printing! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-            string res = "{ ";
+            string res = "{" ~ nl;
             foreach (k, v; value.asAA)
-               res ~= k ~ " = " ~ doStringify(v, indentLevel + 1) ~ ", ";
+            {
+               res ~= inThis ~ k ~ space ~ "=" ~ space
+                  ~ doStringify(v, indentLevel + 1) ~ "," ~ nl;
+            }
 
-            return res ~ " }";
+            return res ~ inPrev ~ "}";
          }
 
          case ConfigValueType.LIST:
          {
-            // xxxxxxxxxxxxxxx spaces if pretty printing! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-            string res = "{ ";
+            string res = "{" ~ nl;
             foreach (v; value.asList)
-               res ~= doStringify(v, indentLevel + 1) ~ ", ";
+               res ~= inThis ~ doStringify(v, indentLevel + 1) ~ "," ~ nl;
 
-            return res ~ " }";
+            return res ~ inPrev ~ "}";
          }
       }
    }
@@ -1476,10 +1484,6 @@ unittest
    // Pretty
    {
       string s = origCV.stringify(true);
-
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      import std.stdio; writefln("Pretty string\n--------------------\n%s-------------------\n", s);
-
       auto cv = parseConfig(s);
 
       assert(cv.isAA);
@@ -1515,10 +1519,6 @@ unittest
    // Ugly
    {
       string s = origCV.stringify(false);
-
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      import std.stdio; writefln("Ugly string\n--------------------\n%s-------------------\n", s);
-
       auto cv = parseConfig(s);
 
       assert(cv.isAA);
@@ -1552,8 +1552,7 @@ unittest
    }
 }
 
-// xxxxxxxxx line breaks, backslashes... xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-// stringify: string
+// stringify: string with escaped characters
 unittest
 {
    enum theString = `First 'quoted" line
@@ -1565,27 +1564,14 @@ Second line \ contains a backslash!`;
    // Pretty
    {
       string s = origCV.stringify(true);
-
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      import std.stdio; writefln("Pretty string\n--------------------\n%s-------------------\n", s);
-
       auto cv = parseConfig(s);
-
-      import std.stdio; writefln("cv[s].asString (pretty)\n--------------------\n%s-------------------\n", cv["s"].asString);
-      import std.stdio; writefln("theString (pretty)\n--------------------\n%s-------------------\n", theString);
-
       assert(cv["s"].asString == theString);
    }
 
    // Ugly
    {
       string s = origCV.stringify(false);
-
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-      import std.stdio; writefln("Ugly string\n--------------------\n%s-------------------\n", s);
-
       auto cv = parseConfig(s);
-
       assert(cv["s"].asString == theString);
    }
 }
@@ -1612,13 +1598,6 @@ unittest
 
    string prettyString = cv.stringify(true);
    string uglyString = cv.stringify(false);
-
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   import std.stdio; writefln("Pretty string\n--------------------\n%s-------------------\n", prettyString);
-
-   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   import std.stdio; writefln("Ugly string\n--------------------\n%s-------------------\n", uglyString);
-
 
    // Pretty
    auto prettyCV = parseConfig(prettyString);
