@@ -7,6 +7,8 @@
 
 module fewdee.config;
 
+import std.array;
+import std.conv;
 import std.traits;
 import fewdee.internal.config_lexer;
 
@@ -567,6 +569,18 @@ unittest
    ConfigValue[string] anEmptyTable;
    auto emptyAAValue = ConfigValue(anEmptyTable);
    assert(emptyAAValue.isEmptyTable);
+}
+
+// Tests ConfigValue.asString with backslashes
+unittest
+{
+   enum aString = "I am a string \\ and I have an embedded backslash!";
+   auto cv = ConfigValue(aString);
+
+   assert(cv.type == ConfigValueType.STRING);
+   assert(cv.isString);
+   assert(cv.asString == aString);
+   assert(cv == aString);
 }
 
 
@@ -1345,4 +1359,332 @@ unittest
    assert(c["A"] == -987.6);
    assert(c["b"] == true);
    assert(c["cee"] == "abc");
+}
+
+
+/**
+ * Converts a $(D ConfigValue) to its string representation.
+ *
+ * Actually, this doesn't work with any $(D ConfigValue); this works only with
+ * associative arrays, and the key/value pairs are converted to top-level
+ * assignments. In other words, this does the inverse of $(D parseConfig()).
+ *
+ * Parameters:
+ *    data = The value to convert to a string. Must be an associative array.
+ *    prettyPrint = Add line breaks and indentation to make the string easier to
+ *       be read by human beings? If not, the returned string will be more
+ *       compact.
+ *
+ * Returns:
+ *    $(D value), represented as a string of Lua-like code.
+ */
+public string stringify(const ConfigValue value, bool prettyPrint = true)
+in
+{
+   assert(value.isAA);
+}
+body
+{
+   string doStringify(const ConfigValue value, int indentLevel)
+   {
+      @property string indentString()
+      {
+         string res = "";
+         foreach (i; 0..indentLevel)
+            res ~= "   ";
+         return res;
+      }
+
+      auto nl = prettyPrint ? "\n" : "";
+      auto indent = prettyPrint ? indentString : "";
+
+      final switch(value.type)
+      {
+         case ConfigValueType.NIL:
+            return "nil";
+
+         case ConfigValueType.NUMBER:
+            return to!string(value.asNumber);
+
+         case ConfigValueType.STRING:
+         {
+            return `"`
+               ~ value.asString
+               .replace("\\", "\\\\")
+               .replace("\n", "\\n")
+               .replace("\'", "\\\'")
+               .replace("\"", "\\\"")
+               ~ `"`;
+         }
+
+         case ConfigValueType.BOOLEAN:
+            return value.asBoolean ? "true" : "false";
+
+         case ConfigValueType.AA:
+         {
+            // xxxxxxxxxxxxxxx spaces if pretty printing! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            string res = "{ ";
+            foreach (k, v; value.asAA)
+               res ~= k ~ " = " ~ doStringify(v, indentLevel + 1) ~ ", ";
+
+            return res ~ " }";
+         }
+
+         case ConfigValueType.LIST:
+         {
+            // xxxxxxxxxxxxxxx spaces if pretty printing! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            string res = "{ ";
+            foreach (v; value.asList)
+               res ~= doStringify(v, indentLevel + 1) ~ ", ";
+
+            return res ~ " }";
+         }
+      }
+   }
+
+   string res = "";
+
+   auto len = value.length;
+   auto i = 0;
+   foreach (k, v; value.asAA)
+      res ~= k ~ " = " ~ doStringify(v, 1) ~ "\n";
+
+   return res;
+}
+
+
+// stringify: simple cases
+unittest
+{
+   ConfigValue origCV;
+   origCV.makeAA();
+   origCV["aNil"] = ConfigValue();
+   origCV["aNumber"] = ConfigValue(-756.342);
+   origCV["aString"] = ConfigValue("Beep!");
+   origCV["aBoolean"] = ConfigValue(true);
+
+   ConfigValue[string] theAA;
+   theAA["x"] = 1;
+   theAA["y"] = "yay!";
+   theAA["z"] = false;
+
+   origCV["anAA"] = ConfigValue(theAA);
+
+   auto theList = [ ConfigValue(-8.2), ConfigValue(true), ConfigValue("bab!") ];
+   origCV["aList"] = ConfigValue(theList);
+
+   // Pretty
+   {
+      string s = origCV.stringify(true);
+
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      import std.stdio; writefln("Pretty string\n--------------------\n%s-------------------\n", s);
+
+      auto cv = parseConfig(s);
+
+      assert(cv.isAA);
+      assert(cv.length == 6);
+      assert("aNil" in cv.asAA);
+      assert("aNumber" in cv.asAA);
+      assert("aString" in cv.asAA);
+      assert("aBoolean" in cv.asAA);
+      assert("anAA" in cv.asAA);
+      assert("aList" in cv.asAA);
+
+      assert(cv["aNil"].isNil);
+      assert(cv["aNumber"] == -756.342);
+      assert(cv["aString"] == "Beep!");
+      assert(cv["aBoolean"] == true);
+
+      assert(cv["anAA"].isAA);
+      assert(cv["anAA"].length == 3);
+      assert("x" in cv["anAA"].asAA);
+      assert("y" in cv["anAA"].asAA);
+      assert("z" in cv["anAA"].asAA);
+      assert(cv["anAA"]["x"] == 1);
+      assert(cv["anAA"]["y"] == "yay!");
+      assert(cv["anAA"]["z"] == false);
+
+      assert(cv["aList"].isList);
+      assert(cv["aList"].length == 3);
+      assert(cv["aList"][0] == -8.2);
+      assert(cv["aList"][1] == true);
+      assert(cv["aList"][2] == "bab!");
+   }
+
+   // Ugly
+   {
+      string s = origCV.stringify(false);
+
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      import std.stdio; writefln("Ugly string\n--------------------\n%s-------------------\n", s);
+
+      auto cv = parseConfig(s);
+
+      assert(cv.isAA);
+      assert(cv.length == 6);
+      assert("aNil" in cv.asAA);
+      assert("aNumber" in cv.asAA);
+      assert("aString" in cv.asAA);
+      assert("aBoolean" in cv.asAA);
+      assert("anAA" in cv.asAA);
+      assert("aList" in cv.asAA);
+
+      assert(cv["aNil"].isNil);
+      assert(cv["aNumber"] == -756.342);
+      assert(cv["aString"] == "Beep!");
+      assert(cv["aBoolean"] == true);
+
+      assert(cv["anAA"].isAA);
+      assert(cv["anAA"].length == 3);
+      assert("x" in cv["anAA"].asAA);
+      assert("y" in cv["anAA"].asAA);
+      assert("z" in cv["anAA"].asAA);
+      assert(cv["anAA"]["x"] == 1);
+      assert(cv["anAA"]["y"] == "yay!");
+      assert(cv["anAA"]["z"] == false);
+
+      assert(cv["aList"].isList);
+      assert(cv["aList"].length == 3);
+      assert(cv["aList"][0] == -8.2);
+      assert(cv["aList"][1] == true);
+      assert(cv["aList"][2] == "bab!");
+   }
+}
+
+// xxxxxxxxx line breaks, backslashes... xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+// stringify: string
+unittest
+{
+   enum theString = `First 'quoted" line
+Second line \ contains a backslash!`;
+   ConfigValue origCV;
+   origCV.makeAA();
+   origCV["s"] = theString;
+
+   // Pretty
+   {
+      string s = origCV.stringify(true);
+
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      import std.stdio; writefln("Pretty string\n--------------------\n%s-------------------\n", s);
+
+      auto cv = parseConfig(s);
+
+      import std.stdio; writefln("cv[s].asString (pretty)\n--------------------\n%s-------------------\n", cv["s"].asString);
+      import std.stdio; writefln("theString (pretty)\n--------------------\n%s-------------------\n", theString);
+
+      assert(cv["s"].asString == theString);
+   }
+
+   // Ugly
+   {
+      string s = origCV.stringify(false);
+
+      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      import std.stdio; writefln("Ugly string\n--------------------\n%s-------------------\n", s);
+
+      auto cv = parseConfig(s);
+
+      assert(cv["s"].asString == theString);
+   }
+}
+
+// stringify: more complex case
+unittest
+{
+   ConfigValue[string] yetAnotherAA;
+   yetAnotherAA["a"] = true;
+   yetAnotherAA["b"] = -1.001;
+   yetAnotherAA["c"] = ConfigValue();
+
+   ConfigValue[string] anotherAA;
+   anotherAA["foo"] = "FOO";
+   anotherAA["bar"] = yetAnotherAA;
+   anotherAA["baz"] = 645;
+
+   ConfigValue[string] rootAA;
+   rootAA["aNumber"] = -0.1234;
+   rootAA["aList"] = ConfigValue([ ConfigValue(1.1), ConfigValue("true") ]);
+   rootAA["anotherAA"] = anotherAA;
+
+   auto cv = ConfigValue(rootAA);
+
+   string prettyString = cv.stringify(true);
+   string uglyString = cv.stringify(false);
+
+   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   import std.stdio; writefln("Pretty string\n--------------------\n%s-------------------\n", prettyString);
+
+   // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   import std.stdio; writefln("Ugly string\n--------------------\n%s-------------------\n", uglyString);
+
+
+   // Pretty
+   auto prettyCV = parseConfig(prettyString);
+   assert(prettyCV.isAA);
+   assert(prettyCV.length == 3);
+
+   assert("aNumber" in prettyCV.asAA);
+   assert(prettyCV["aNumber"] == -0.1234);
+
+   assert("aList" in prettyCV.asAA);
+   assert(prettyCV["aList"].isList);
+   assert(prettyCV["aList"].length == 2);
+   assert(prettyCV["aList"][0] == 1.1);
+   assert(prettyCV["aList"][1] == "true");
+
+   assert("anotherAA" in prettyCV.asAA);
+   assert(prettyCV["anotherAA"].isAA);
+   assert(prettyCV["anotherAA"].length == 3);
+
+   assert("foo" in prettyCV["anotherAA"].asAA);
+   assert(prettyCV["anotherAA"]["foo"] == "FOO");
+
+   assert("bar" in prettyCV["anotherAA"].asAA);
+   assert(prettyCV["anotherAA"]["bar"].isAA);
+   assert(prettyCV["anotherAA"]["bar"].length == 3);
+   assert("a" in prettyCV["anotherAA"]["bar"].asAA);
+   assert(prettyCV["anotherAA"]["bar"]["a"] == true);
+   assert("b" in prettyCV["anotherAA"]["bar"].asAA);
+   assert(prettyCV["anotherAA"]["bar"]["b"] == -1.001);
+   assert("c" in prettyCV["anotherAA"]["bar"].asAA);
+   assert(prettyCV["anotherAA"]["bar"]["c"].isNil);
+
+   assert("baz" in prettyCV["anotherAA"].asAA);
+   assert(prettyCV["anotherAA"]["baz"] = 645);
+
+   // Ugly
+   auto uglyCV = parseConfig(uglyString);
+   assert(uglyCV.isAA);
+   assert(uglyCV.length == 3);
+
+   assert("aNumber" in uglyCV.asAA);
+   assert(uglyCV["aNumber"] == -0.1234);
+
+   assert("aList" in uglyCV.asAA);
+   assert(uglyCV["aList"].isList);
+   assert(uglyCV["aList"].length == 2);
+   assert(uglyCV["aList"][0] == 1.1);
+   assert(uglyCV["aList"][1] == "true");
+
+   assert("anotherAA" in uglyCV.asAA);
+   assert(uglyCV["anotherAA"].isAA);
+   assert(uglyCV["anotherAA"].length == 3);
+
+   assert("foo" in uglyCV["anotherAA"].asAA);
+   assert(uglyCV["anotherAA"]["foo"] == "FOO");
+
+   assert("bar" in uglyCV["anotherAA"].asAA);
+   assert(uglyCV["anotherAA"]["bar"].isAA);
+   assert(uglyCV["anotherAA"]["bar"].length == 3);
+   assert("a" in uglyCV["anotherAA"]["bar"].asAA);
+   assert(uglyCV["anotherAA"]["bar"]["a"] == true);
+   assert("b" in uglyCV["anotherAA"]["bar"].asAA);
+   assert(uglyCV["anotherAA"]["bar"]["b"] == -1.001);
+   assert("c" in uglyCV["anotherAA"]["bar"].asAA);
+   assert(uglyCV["anotherAA"]["bar"]["c"].isNil);
+
+   assert("baz" in uglyCV["anotherAA"].asAA);
+   assert(uglyCV["anotherAA"]["baz"] == 645);
 }

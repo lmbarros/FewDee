@@ -7,6 +7,7 @@
 
 module fewdee.internal.config_lexer;
 
+import std.array;
 import std.ascii;
 import std.format;
 import std.string;
@@ -159,17 +160,11 @@ package struct Token
    }
    body
    {
-      auto data = rawData[1..$-1]; // removes quotes
-      string result;
-
-      while (data.length > 0)
-      {
-         result ~= munch(data, "^\\");
-         if (data.length > 0)
-            data = data[1..$]; // skip backslash
-      }
-
-      return result;
+      return rawData[1..$-1]     // removes quotes
+         .replace("\\\\", "\\")  // backslashes
+         .replace("\\n", "\n")   // newlines
+         .replace("\\\'", "\'")  // single quotes
+         .replace("\\\"", "\""); // double quotes
    }
 
    /**
