@@ -1141,30 +1141,36 @@ private class InputManagerImpl: LowLevelEventHandler
    /// Ditto.
    public final @property void memento(const ConfigValue state)
    {
-      enforce(hasString(state, "commands"));
-      enforce(hasString(state, "states"));
+      enforce(hasPossiblyEmptyAA(state, "commands"));
+      enforce(hasPossiblyEmptyAA(state, "states"));
 
       clearCommandTriggersAndStates();
 
       // Command triggers
-      foreach (strCommandID; state["commands"].asAA.keys)
+      if (!state["commands"].isEmptyTable)
       {
-         const commandID = _commandMappings[strCommandID];
-
-         foreach (cfgTrigger; state["commands"][strCommandID].asList)
+         foreach (strCommandID; state["commands"].asAA.keys)
          {
-            auto objTrigger = makeInputTrigger(cfgTrigger);
-            addCommandTrigger(commandID, objTrigger);
+            const commandID = _commandMappings[strCommandID];
+
+            foreach (cfgTrigger; state["commands"][strCommandID].asList)
+            {
+               auto objTrigger = makeInputTrigger(cfgTrigger);
+               addCommandTrigger(commandID, objTrigger);
+            }
          }
       }
 
       // States
-      foreach (strStateID; state["states"].asAA.keys)
+      if (!state["states"].isEmptyTable)
       {
-         const stateID = _stateMappings[strStateID];
-         const cfgState = state["states"][strStateID];
-         auto objState = makeInputState(cfgState);
-         addState(stateID, objState);
+         foreach (strStateID; state["states"].asAA.keys)
+         {
+            const stateID = _stateMappings[strStateID];
+            const cfgState = state["states"][strStateID];
+            auto objState = makeInputState(cfgState);
+            addState(stateID, objState);
+         }
       }
    }
 
