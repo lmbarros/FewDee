@@ -1243,6 +1243,35 @@ private class InputManagerImpl: LowLevelEventHandler
       _commandTriggers = typeof(_commandTriggers).init;
       _states = typeof(_states).init;
    }
+
+   /// Obtains the input source of a given Allegro event.
+   public final InputSource inputSource(in ref ALLEGRO_EVENT event)
+   {
+      switch (event.type)
+      {
+         case ALLEGRO_EVENT_KEY_DOWN:
+         case ALLEGRO_EVENT_KEY_UP:
+         case ALLEGRO_EVENT_KEY_CHAR:
+            return InputSource.KEYBOARD;
+
+         case ALLEGRO_EVENT_MOUSE_AXES:
+         case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+         case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+         case ALLEGRO_EVENT_MOUSE_WARPED:
+         case ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY:
+         case ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY:
+            return InputSource.MOUSE;
+
+         case ALLEGRO_EVENT_JOYSTICK_AXIS:
+         case ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN:
+         case ALLEGRO_EVENT_JOYSTICK_BUTTON_UP:
+            return cast(InputSource)
+               (InputSource.JOY0 + _joyIndex[event.joystick.id]);
+
+         default:
+            return InputSource.INVALID;
+      }
+   }
 }
 
 
