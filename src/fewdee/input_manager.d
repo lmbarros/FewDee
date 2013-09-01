@@ -1216,7 +1216,7 @@ private class InputManagerImpl: LowLevelEventHandler
       {
          // Ignore disabled commands
          if (commandID in _disabledCommands)
-            break;
+            continue;
 
          // Execute triggers, call handlers
          foreach (trigger; _commandTriggers.get(commandID))
