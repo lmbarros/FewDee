@@ -43,6 +43,41 @@ package bool hasBoolean(const ConfigValue c, string s)
 
 
 /**
+ * Is this $(D ConfigValue) an associative array and does it have a list field
+ * named $(D s)?
+ */
+package bool hasList(const ConfigValue c, string s)
+{
+   return c.isAA && s in c.asAA && c[s].isList;
+}
+
+
+/**
+ * Is this $(D ConfigValue) an associative array and does it have an associative
+ * array field named $(D s)?
+ *
+ * Notice that, if $(D c[s]) is an empty table, this will return $(D false),
+ * because an empty table is considered to be an empty list.
+ *
+ * See_also: hasPossiblyEmptyAA
+ */
+package bool hasAA(const ConfigValue c, string s)
+{
+   return c.isAA && s in c.asAA && c[s].isAA;
+}
+
+
+/**
+ * Is this $(D ConfigValue) an associative array and does it have an associative
+ * array field named $(D s)?
+ */
+package bool hasPossiblyEmptyAA(const ConfigValue c, string s)
+{
+   return c.isAA && s in c.asAA && (c[s].isAA || c[s].isEmptyTable);
+}
+
+
+/**
  * Instantiates and initializes an $(D InputTrigger) based on the data in $(D
  * c).
  */
