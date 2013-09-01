@@ -79,7 +79,8 @@ public class GameState
     * state is pushed into the stack, just on top of this one).
     *
     * The default implementation simply says that this state no longer desires
-    * to receive any events.
+    * to receive any events. By the way, you'll very likely to want call $(D
+    * super.onBury()) when overriding this method.
     */
    public void onBury()
    {
@@ -93,7 +94,8 @@ public class GameState
     * the state previously on top was popped.
     *
     * The default implementation simply says that this state desires to restart
-    * receiving all events.
+    * receiving all events. By the way, you'll very likely to want call $(D
+    * super.onDigOut()) when overriding this method.
     */
    public void onDigOut()
    {
