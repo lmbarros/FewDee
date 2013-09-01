@@ -87,6 +87,18 @@
       updater. I am thinking about something like this:
       =addGenericUpdater!"opacity"()=. Maybe most of the others could
       be just aliases.
+* Example TODOs
+*** Consider making all examples "high-level"
+    - [2013-09-01 Sun 20:23] Right now, most examples avoid using
+      higher-level features provided by FewDee. My goal was to
+      portrait FewDee as a set of modules that could be used
+      independently (the examples also serve to test if this is indeed
+      the case). But most examples end up being more complex than
+      necessary, with disclaimers like "we'll need to free these
+      resources manually, because we are not using the
+      =ResourceManager=". Well, I think that most examples should use
+      all FewDee has to offer. If still think that it is important to
+      test the sub-modules individually, then add examples for this.
 * TODOish notes concerning resources
    - Not all resources have a 1:1 mapping between files and the
      resources themselves. Case in point: one bitmap may contain
