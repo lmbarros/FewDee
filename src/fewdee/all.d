@@ -17,7 +17,6 @@ public import allegro5.allegro_primitives;
 
 // The FewDee public interface is imported here
 public import fewdee.aabb;
-public import fewdee.abstracted_input;
 public import fewdee.allegro_manager;
 public import fewdee.audio_manager;
 public import fewdee.audio_sample;
@@ -33,6 +32,11 @@ public import fewdee.event_manager;
 public import fewdee.font;
 public import fewdee.game_loop;
 public import fewdee.game_state;
+public import fewdee.input_helpers;
+public import fewdee.input_listener;
+public import fewdee.input_manager;
+public import fewdee.input_states;
+public import fewdee.input_triggers;
 public import fewdee.interpolators;
 public import fewdee.low_level_event_handler;
 public import fewdee.low_level_resource;

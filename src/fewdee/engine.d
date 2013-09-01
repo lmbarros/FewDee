@@ -13,6 +13,7 @@ import fewdee.allegro_manager;
 import fewdee.audio_manager;
 import fewdee.event_manager;
 import fewdee.game_state;
+import fewdee.input_manager;
 import fewdee.state_manager;
 import fewdee.display_manager;
 import fewdee.resource_manager;
@@ -123,6 +124,7 @@ private class EngineImpl
    private final void stop()
    {
       EventManager.destroyInstance();
+      InputManager.destroyInstance();
       StateManager.destroyInstance();
       ResourceManager.destroyInstance();
       AudioManager.destroyInstance();

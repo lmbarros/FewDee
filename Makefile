@@ -24,7 +24,8 @@ all: fewdee.a fewdeedemo.example display_manager_info.example \
      states_simple.example interpolators_graphs.example \
      updater_simple.example updater_canned.example \
      updater_canned_audio.example sg_solar_system.example \
-     sg_parallax_scrolling.example abstracted_input_simple.example \
+     sg_parallax_scrolling.example input_manager_simple.example \
+     input_manager_joysticks.example input_listener_memento.example \
      audio_sample_simple.example audio_stream_simple.example \
      sprite_simple.example sprite_animation_events.example \
      game_loop_simple.example game_loop_prediction.example
@@ -45,7 +46,9 @@ updater_canned_audio.example: examples/updater_canned_audio.d fewdee.a
 sg_solar_system.example: examples/sg_solar_system.d fewdee.a
 sg_parallax_scrolling.example: examples/sg_parallax_scrolling.d fewdee.a
 interpolators_graphs.example: examples/interpolators_graphs.d fewdee.a
-abstracted_input_simple.example: examples/abstracted_input_simple.d fewdee.a
+input_manager_joysticks.example: examples/input_manager_joysticks.d fewdee.a
+input_listener_memento.example: examples/input_listener_memento.d fewdee.a
+input_manager_simple.example: examples/input_manager_simple.d fewdee.a
 audio_sample_simple.example: examples/audio_sample_simple.d fewdee.a
 audio_stream_simple.example: examples/audio_stream_simple.d fewdee.a
 sprite_simple.example: examples/sprite_simple.d fewdee.a
@@ -64,4 +67,5 @@ test: fewdee_unit_tests
 
 # Clean
 clean:
-	rm -f fewdee.a *.o *.example fewdee_unit_tests
+	rm -f fewdee.a *.o *.example input_listener_memento.cfg \
+   fewdee_unit_tests
