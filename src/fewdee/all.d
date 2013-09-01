@@ -32,6 +32,8 @@ public import fewdee.event_manager;
 public import fewdee.font;
 public import fewdee.game_loop;
 public import fewdee.game_state;
+public import fewdee.input_helpers;
+public import fewdee.input_listener;
 public import fewdee.input_manager;
 public import fewdee.input_states;
 public import fewdee.input_triggers;

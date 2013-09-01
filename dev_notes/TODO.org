@@ -1,6 +1,16 @@
 #+STARTUP: overview hidestars odd
 
 * Bugs
+*** =InputListener= listens too much
+    - [2013-09-01 Sun 12:20] See the TODO in the lister/memento
+      example. The keydown event that made us enter the
+      =ConfigInputState= is already listened by the =InputListener= --
+      therefore, the first command is always interpreted as "F10". As
+      a quick fix, I am using key up events to trigger the state
+      change. The real solution probably has to do with some kind of
+      linking between the =InputListener= and the =GameState=. (See
+      the item "Add GameState-specific updaters" somewhere else in
+      this file; these are very strongly related issues, I guess.
 *** =updater_canned_audio.example= freezes sometimes
     - [2013-07-03 Wed 20:53] I don't know exactly how to reproduce,
       but it seems to have something to do with varying the playing

@@ -635,23 +635,6 @@ void initInputStatesConstants(EnumStates)()
 
 
 
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-// Maybe not a good name. This is to implement those "configure keys"
-// screens. Create it, reset() it and keep checking if hasCommand(). When it
-// has, just taje the command(). Maybe will need a way to set a "cancel" command
-// ("press ESC to not read any command").
-// And... move to a separate file?
-class CommandListener: LowLevelEventHandler
-{
-   // clears the current command
-   public void reset() { };
-   public @property bool hasCommand() { return false; }
-
-   // What to return here?
-   public @property int command() { return 0; };
-}
-
-
 /**
  * The type of functions (er, delegates) used to handle high-level commands.
  *
