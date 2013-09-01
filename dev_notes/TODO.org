@@ -57,7 +57,6 @@
       wasn't being called when =destroy()= was called on the resources
       (at least, that's what was seemingly happening with the
       =FakeResource= used in some unit tests.
-
 *** Smarter sound initialization
     - If the sound cannot be initialized, the audio examples
       crash. There must be an easy and clean way for checking if the
@@ -69,18 +68,15 @@
       should simply be no-ops. This would be great, since the FewDee
       user wouldn't need to code worrying if audio is available or
       not. Graceful degration.
-
 *** Virtual screen
      - Create a "virtual screen" with a given "virtual size". Draw
        everything relative to this virtual screen. Scale when
        drawing. But allow to use "real pixels", too. (This would be an
        option when creating (or re-creating, if possible) the
        display).
-
 *** Replace fewdee.all with something more standard
      - Some people were using =fewdee/_.d=. But it seems that
        =fewdee/package.d= will be the standard.
-
 *** Consider making the canned updaters more generic
     - [2013-07-02 Tue 21:59] C'mon... most of them have the same
       overall structure. Change the attribute, there we got a new
@@ -115,7 +111,6 @@
    - The resource manager would be, perhaps, the point where we chose
      between a real file system or an archive file
      system. Perhaps. Must think about this.
-
 * Node Events TODOs
 *** Z-order
     - Drawables have a "z" property; I can implement a picking visitor
@@ -136,44 +131,15 @@
       "real" bitmap for sorting purposes. Anyway, must implement a
       benchmark to test how slower it is to render from different
       bitmaps versus from a single one versus sub-bitmaps.
-
-* Abstracted Input TODOs
-*** Add means to remove objects/handlers from AbstractedInput
-*** Add more Command Triggers
+* InputManager TODOs
+*** Add more InputTriggers
     - Including one to recognize sequences of keys (both with
       time-constraints, like in fighting games, and without, like in
       IDKFA).
-*** Make AbstractedInput more usable
-    - Think about ways to make AbstractedInput more usable. Think
-      about moving a character around. There is a set of low-level
-      events (left key up, right_key_down...) that work together to
-      generate the high-level commands (Think about diagonals;
-      specially in a discrete grid; if "up" and "left" are pressed
-      within a very short period, we want diagonal walking
-      events. This is no one-to-one, as the current design
-      assumes). And even then, the high-level commands could be
-      implemented in different ways; do we have a "start walking
-      right" command? Or we want to manage a "currently walking right"
-      state? Or perhaps generate a sequence of "walked one step to the
-      right" events?
-   - Here's the result of some recent thinking about it: The problem
-     is that the current design always maps events to commands, while
-     sometimes we simply want to update some state that can be queried
-     by the game at some specific moment. So, in addition to executing
-     callbacks, AbstractedInput should be able to maintain some state
-     updated as the user generates low-level events.
-      - What kind of state? Boolean, integer, floating point, perhaps
-        even "enum". A "direction" state, for 4- or 8-directions would
-        be very useful, too.
-      - We could call state changed callbacks (but I don't know if
-        this would be useful).
-      - Different strategies for state updates should be usable. For
-        example, a float state could gradually go back to zero in the
-        absence of an input signal, or keep the value "forever".
-
+*** Add more InputStates
+    - Like floating point states and 4-way direction states.
 * Text TODOs
 *** Add Text vertical alignment
-
 * Scene Graph TODOs
 *** Add multiple children with one call?
     - Group.addChild(): accept multiple children at a time?
@@ -187,7 +153,7 @@
       and create SpriteNode and TextNode classes for the scene graph.
 
 * Optimization TODOs
-*** Updated AABBs only when needed
+*** Update AABBs only when needed
     - Child nodes call a parents' method to tell to update their
       bounding boxes because their own bounding box changed. This way,
       we'll always have updated bounding boxes. [ initial
@@ -204,22 +170,7 @@
       remember to take subbitmaps into account. (Need to benchmark
       this; perhaps leave the sorting policy as something
       user-definable)
-
 * Longer term TODOs
 *** Hide Allegro completelly?
     - Consider hiding Allegro completely. Or perhaps allow multiple
       back-ends.
-
-*** Find a decent way to represent input devices uniquely
-    - Think about a decent way to represent input devices
-      uniquely. Also, consider that joysticks can be plugged or
-      unplugged at any time. This should be supported.
-    - [2013-07-21 Sun 00:03] Well, each input device has a unique
-      pointer identifying it; as long as joysticks are not connected
-      and disconnected, joystick pointers "remain unique". I could map
-      a sequential number to input devices... like "0 = keyboard", "1
-      = mouse", "2 = joystick A", "3 = joystick B". If joystick A is
-      disconnected, id 2 becomes invalid. If a new (perhaps the same)
-      joystick is the connected, a new inout device id, 4, is created
-      for it (which may be associated with the same JOYSTICK* as id 2,
-      since JOYSTICK* can be recycled).
