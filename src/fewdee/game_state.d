@@ -20,7 +20,7 @@ public class GameState
     *
     * This must be called by the state on the top of the stack. Failing to
     * observe this rule will trigger an $(D assert()). For pushing the first
-    * state on the stack, please use $(StateManager.pushState()).
+    * state on the stack, please use $(D StateManager.pushState()).
     *
     * Parameters:
     *    state = The state to push into the stack of states, just on top of this
@@ -105,8 +105,8 @@ public class GameState
    };
 
    /**
-    * Adds an event handler. Its handleEvent() method will be called from now on
-    * for every event handled by this game state.
+    * Adds an event handler. Its $(D handleEvent()) method will be called from
+    * now on for every event handled by this game state.
     *
     * Parameters:
     *    handler = The event handler to add.
@@ -138,30 +138,30 @@ public class GameState
       return "GameState(" ~ typeid(this).name ~ ")";
    }
 
-   /// Does this GameState want to receive "tick" events?
+   /// Does this $(D GameState) want to receive "tick" events?
    public final @property bool wantsTicks() const { return _wantsTicks; }
 
-   /// Does this GameState want to receive "tick" events?
+   /// Ditto.
    public final @property void wantsTicks(bool wants) { _wantsTicks = wants; }
 
-   /// Does this GameState want to receive events other than "tick"?
-   public final @property bool wantsEvents() const { return _wantsEvents; }
-
-   /// Does this GameState want to receive events other than "tick"?
-   public final @property void wantsEvents(bool wants) { _wantsEvents = wants; }
-
-   /// Does this GameState want to draw?
-   public final @property bool wantsToDraw() const { return _wantsToDraw; }
-
-   /// Does this GameState want to draw?
-   public final @property void wantsToDraw(bool wants) { _wantsToDraw = wants; }
-
-   /// Does this GameState want to receive "tick" events?
+   /// Ditto.
    private bool _wantsTicks = true;
 
-   /// Does this GameState want to receive events other than "tick"?
+   /// Does this $(D GameState) want to receive events other than "tick"?
+   public final @property bool wantsEvents() const { return _wantsEvents; }
+
+   /// Ditto.
+   public final @property void wantsEvents(bool wants) { _wantsEvents = wants; }
+
+   /// Ditto.
    private bool _wantsEvents = true;
 
-   /// Does this GameState want to draw?
+   /// Does this $(D GameState) want to draw?
+   public final @property bool wantsToDraw() const { return _wantsToDraw; }
+
+   /// Ditto.
+   public final @property void wantsToDraw(bool wants) { _wantsToDraw = wants; }
+
+   /// Ditto.
    private bool _wantsToDraw = true;
 }
