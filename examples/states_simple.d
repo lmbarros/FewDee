@@ -144,7 +144,7 @@ void main()
       DisplayManager.createDisplay("main");
 
       // Load the font. This will throw if some error happens.
-      theFont = new Font("data/bluehigl.ttf", 30);
+      theFont = new Font("data/lato.otf", 22);
 
       // Starts the game main loop, with an 'InitialState' as the starting
       // state. The loop will run as long as there is at least one state in the

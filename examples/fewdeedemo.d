@@ -22,7 +22,7 @@ void main()
       ResourceManager.bitmaps.add("bmp1", new Bitmap("data/flag_1.png"));
       ResourceManager.bitmaps.add("bmp2", new Bitmap("data/flag_2.png"));
       ResourceManager.bitmaps.add("bmp3", new Bitmap("data/flag_3.png"));
-      ResourceManager.fonts.add("font", new Font("data/bluehigl.ttf", 50));
+      ResourceManager.fonts.add("font", new Font("data/lato.otf", 50));
 
       // Create a sprite
       auto spriteType = new SpriteType(64, 64, "bmp1", "bmp2", "bmp3");

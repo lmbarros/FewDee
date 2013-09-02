@@ -25,7 +25,7 @@ void main()
       // free it manually latter.
       enum fontSize = 20;
       enum fontSpacing = fontSize * 1.3;
-      Font font = new Font("data/bluehigl.ttf", fontSize);
+      Font font = new Font("data/lato.otf", fontSize);
 
       // Helper function, to draw text on the screen
       void drawText(string text, float x, float y)

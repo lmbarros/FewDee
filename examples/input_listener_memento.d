@@ -52,7 +52,7 @@ void main()
 
       // Load a font. We are not using the 'ResourceManager', so we'll have to
       // free it manually latter.
-      theFont = new Font("data/bluehigl.ttf", 30);
+      theFont = new Font("data/lato.otf", 22);
 
       // Tell the 'InputManager' which are the commands we'll be using. Since we
       // are not using any 'InputStates', we can't use

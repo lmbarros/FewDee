@@ -25,7 +25,7 @@ void main()
       scope updater = new TickBasedUpdater();
       bool exitPlease = false;
 
-      auto font = new Font("data/bluehigl.ttf", 26);
+      auto font = new Font("data/lato.otf", 22);
 
       // Lil' function to draw text on the display
       void drawText(string text, float x, float y)

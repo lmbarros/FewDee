@@ -51,7 +51,7 @@ void main()
 
       // Load a font. We are not using the 'ResourceManager', so we'll have to
       // free it manually latter.
-      Font font = new Font("data/bluehigl.ttf", 30);
+      Font font = new Font("data/lato.otf", 22);
 
       // Helper function, to draw text on the screen
       void drawText(string text, float x, float y)

@@ -408,9 +408,9 @@ unittest
    rm.bitmaps.add("", new Bitmap("data/logo.png")); // empty string as key
    assert(rm.bitmaps._resources.length == 4);
 
-   rm.fonts.add("a", new Font("data/bluehigl.ttf", 10));
-   rm.fonts.add("b", new Font("data/bluehigl.ttf", 15));
-   rm.fonts.add("c", new Font("data/bluehigl.ttf", 20));
+   rm.fonts.add("a", new Font("data/lato.otf", 10));
+   rm.fonts.add("b", new Font("data/lato-b.otf", 15));
+   rm.fonts.add("c", new Font("data/lato-i.otf", 20));
    assert(rm.fonts._resources.length == 3);
 
    rm.samples.add("a", new AudioSample("data/yes.ogg"));
@@ -449,9 +449,9 @@ unittest
    rm.bitmaps.add("3-a", new Bitmap("data/logo.png"));
    assert(rm.bitmaps._resources.length == 4);
 
-   rm.fonts.add("1-a", new Font("data/bluehigl.ttf", 12));
-   rm.fonts.add("2-a", new Font("data/bluehigl.ttf", 18));
-   rm.fonts.add("2-b", new Font("data/bluehigl.ttf", 24));
+   rm.fonts.add("1-a", new Font("data/lato.otf", 12));
+   rm.fonts.add("2-a", new Font("data/lato-bi.otf", 18));
+   rm.fonts.add("2-b", new Font("data/lato-b.otf", 24));
    assert(rm.fonts._resources.length == 3);
 
    rm.samples.add("1-a", new AudioSample("data/yes.ogg"));
@@ -507,9 +507,9 @@ unittest
    rm.bitmaps.add("3-a", new Bitmap("data/logo.png"));
    assert(rm.bitmaps._resources.length == 4);
 
-   rm.fonts.add("1-a", new Font("data/bluehigl.ttf", 8));
-   rm.fonts.add("2-a", new Font("data/bluehigl.ttf", 10));
-   rm.fonts.add("2-b", new Font("data/bluehigl.ttf", 12));
+   rm.fonts.add("1-a", new Font("data/lato-b.otf", 8));
+   rm.fonts.add("2-a", new Font("data/lato-bi.otf", 10));
+   rm.fonts.add("2-b", new Font("data/lato-i.otf", 12));
    assert(rm.fonts._resources.length == 3);
 
    rm.samples.add("1-a", new AudioSample("data/yes.ogg"));
