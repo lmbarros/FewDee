@@ -59,22 +59,12 @@ auto to = 10.0;
 // certain value.
 auto duration = 1.0;
 
-// "Amplitude" is a parameter used only by the "back" and "elastic"
-// interpolators. (And even those have default values for these parameters, so
-// in many cases you don't have to worry about "amplitude").
-auto amplitude = 2.0;
-
-// "Period" is used by the "elastic" interpolators; like "amplitude", "period"
-// has a default value that may be just you need in practice.
-auto period = 0.3;
-
 // Interpolators in FewDee are delegates that take one parameter (the "t" value)
 // and return the interpolated value. In this example, the following variable
 // stores the interpolator used to draw the graphs.
 Interpolator theInterpolator;
 
-// And this is our neat "graph paper" bitmap that will be used as the background
-// image.
+// And this is the neat "graph paper" bitmap we'll use as the background image.
 Bitmap bmpBG;
 
 
@@ -82,18 +72,14 @@ Bitmap bmpBG;
 // 'theInterpolator' variable with an updated interpolator. That's what this
 // function does.
 //
-// The easiest way to create an interpolator is to call the 'interpolator()'
-// template function. The only drawback of 'interpolator()' is that it doesn't
-// allow to set the "amplitude" and "period" parameters of "back" and "elastic"
-// interpolators (you can use 'interpolator()' to create interpolators of these
-// types, but the default values for "amplitude" and "period" will be used).
+// To create an interpolator, we call the 'interpolator()' template function.
 private void remakeInterpolator()
 {
    final switch (currentInterpolator) with (InterpolatorType)
    {
-      // This is the simplest case of calling the 'interpolator()' function. The
-      // template parameter (here, "t") determines the type of interpolator that
-      // will be created and returned (in this case, a linear interpolator).
+      // This is how we call the 'interpolator()' function. The template
+      // parameter (here, "t") determines the type of interpolator that will be
+      // created and returned (in this case, a linear interpolator).
       case Linear:
          theInterpolator = interpolator!"t"(from, to, duration);
          break;
@@ -116,9 +102,10 @@ private void remakeInterpolator()
          theInterpolator = interpolator!"[t^2]"(from, to, duration);
          break;
 
-      // From now on, most calls are similar... just the template parameter
+      // From now on, all calls are similar... just the template parameter
       // changes. The documentation of 'interpolator()' lists all accepted
-      // values, including variations like "[cubic" instead of "[t^3".
+      // values, including variations -- you could "[cubic" instead of "[t^3",
+      // for example.
       case CubicIn:
          theInterpolator = interpolator!"[t^3"(from, to, duration);
          break;
@@ -192,24 +179,15 @@ private void remakeInterpolator()
          break;
 
       case BackIn:
-         // Here's the first case in which we don't use 'interpolator()' to
-         // create an interpolator. Since we are creating a "back" interpolator
-         // *and* want to set its "nonstandard" "amplitude" parameter, we have o
-         // use a specific function to create it. Notice that, if you were OK to
-         // use the default value for "amplitude", you could call
-         // 'interpolator!"[back"()' here.
-         theInterpolator =
-            makeBackInInterpolator(from, to, amplitude, duration);
+         theInterpolator = interpolator!"[back"(from, to, duration);
          break;
 
       case BackOut:
-         theInterpolator =
-            makeBackOutInterpolator(from, to, amplitude, duration);
+         theInterpolator = interpolator!"back]"(from, to, duration);
          break;
 
       case BackInOut:
-         theInterpolator =
-            makeBackInOutInterpolator(from, to, amplitude, duration);
+         theInterpolator = interpolator!"[back]"(from, to, duration);
          break;
 
       case BounceIn:
@@ -225,18 +203,15 @@ private void remakeInterpolator()
          break;
 
       case ElasticIn:
-         theInterpolator =
-            makeElasticInInterpolator(from, to, amplitude, period, duration);
+         theInterpolator = interpolator!"[elastic"(from, to, duration);
          break;
 
       case ElasticOut:
-         theInterpolator =
-            makeElasticOutInterpolator(from, to, amplitude, period, duration);
+         theInterpolator = interpolator!"elastic]"(from, to, duration);
          break;
 
       case ElasticInOut:
-         theInterpolator =
-            makeElasticInOutInterpolator(from, to, amplitude, period, duration);
+         theInterpolator = interpolator!"[elastic]"(from, to, duration);
          break;
 
       case Count:
@@ -382,36 +357,6 @@ void main()
                      to += 1.0;
 
                   writefln("to = %s", to);
-                  remakeInterpolator();
-
-                  break;
-               }
-
-               // amplitude
-               case ALLEGRO_KEY_A:
-               {
-                  auto mod = event.keyboard.modifiers;
-                  if (mod & ALLEGRO_KEYMOD_SHIFT)
-                     amplitude -= 0.1;
-                  else
-                     amplitude += 0.1;
-
-                  writefln("amplitude = %s", amplitude);
-                  remakeInterpolator();
-
-                  break;
-               }
-
-               // period
-               case ALLEGRO_KEY_P:
-               {
-                  auto mod = event.keyboard.modifiers;
-                  if (mod & ALLEGRO_KEYMOD_SHIFT)
-                     period -= 0.1;
-                  else
-                     period += 0.1;
-
-                  writefln("period = %s", period);
                   remakeInterpolator();
 
                   break;
