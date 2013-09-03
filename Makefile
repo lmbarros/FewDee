@@ -28,7 +28,8 @@ all: fewdee.a fewdeedemo.example display_manager_info.example \
      input_manager_joysticks.example input_listener_memento.example \
      audio_sample_simple.example audio_stream_simple.example \
      sprite_simple.example sprite_animation_events.example \
-     game_loop_simple.example game_loop_prediction.example
+     game_loop_simple.example game_loop_prediction.example \
+     opengl_simple.example
 
 
 # The library
@@ -55,6 +56,7 @@ sprite_simple.example: examples/sprite_simple.d fewdee.a
 sprite_animation_events.example: examples/sprite_animation_events.d fewdee.a
 game_loop_simple.example: examples/game_loop_simple.d fewdee.a
 game_loop_prediction.example: examples/game_loop_prediction.d fewdee.a
+opengl_simple.example: examples/opengl_simple.d fewdee.a
 
 
 # Unit tests
