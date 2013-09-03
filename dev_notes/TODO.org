@@ -68,6 +68,12 @@
       should simply be no-ops. This would be great, since the FewDee
       user wouldn't need to code worrying if audio is available or
       not. Graceful degration.
+    - [2013-09-03 Tue 16:13] I thought just had higher-priority than
+      it does. I used to have problems with this because my audio
+      player was using OSS, while FewDee was using ALSA. Now I
+      configured my player to use ALSA, so it and FewDee audio work
+      together. I guess the problem still exists, but it no longer
+      worries me much.
 *** Virtual screen
      - Create a "virtual screen" with a given "virtual size". Draw
        everything relative to this virtual screen. Scale when
