@@ -1,6 +1,8 @@
 /**
  * Default implementations for $(D Colorable), $(D Positionable) and friends.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

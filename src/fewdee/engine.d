@@ -2,6 +2,8 @@
  * The engine core. Provides some very fundamental services, plus some
  * utilities.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

@@ -1,6 +1,8 @@
 /**
  * Base class for the states the game can be in.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

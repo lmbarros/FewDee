@@ -2,6 +2,8 @@
  * A color representation that can behave either as in premultiplied alpha
  * blending or as in conventional alpha blending.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

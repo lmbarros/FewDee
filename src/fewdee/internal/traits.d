@@ -1,6 +1,8 @@
 /**
  * Traits-like helpers for FewDee implementation.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  *
  * TODO: All the $(D static if)s used below to detect if a given type $(D

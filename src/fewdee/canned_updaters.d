@@ -9,6 +9,8 @@
  * On the other hand, using them requires very little effort, and therefore they
  * are an excellent way to make your graphics and interfaces more "lively".
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

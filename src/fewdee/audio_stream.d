@@ -1,6 +1,8 @@
 /**
  * A low(ish)-level Audio Stream resource.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

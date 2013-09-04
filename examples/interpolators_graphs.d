@@ -4,6 +4,8 @@
  * Plots the interpolators' graphs. Allows to change the interpolation
  * parameters and see the results right there.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

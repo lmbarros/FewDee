@@ -5,6 +5,8 @@
  * (which are the places where things are drawn, like a window or "a full
  * screen").
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

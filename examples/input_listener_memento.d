@@ -3,6 +3,8 @@
  * configure the input and the memento-like interface to persist the input
  * configuration.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

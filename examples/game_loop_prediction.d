@@ -10,6 +10,8 @@
  * See_also: http://www.koonsolo.com/news/dewitters-gameloop/ (Look for "The
  * Need for Interpolation" and "Interpolation and Prediction".)
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

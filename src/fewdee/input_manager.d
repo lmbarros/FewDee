@@ -18,6 +18,8 @@
  * too) convoluted, you don't have to use it at all -- its usage is completely
  * optional.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

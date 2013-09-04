@@ -6,6 +6,8 @@
  * different, I am talking about the FewDee side; OpenGL and Direct3D APIs are
  * pretty different from each other.)
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

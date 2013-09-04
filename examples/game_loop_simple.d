@@ -1,6 +1,8 @@
 /**
  * An example showing how to use the different main game loops.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

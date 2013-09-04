@@ -4,6 +4,8 @@
  * Canned updaters are a handy way to do things like smoothly moving things
  * around the screen or smoothly changing their sizes or colors.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

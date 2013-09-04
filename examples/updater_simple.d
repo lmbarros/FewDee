@@ -3,6 +3,8 @@
  * $(D Updater) (in fact, of a $(D TickBasedUpdater), which is probably what
  * most people will want to use in practice).
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

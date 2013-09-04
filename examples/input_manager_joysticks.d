@@ -1,6 +1,8 @@
 /**
  * An example showing the joysticks detected by $(D InputManager).
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

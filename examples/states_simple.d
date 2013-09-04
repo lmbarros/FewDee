@@ -4,6 +4,8 @@
  * A simple example showing the use of game states. We create a few states and
  * allow the user to change between them by pressing some keys.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

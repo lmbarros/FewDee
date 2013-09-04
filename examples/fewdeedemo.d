@@ -2,6 +2,8 @@
  * A quick and dirty FewDee demo. Should be removed once I have better examples
  * for everything.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

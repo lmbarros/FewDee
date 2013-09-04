@@ -2,6 +2,8 @@
  * @file
  * An abstract interface representing a low-level resource.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * @author Leandro Motta Barros
  */
 

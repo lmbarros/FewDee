@@ -4,6 +4,8 @@
  * The Audio Manager allows to play audio samples and audio streams. And stop
  * them. And seek. And loop. These things.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

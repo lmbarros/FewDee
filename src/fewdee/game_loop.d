@@ -4,6 +4,8 @@
  * The implementations presented here are based on a blog post by Koen Witters,
  * which discusses the pros and cons of each one.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  *
  * See_also: http://www.koonsolo.com/news/dewitters-gameloop/

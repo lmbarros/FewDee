@@ -4,6 +4,8 @@
  * This implements a tried and true idiom: a stack of states in which, normally,
  * only the state on top (that is, the current one) responds to events.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

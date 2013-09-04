@@ -1,6 +1,8 @@
 /**
  * Helpers used to implement $(D InputState)s and $(D InputTrigger)s.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

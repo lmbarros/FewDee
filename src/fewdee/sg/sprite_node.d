@@ -1,6 +1,8 @@
 /**
  * A scene graph node that displays a $(D Sprite).
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

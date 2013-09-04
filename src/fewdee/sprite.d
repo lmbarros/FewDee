@@ -11,6 +11,8 @@
  * here. (As I write this, the only one is a function used together with an $(D
  * Updater) to play sprite animations.)
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

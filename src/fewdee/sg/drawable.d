@@ -1,6 +1,8 @@
 /**
  * A scene graph node that can be drawn.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

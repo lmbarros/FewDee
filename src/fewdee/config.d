@@ -2,6 +2,8 @@
  * Configuration files (actually, configuration strings), which work even at
  * compile-time and use a Lua-like syntax.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

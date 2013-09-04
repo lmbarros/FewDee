@@ -14,6 +14,8 @@
  * (by calling $(D al_install_audio()), for example) should be avoided, because
  * FewDee may have initialized the submodule already.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

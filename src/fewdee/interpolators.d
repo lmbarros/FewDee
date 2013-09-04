@@ -6,9 +6,13 @@
  * an object, or the volume of a sound sample, take a look at module $(D
  * fewdee.canned_updaters); it may be just what you need.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib
+ *    License). (Warren Moore's original C code was licensed under the
+ *    $(LINK2 http://www.wtfpl.net, Do What The Fuck You Want To Public License,
+ *    version 2).)
+ *
  * Authors: Leandro Motta Barros, based on C code originally written by Warren
- *    Moore (which was licensed under the Do What The Fuck You Want To Public
- *    License, version 2).
+ *    Moore.
  *
  * See_Also: https://github.com/warrenm/AHEasing, http://robertpenner.com/easing
  */

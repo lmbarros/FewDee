@@ -10,6 +10,8 @@
  * graph rendering was respecting the z-order and this was the first thing I
  * tought of.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

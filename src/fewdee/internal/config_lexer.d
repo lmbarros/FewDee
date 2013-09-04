@@ -2,6 +2,8 @@
  * A lexer (tokenizer) for configuration files/strings; works even at
  * compile-time and expects a Lua-like input syntax.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

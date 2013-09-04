@@ -2,6 +2,8 @@
  * Listens to input events and make them available in a way that is useful to
  * implement a "configure input" screen.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 

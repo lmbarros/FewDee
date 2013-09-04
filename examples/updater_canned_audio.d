@@ -4,6 +4,8 @@
  * This is just like the "Canned Updaters" example, but tests the updaters
  * usable with audio.
  *
+ * License: $(LINK2 http://opensource.org/licenses/zlib-license, Zlib License).
+ *
  * Authors: Leandro Motta Barros
  */
 
