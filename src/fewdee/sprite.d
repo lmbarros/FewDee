@@ -30,7 +30,7 @@ import fewdee.internal.default_implementations;
 
 /**
  * A sprite type is a template upon which actual sprite instances (represented
- * by $(Sprite) instances); it contains collections of same-sized images,
+ * by $(D Sprite) instances); it contains collections of same-sized images,
  * animations and animation events.
  *
  * Notice that it has a collection of $(I images), not of $(D Bitmap)s. What I
@@ -244,7 +244,7 @@ public class SpriteType
     *    frame = The frame that will be trigger the event.
     *    eventID = An ID that will be associated with the event data; you can
     *       use this to differentiate between various types of sprite animation
-    *       events. You may wish to use $(fewdee.strid.strID()) to create
+    *       events. You may wish to use $(D fewdee.strid.strID()) to create
     *       integer IDs from short strings.
     */
    public final void addAnimationEvent(
@@ -298,9 +298,9 @@ public class SpriteType
     *
     * $(D _animationEvents[animationName][frameNumber]) yields the list of IDs
     * of the events to generate at that animation frame. Data is added only if
-    * it is present, so it is necessary to check if $(animationName in
-    * _animationEvents) and if $(frameNumber in _animationEvents[animationName])
-    * before accessing the data.
+    * it is present, so it is necessary to check if $(D animationName in
+    * _animationEvents) and if $(D frameNumber in
+    * _animationEvents[animationName]) before accessing the data.
     */
    int[][size_t][string] _animationEvents;
 
@@ -382,7 +382,7 @@ public class Sprite
       return _type;
    }
 
-   /// Ditto.
+   /// Ditto
    public final immutable(SpriteType) type() immutable
    {
       return _type;
@@ -478,7 +478,7 @@ public class Sprite
       return _currentImage;
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void currentImage(size_t index)
    {
       _currentImage = index;

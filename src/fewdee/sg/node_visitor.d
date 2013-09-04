@@ -29,7 +29,7 @@ public class NodeVisitor
    /// Called when visiting a $(D Group). Override as necessary in subclasses.
    public void visit(Group node) { }
 
-   /// Called when visiting a $(S SRT). Override as necessary in subclasses.
+   /// Called when visiting a $(D SRT). Override as necessary in subclasses.
    public void visit(SRT node) { }
 
    /**

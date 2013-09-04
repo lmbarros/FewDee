@@ -54,7 +54,7 @@ public class SRT: Group
     */
    public final @property float x() const { return _x; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void x(float x)
    {
       _x = x;
@@ -69,7 +69,7 @@ public class SRT: Group
     */
    public final @property float y() const { return _y; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void y(float y)
    {
       _y = y;
@@ -79,7 +79,7 @@ public class SRT: Group
    /// The scale along the $(I x) axis.
    public final @property float scaleX() const { return _scaleX; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void scaleX(float scaleX)
    {
       _scaleX = scaleX;
@@ -89,7 +89,7 @@ public class SRT: Group
    /// The scale along the $(I y) axis.
    public final @property float scaleY() const { return _scaleY; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void scaleY(float scaleY)
    {
       _scaleY = scaleY;
@@ -99,7 +99,7 @@ public class SRT: Group
    /// The rotation, in radians. The angle grows in the clockwise direction.
    public final @property float rotation() const { return _rotation; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void rotation(float rotation)
    {
       _rotation = rotation;

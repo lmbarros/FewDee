@@ -38,13 +38,13 @@ mixin template KeyCodeMixin()
       return _keyCode;
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void keyCode(int keyCode)
    {
       _keyCode = keyCode;
    }
 
-   /// Ditto.
+   /// Ditto
    private int _keyCode = ALLEGRO_KEY_MAX;
 }
 
@@ -74,13 +74,13 @@ mixin template JoyMixin()
       return _joy;
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void joy(int joy)
    {
       _joy = joy;
    }
 
-   /// Ditto.
+   /// Ditto
    private int _joy = -1;
 }
 
@@ -109,13 +109,13 @@ mixin template JoyAxisMixin()
       return _joyAxis;
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void joyAxis(int axis)
    {
       _joyAxis = axis;
    }
 
-   /// Ditto.
+   /// Ditto
    private int _joyAxis = -1;
 }
 
@@ -139,13 +139,13 @@ mixin template JoyButtonMixin()
       return _joyButton;
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void joyButton(int button)
    {
       _joyButton = button;
    }
 
-   /// Ditto.
+   /// Ditto
    private int _joyButton = -1;
 }
 
@@ -158,13 +158,13 @@ mixin template ThresholdMixin(float initValue)
       return _threshold;
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void threshold(float threshold)
    {
       _threshold = threshold;
    }
 
-   /// Ditto.
+   /// Ditto
    private float _threshold = initValue;
 }
 

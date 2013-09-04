@@ -93,7 +93,7 @@ public @property InputSource source(const InputHandlerParam p)
    return p._source;
 }
 
-/// Ditto.
+/// Ditto
 public @property void source(ref InputHandlerParam p, InputSource source)
 {
    p._source = source;
@@ -105,73 +105,73 @@ public bool isSourceGUI(const InputHandlerParam p)
    return p._source == InputSource.GUI;
 }
 
-/// Ditto.
+/// Ditto
 public bool isSourceKeyboard(const InputHandlerParam p)
 {
    return p._source == InputSource.KEYBOARD;
 }
 
-/// Ditto.
+/// Ditto
 public bool isSourceMouse(const InputHandlerParam p)
 {
    return p._source == InputSource.MOUSE;
 }
 
-/// Ditto.
+/// Ditto
 public bool isSourceJoy0(const InputHandlerParam p)
 {
    return p._source == InputSource.JOY0;
 }
 
-/// Ditto.
+/// Ditto
 public bool isSourceJoy1(const InputHandlerParam p)
 {
    return p._source == InputSource.JOY1;
 }
 
-/// Ditto.
+/// Ditto
 public bool isSourceJoy2(const InputHandlerParam p)
 {
    return p._source == InputSource.JOY2;
 }
 
-/// Ditto.
+/// Ditto
 public bool isSourceJoy3(const InputHandlerParam p)
 {
    return p._source == InputSource.JOY3;
 }
 
-/// Ditto.
+/// Ditto
 public bool isSourceJoy4(const InputHandlerParam p)
 {
    return p._source == InputSource.JOY4;
 }
 
-/// Ditto.
+/// Ditto
 public bool isSourceJoy5(const InputHandlerParam p)
 {
    return p._source == InputSource.JOY5;
 }
 
-/// Ditto.
+/// Ditto
 public bool isSourceJoy6(const InputHandlerParam p)
 {
    return p._source == InputSource.JOY6;
 }
 
-/// Ditto.
+/// Ditto
 public bool isSourceJoy7(const InputHandlerParam p)
 {
    return p._source == InputSource.JOY7;
 }
 
-/// Ditto.
+/// Ditto
 public bool isSourceJoy8(const InputHandlerParam p)
 {
    return p._source == InputSource.JOY8;
 }
 
-/// Ditto.
+/// Ditto
 public bool isSourceJoy9(const InputHandlerParam p)
 {
    return p._source == InputSource.JOY9;
@@ -238,7 +238,7 @@ class InputTrigger
     */
    public abstract @property ConfigValue memento() inout;
 
-   /// Ditto.
+   /// Ditto
    public abstract @property void memento(const ConfigValue state);
 
    /**
@@ -378,10 +378,10 @@ public immutable TriggerID InvalidTriggerID = 0;
 
 
 /**
- * Base class for $(InputState)s, which store some information that changes as
+ * Base class for $(D InputState)s, which store some information that changes as
  * input events are triggered.
  *
- * $(InputState)s can be used, for example, to easily have a "throttle" or a
+ * $(D InputState)s can be used, for example, to easily have a "throttle" or a
  * "walking direction" value automatically updated in response to low-level
  * events.
  *
@@ -407,7 +407,7 @@ public immutable TriggerID InvalidTriggerID = 0;
  * In order to facilitate all this multiple triggers support, this base class
  * provides the means to manage collections of $(D InputTrigger)s indexed by
  * strings. Subclasses should leverage this to do their own work. (See $(D
- * addTrigger()) and $($D removeTrigger())).
+ * addTrigger()) and $(D removeTrigger())).
  *
  * The $(D update()) method is supposed to, well, update the state. It is called
  * by the $(D StateManager) for each low-level event it receives. A typical
@@ -440,7 +440,7 @@ class InputState
     */
    public abstract @property ConfigValue memento() inout;
 
-   /// Ditto.
+   /// Ditto
    public abstract @property void memento(const ConfigValue state);
 
    /**
@@ -485,7 +485,8 @@ class InputState
    /**
     * Removes a set of triggers from the internal collections of triggers.
     *
-    * This is equivalent to calling $(removeTrigger()) for each ID sequentially.
+    * This is equivalent to calling $(D removeTrigger()) for each ID
+    * sequentially.
     *
     * Parameters:
     *    triggerIDs = The IDs of the triggers to remove.
@@ -579,14 +580,14 @@ class InputState
 
 
 /**
- * Sets the $(InputManager) up so that it can properly work with the constants
+ * Sets the $(D InputManager) up so that it can properly work with the constants
  * describing the high-level input commands and the input states used in your
  * game.
  *
- * This must be called before using the $(InputManager). (Well, not really. This
- * is only really necessary if you want to use its "memento-like" features (see
- * the $(D memento) property). Anyway, calling this will not hurt, so do it
- * always anyway.)
+ * This must be called before using the $(D InputManager). (Well, not
+ * really. This is only really necessary if you want to use its "memento-like"
+ * features (see the $(D memento) property). Anyway, calling this will not hurt,
+ * so do it always anyway.)
  *
  * This function assumes that you are using both commands and states. If you are
  * using only commands or only states, there are other functions you can use
@@ -858,8 +859,8 @@ private class InputManagerImpl: LowLevelEventHandler
     *       initInputStatesConstants()).
     *
     * Returns:
-    *    The input state associated with $(state). If no input state was
-    *    associated with $(state), returns $(D null).
+    *    The input state associated with $(D state). If no input state was
+    *    associated with $(D state), returns $(D null).
     */
    public final @property const(InputState) state(int state) const
    {
@@ -1121,7 +1122,7 @@ private class InputManagerImpl: LowLevelEventHandler
       return c;
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void memento(const ConfigValue state)
    {
       enforce(hasPossiblyEmptyAA(state, "commands"));

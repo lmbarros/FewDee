@@ -208,7 +208,7 @@ public struct BiMap(TypeA, TypeB)
       return _aToB[valueA];
    }
 
-   /// Ditto.
+   /// Ditto
    public final TypeA opIndex(TypeB valueB) inout
    {
       return _bToA[valueB];
@@ -232,7 +232,7 @@ public struct BiMap(TypeA, TypeB)
       return valueA;
    }
 
-   /// Ditto.
+   /// Ditto
    public final TypeB opIndexAssign(TypeB valueB, TypeA valueA)
    {
       const oldA = valueB in _bToA;
@@ -274,7 +274,7 @@ public struct BiMap(TypeA, TypeB)
       return valueB in _bToA;
    }
 
-   /// Ditto.
+   /// Ditto
    public TypeB* opBinaryRight(string op: "in")(TypeA valueA)
    {
       return valueA in _aToB;

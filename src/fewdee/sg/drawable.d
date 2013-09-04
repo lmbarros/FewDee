@@ -34,7 +34,7 @@ public class Drawable: Node
     */
    public final @property float z() const { return z_; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void z(float newZ) { z_ = newZ; }
 
    /// The $(D Drawable)'s "z-order".

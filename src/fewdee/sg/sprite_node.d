@@ -59,7 +59,7 @@ public class SpriteNode: Drawable
       return _sprite.x;
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void x(float x)
    {
       _sprite.x = x;
@@ -72,7 +72,7 @@ public class SpriteNode: Drawable
       return _sprite.y;
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void y(float y)
    {
       _sprite.y = y;
@@ -82,7 +82,7 @@ public class SpriteNode: Drawable
    /// The rotation, in radians.
    public final @property float rotation() const { return _sprite.rotation; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void rotation(float rotation)
    {
       _sprite.rotation = rotation;
@@ -100,7 +100,7 @@ public class SpriteNode: Drawable
    /// The sprite scale along the $(I x) axis.
    public final @property float scaleX() const { return _sprite.scaleX; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void scaleX(float scaleX)
    {
       _sprite.scaleX = scaleX;
@@ -110,7 +110,7 @@ public class SpriteNode: Drawable
    /// The sprite scale along the $(I y) axis.
    public final @property float scaleY() const { return _sprite.scaleY; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void scaleY(float scaleY)
    {
       _sprite.scaleY = scaleY;
@@ -123,13 +123,13 @@ public class SpriteNode: Drawable
       return _sprite.color;
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void color(in Color color)
    {
       _sprite.color = color;
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void color(in ALLEGRO_COLOR color)
    {
       _sprite.color.rgba = color;

@@ -218,7 +218,7 @@ public string nextToken(string data, out Token token)
    }
 
    /**
-    * Reads a string from $(D data), stores the read data in ($D token).
+    * Reads a string from $(D data), stores the read data in $(D token).
     *
     * Returns: $(D true) if the data was successfully read. $(D false)
     *    otherwise, in which case, $(D token) will be an "error token".
@@ -273,7 +273,7 @@ public string nextToken(string data, out Token token)
    }
 
    /**
-    * Reads a number from $(D data), stores the read data in ($D token).
+    * Reads a number from $(D data), stores the read data in $(D token).
     *
     * Returns: $(D true) if the data was successfully read. $(D false)
     *    otherwise, in which case, $(D token) will be an "error token".
@@ -384,7 +384,7 @@ public string nextToken(string data, out Token token)
 
    /**
     * Reads an identifier, a "nil" or a Boolean value from $(D data), stores the
-    * read data in ($D token).
+    * read data in $(D token).
     *
     * Returns: $(D true) if the data was successfully read. $(D false)
     *    otherwise, in which case, $(D token) will be an "error token".
@@ -465,7 +465,7 @@ public string nextToken(string data, out Token token)
 
    /**
     * Reads a "special character" (comma, equals, braces...) from $(D data),
-    * stores the read data in ($D token).
+    * stores the read data in $(D token).
     *
     * Returns: $(D true) if the data was successfully read. $(D false)
     *    otherwise, in which case, $(D token) will be an "error token".

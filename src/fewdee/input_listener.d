@@ -28,10 +28,10 @@ public struct ListenedEvent
  * Listens to input events and make them available in a way that is useful to
  * implement a "configure input" screen.
  *
- * Basically, an $(InputListener) will listen to user input until the first
+ * Basically, an $(D InputListener) will listen to user input until the first
  * input event is triggered; this event is saved and can be queried. In a
  * typical usage, you'd show a message like "press the key you want to use for
- * jumping"; then start an $(InputListener) and query it until an event is
+ * jumping"; then start an $(D InputListener) and query it until an event is
  * available; then you use this information to configure the game input.
  *
  * The $(D InputListener) has properties allowing to configure its behavior in
@@ -57,7 +57,7 @@ class InputListener: LowLevelEventHandler
       return _listenedEvent;
    }
 
-   /// Ditto.
+   /// Ditto
    private ListenedEvent _listenedEvent;
 
    /**
@@ -121,13 +121,13 @@ class InputListener: LowLevelEventHandler
       addIgnoredKeys(keyCodes);
    }
 
-   /// Ditto.
+   /// Ditto
    public final int[] ignoredKeys() inout
    {
       return _ignoredKeys.keys;
    }
 
-   /// Ditto.
+   /// Ditto
    private bool[int] _ignoredKeys; // used as a set, Boolean value is ignored
 
    /**
@@ -142,13 +142,13 @@ class InputListener: LowLevelEventHandler
       _validInputSources = value;
    }
 
-   /// Ditto.
+   /// Ditto
    public final uint validInputSources() inout
    {
       return _validInputSources;
    }
 
-   /// Ditto.
+   /// Ditto
    private uint _validInputSources = ~0;
 
    // Inherit docs.

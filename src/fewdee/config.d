@@ -188,7 +188,7 @@ public struct ConfigValue
     *
     * When using the non-const version and using an index that is larger than
     * the list length, the list resized (with default-constructed
-    * $D(ConfigValue)s as the new items) and the new item at $(D index) is
+    * $(D ConfigValue)s as the new items) and the new item at $(D index) is
     * returned.
     *
     * Using this yields code like $(D value[0]), which is more readable than $(D
@@ -209,7 +209,7 @@ public struct ConfigValue
       return _list[index];
    }
 
-   /// Ditto.
+   /// Ditto
    public ref ConfigValue opIndex(size_t index)
    in
    {
@@ -247,7 +247,7 @@ public struct ConfigValue
       return _aa[key];
    }
 
-   // Ditto.
+   // Ditto
    public ref ConfigValue opIndex(string key)
    in
    {
@@ -901,7 +901,7 @@ body
  * Parameters:
  *    data = The configuration data string.
  *
- * Returns: A $(ConfigValue) of type $(D ConfigValueType.AA) with all the
+ * Returns: A $(D ConfigValue) of type $(D ConfigValueType.AA) with all the
  *    "top-level key/value pairs found in $(D data).
  *
  * Throws:

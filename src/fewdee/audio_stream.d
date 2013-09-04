@@ -112,7 +112,7 @@ public class AudioStream: LowLevelResource
       return al_get_audio_stream_position_secs(_stream);
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void position(float position)
    {
       al_seek_audio_stream_secs(_stream, position);
@@ -139,7 +139,7 @@ public class AudioStream: LowLevelResource
       return al_get_audio_stream_speed(_stream);
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void speed(float speed)
    {
       // Allegro docs don't mention it, but changing the stream speed while
@@ -160,7 +160,7 @@ public class AudioStream: LowLevelResource
       return al_get_audio_stream_gain(_stream);
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void gain(float gain)
    {
       al_set_audio_stream_gain(_stream, gain);
@@ -169,7 +169,7 @@ public class AudioStream: LowLevelResource
    /**
     * The audio balance (this is what Allegro calls "pan").
     *
-    * A value of ($D 0.0) (the default) centers the sound on both speakers; $(D
+    * A value of $(D 0.0) (the default) centers the sound on both speakers; $(D
     * -1.0) plays the sound only through the left speaker; $(D +1.0) plays it
     * only through the right speaker; and intermediate values produce the
     * expected intermediate behavior.
@@ -179,7 +179,7 @@ public class AudioStream: LowLevelResource
       return al_get_audio_stream_pan(_stream);
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void balance(float balance)
    {
       al_set_audio_stream_pan(_stream, balance);

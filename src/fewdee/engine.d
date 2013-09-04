@@ -51,13 +51,13 @@ enum Features
 public scope class Crank
 {
    /**
-    * Creates the $D(Crank), which causes the engine to be started ($(D
+    * Creates the $(D Crank), which causes the engine to be started ($(D
     * fewdee.core.Core.start()) is called).
     *
     * Parameters:
     *    features = The desired engine features. By default, all features are
     *       enabled. If you know that, say keyboard events will not be used in
-    *       your program, you can pass $(Features.D I_WANT_IT_ALL &
+    *       your program, you can pass $(D Features.D I_WANT_IT_ALL &
     *       ~Features.KEYBOARD) here and hope to spare a few microsseconds per
     *       frame.
     */
@@ -67,8 +67,8 @@ public scope class Crank
    }
 
    /**
-    * Destroys the $D(Crank), which causes the engine to be stopped
-    * ($D(fewdee.core.Core.stop()) is called).
+    * Destroys the $(D Crank), which causes the engine to be stopped
+    * ($(D fewdee.core.Core.stop()) is called).
     */
    public ~this()
    {

@@ -141,27 +141,27 @@ public class GameState
    /// Does this $(D GameState) want to receive "tick" events?
    public final @property bool wantsTicks() const { return _wantsTicks; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void wantsTicks(bool wants) { _wantsTicks = wants; }
 
-   /// Ditto.
+   /// Ditto
    private bool _wantsTicks = true;
 
    /// Does this $(D GameState) want to receive events other than "tick"?
    public final @property bool wantsEvents() const { return _wantsEvents; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void wantsEvents(bool wants) { _wantsEvents = wants; }
 
-   /// Ditto.
+   /// Ditto
    private bool _wantsEvents = true;
 
    /// Does this $(D GameState) want to draw?
    public final @property bool wantsToDraw() const { return _wantsToDraw; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void wantsToDraw(bool wants) { _wantsToDraw = wants; }
 
-   /// Ditto.
+   /// Ditto
    private bool _wantsToDraw = true;
 }

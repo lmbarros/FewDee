@@ -112,9 +112,9 @@ private class EventManagerImpl
     * requested type is triggered, the handler will be called.
     *
     * If you are using the $(D StateManager) (which is probably a good idea!),
-    * you may wish to call $(GameState.addHandler()) instead. This method adds
+    * you may wish to call $(D GameState.addHandler()) instead. This method adds
     * what can be seen as a "global" handler, that will get called regardless of
-    * the current game state. $(GameState.addHandler()) will add a
+    * the current game state. $(D GameState.addHandler()) will add a
     * "state-conscious" handler, which will be called only when that state is
     * the current one (or if you explicitly said you wanted that state to
     * receive events even when not on the top of the stack).
@@ -337,8 +337,8 @@ private class EventManagerImpl
    private ALLEGRO_EVENT_SOURCE _customEventSource;
 
    /**
-    * The one and only event queue. Notice that draw events ($D
-    * FEWDEE_EVENT_DRAW) are never added here (nor in any other event queue);
+    * The one and only event queue. Notice that draw events ($(D
+    * FEWDEE_EVENT_DRAW)) are never added here (nor in any other event queue);
     * they are handled separately, in $(D triggerDrawEvent()).
     */
    private ALLEGRO_EVENT_QUEUE* _eventQueue;

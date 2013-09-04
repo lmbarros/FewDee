@@ -57,7 +57,7 @@ class BooleanInputState: InputState
       _value = value;
    }
 
-   /// Ditto.
+   /// Ditto
    final public @property bool defaultDalue()
    {
       return _defaultValue;
@@ -450,43 +450,43 @@ class DirectionInputState: InputState
       return addTrigger("startNorth", trigger);
    }
 
-   /// Ditto.
+   /// Ditto
    public final TriggerID addStartSouthTrigger(InputTrigger trigger)
    {
       return addTrigger("startSouth", trigger);
    }
 
-   /// Ditto.
+   /// Ditto
    public final TriggerID addStartEastTrigger(InputTrigger trigger)
    {
       return addTrigger("startEast", trigger);
    }
 
-   /// Ditto.
+   /// Ditto
    public final TriggerID addStartWestTrigger(InputTrigger trigger)
    {
       return addTrigger("startWest", trigger);
    }
 
-   /// Ditto.
+   /// Ditto
    public final TriggerID addStopNorthTrigger(InputTrigger trigger)
    {
       return addTrigger("stopNorth", trigger);
    }
 
-   /// Ditto.
+   /// Ditto
    public final TriggerID addStopSouthTrigger(InputTrigger trigger)
    {
       return addTrigger("stopSouth", trigger);
    }
 
-   /// Ditto.
+   /// Ditto
    public final TriggerID addStopEastTrigger(InputTrigger trigger)
    {
       return addTrigger("stopEast", trigger);
    }
 
-   /// Ditto.
+   /// Ditto
    public final TriggerID addStopWestTrigger(InputTrigger trigger)
    {
       return addTrigger("stopWest", trigger);

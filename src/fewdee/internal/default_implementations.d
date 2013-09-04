@@ -19,7 +19,7 @@ mixin template ColorableDefaultImplementation(string postSet = "")
       return _color;
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void color(in Color color)
    {
       _color = color;
@@ -30,7 +30,7 @@ mixin template ColorableDefaultImplementation(string postSet = "")
       }
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void color(in ALLEGRO_COLOR color)
    {
       _color.rgba = color;
@@ -58,7 +58,7 @@ mixin template PositionableDefaultImplementation(string postSet = "")
    /// The $(I x) coordinate of the object position.
    public final @property float x() const { return _x; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void x(float x)
    {
       _x = x;
@@ -71,7 +71,7 @@ mixin template PositionableDefaultImplementation(string postSet = "")
    /// The $(I y) coordinate of the object position.
    public final @property float y() const { return _y; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void y(float y)
    {
       _y = y;
@@ -100,7 +100,7 @@ mixin template RotatableDefaultImplementation(string postSet = "")
    /// The object rotation, in radians.
    public final @property float rotation() const { return _rotation; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void rotation(float rotation)
    {
       _rotation = rotation;
@@ -137,7 +137,7 @@ mixin template ScalableDefaultImplementation(string postSet = "")
    /// The object scale along the $(I x) axis.
    public final @property float scaleX() const { return _scaleX; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void scaleX(float scaleX)
    {
       _scaleX = scaleX;
@@ -150,7 +150,7 @@ mixin template ScalableDefaultImplementation(string postSet = "")
    /// The object scale along the $(I y) axis.
    public final @property float scaleY() const { return _scaleY; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void scaleY(float scaleY)
    {
       _scaleY = scaleY;

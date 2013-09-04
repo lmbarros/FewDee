@@ -61,7 +61,7 @@ public class Text: Drawable
    /// The text alignment.
    public final @property Alignment alignment() const { return _alignment; }
 
-   /// Ditto.
+   /// Ditto
    public final @property void alignment(Alignment alignment)
    {
       _alignment = alignment;

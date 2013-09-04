@@ -57,7 +57,7 @@ struct Color
       return _rgba;
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void rgba(in ALLEGRO_COLOR rgba)
    {
       _rgba = rgba;
@@ -90,7 +90,7 @@ struct Color
                _baseColor[2] / 255.0 ];
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void baseColor(in float[3] baseColor)
    {
       _baseColor = [ cast(ubyte)(baseColor[0] * 255),
@@ -105,7 +105,7 @@ struct Color
       return _opacity / 255.0;
    }
 
-   /// Ditto.
+   /// Ditto
    public final @property void opacity(in float opacity)
    {
       _opacity = cast(ubyte)(opacity * 255);
