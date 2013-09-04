@@ -61,7 +61,7 @@ Here is a selection of FewDee features:
   supported out-of-the box (and you can roll your own, if you wish).
 
 * *State Manager:* The good and old game state idiom. Neatly separate
-   the title screen from in-game scree from the inventory screen, from
+   the title screen from in-game screen from the inventory screen, from
    the map screen, from...
 
 * *Audio:* Play audio samples and audio streams. Change their volume,
