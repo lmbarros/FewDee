@@ -33,6 +33,21 @@
                0, 0.2              # bitmap index, time
                1, 0.3              # ditto
                0)                  # bitmap index (no time, lasts forever)`
+    - [2013-09-04 Wed 10:58] Using 'ConfigData' is the obvious
+      approach now. The string could look like this:
+         w = 32
+         h = 32 -- or: size = { 32, 32 }
+         images = {
+            "bmp", 0 , 0,    -- name is resmgr, corner x, corner y
+            "bmp", 32, 32,   -- ditto
+         }
+         animations = {
+            punch = {
+               0, 0.2,  -- image index, time
+               1, 0.3,  -- ditto
+               0, 0.2   -- ditto
+            }
+         }
 *** SpriteTemplates: should them be managed by the ResourceManager?
     - [2013-07-12 Fri 21:54] It could make sense to make the resource
       manager manage the =SpriteTemplate=s.
@@ -89,6 +104,11 @@
       updater. I am thinking about something like this:
       =addGenericUpdater!"opacity"()=. Maybe most of the others could
       be just aliases.
+*** Consider using 'ConfigValue' for initializing the Engine.
+    - [2013-09-04 Wed 11:10] This is just something that came to my
+      mind. I don't know even if this is feasible. Anyway, the idea
+      is to pass things like the set of desired engine features to
+      enable and which screens to create initially.
 * Example TODOs
 *** Consider making all examples "high-level"
     - [2013-09-01 Sun 20:23] Right now, most examples avoid using

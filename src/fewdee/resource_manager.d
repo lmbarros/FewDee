@@ -114,7 +114,8 @@ private enum regexMatchingEverything = "";
  * The real implementation of the Resource Manager. Users shall use this through
  * the $(D ResourceManager) class.
  *
- * TODO: Add some syntax to easily load a bunch of resources.
+ * TODO: Add some syntax to easily load a bunch of resources (using stuff from
+ *    $(D fewdee.config) seems like a good way to go).
  */
 private class ResourceManagerImpl
 {
