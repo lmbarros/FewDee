@@ -24,7 +24,9 @@ FewDee is *written in D* because that's the language I am currently
 enamored with. It's pretty good, you should try it, too :-)
 
 FewDee *uses Allegro* -- and this is an understatement, as you
-actually have to use some of the Allegro API along with FewDee.
+actually have to use some of the Allegro API along with FewDee. (By
+the way, I am using the
+[DAllegro5](https://github.com/SiegeLord/DAllegro5) bindings.)
 
 Features
 --------
