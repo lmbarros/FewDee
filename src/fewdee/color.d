@@ -18,7 +18,7 @@ import allegro5.allegro;
  * premultiplied alpha blending or as in conventional alpha blending.
  *
  * Premultiplied alpha blending has some nice advantages over conventional alpha
- * blending, so FewDee adopts it wholeheartedly. however, conventional alpha
+ * blending, so FewDee adopts it wholeheartedly. However, conventional alpha
  * blending is arguably more intuitive to use in some common situations (for
  * example, when you want to make an object completely transparent and then make
  * it opaque again).
@@ -29,7 +29,7 @@ import allegro5.allegro;
  *
  * This comes at a price, both in space and time. First, some additional space
  * is used by a $(D Color) (in comparison to any more orthodox color
- * representation, like $(D ALLEGRO_COLOR). Second, there is some CPU overhead:
+ * representation, like $(D ALLEGRO_COLOR)). Second, there is some CPU overhead:
  * since internally a $(D Color) effectively keeps two different color
  * representations, it has to keep both of them in-sync whenever a $(D Color)
  * object is updated.
@@ -48,7 +48,7 @@ import allegro5.allegro;
  *    http://home.comcast.net/~tom_forsyth/blog.wiki.html%23%5B%5BPremultiplied%2520alpha%5D%5D,
  *    http://blogs.msdn.com/b/shawnhar/archive/2009/11/06/premultiplied-alpha.aspx
  */
-struct Color
+public struct Color
 {
    /**
     * The RGBA color, normally interpreted as if premultiplied alpha blending is
