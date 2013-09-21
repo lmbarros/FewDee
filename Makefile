@@ -57,6 +57,7 @@ sprite_animation_events.example: examples/sprite_animation_events.d fewdee.a
 game_loop_simple.example: examples/game_loop_simple.d fewdee.a
 game_loop_prediction.example: examples/game_loop_prediction.d fewdee.a
 opengl_simple.example: examples/opengl_simple.d fewdee.a
+	dmd $(DMDFLAGS) $(DMDLINKFLAGS) -L-lGL -of$@ $< fewdee.a
 
 
 # Unit tests
