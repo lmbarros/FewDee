@@ -990,7 +990,7 @@ private class InputManagerImpl: LowLevelEventHandler
                   _joyData[i].axes ~= stickName ~ "/"
                      ~ to!string(al_get_joystick_axis_name(joy, j, k));
 
-                  const serial = _joyData[i].axes.length - 1;
+                  const serial = cast(int)(_joyData[i].axes.length - 1);
                   _joyData[i]._axisToStickAndAxis[serial] =
                      JoyInfo.stickAxis(j, k);
                }

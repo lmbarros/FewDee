@@ -62,7 +62,7 @@ public class Group: Node
     *    returns the index of the first occurrence. If $(D node) is not a child
     *    of this $(D Group), returns a negative number.
     */
-   public int childIndex(in Node node)
+   public ptrdiff_t childIndex(in Node node)
    {
       foreach (index, child; _children)
       {

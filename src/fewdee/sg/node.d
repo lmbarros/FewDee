@@ -28,7 +28,7 @@ public class Node
    }
 
    /// Returns the number of parents this node has.
-   public final @property int numParents() const { return parents_.length; }
+   public final @property size_t numParents() const { return parents_.length; }
 
    unittest
    {

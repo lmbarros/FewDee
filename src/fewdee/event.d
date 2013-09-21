@@ -62,7 +62,7 @@ public @property void deltaTime(ref ALLEGRO_USER_EVENT event, double deltaTime)
       const float asFloat = deltaTime;
       event.data1 = *(cast(intptr_t*)(&asFloat));
    }
-   else if (event.data1.sizeof == double.sizeof)
+   else static if (event.data1.sizeof == double.sizeof)
    {
       event.data1 = *(cast(intptr_t*)(&deltaTime));
    }
@@ -86,7 +86,7 @@ public @property double deltaTime(const ref ALLEGRO_USER_EVENT event)
    {
       return *(cast(float*)(&event.data1));
    }
-   else if (event.data1.sizeof == double.sizeof)
+   else static if (event.data1.sizeof == double.sizeof)
    {
       return *(cast(double*)(&event.data1));
    }
@@ -121,7 +121,7 @@ public @property void totalTime(ref ALLEGRO_USER_EVENT event, double totalTime)
       const float asFloat = totalTime;
       event.data2 = *(cast(intptr_t*)(&asFloat));
    }
-   else if (event.data2.sizeof == double.sizeof)
+   else static if (event.data2.sizeof == double.sizeof)
    {
       event.data2 = *(cast(intptr_t*)(&totalTime));
    }
@@ -145,7 +145,7 @@ public @property double totalTime(const ref ALLEGRO_USER_EVENT event)
    {
       return *(cast(float*)(&event.data2));
    }
-   else if (event.data2.sizeof == double.sizeof)
+   else static if (event.data2.sizeof == double.sizeof)
    {
       return *(cast(double*)(&event.data2));
    }
@@ -171,7 +171,7 @@ unittest
  * FEWDEE_EVENT_DRAW)).
  *
  * D's uniform function call syntax and properties allow to use this just as if
- * an $(D ALLEGRO_USER_EVENT) had a $(D totalTime) member.
+ * an $(D ALLEGRO_USER_EVENT) had a $(D timeSinceTick) member.
  */
 public @property void
 timeSinceTick(ref ALLEGRO_USER_EVENT event, double timeSinceTick)
@@ -181,9 +181,9 @@ timeSinceTick(ref ALLEGRO_USER_EVENT event, double timeSinceTick)
       const float asFloat = timeSinceTick;
       event.data3 = *(cast(intptr_t*)(&asFloat));
    }
-   else if (event.data3.sizeof == double.sizeof)
+   else static if (event.data3.sizeof == double.sizeof)
    {
-      event.data3 = *(cast(intptr_t*)(&totalTime));
+      event.data3 = *(cast(intptr_t*)(&timeSinceTick));
    }
    else
    {
@@ -197,7 +197,7 @@ timeSinceTick(ref ALLEGRO_USER_EVENT event, double timeSinceTick)
  * and returns it.
  *
  * D's uniform function call syntax and properties allow to use this just as if
- * an $(D ALLEGRO_USER_EVENT) had a $(D totalTime) member.
+ * an $(D ALLEGRO_USER_EVENT) had a $(D timeSinceTick) member.
  */
 public @property double timeSinceTick(const ref ALLEGRO_USER_EVENT event)
 {
@@ -205,7 +205,7 @@ public @property double timeSinceTick(const ref ALLEGRO_USER_EVENT event)
    {
       return *(cast(float*)(&event.data3));
    }
-   else if (event.data3.sizeof == double.sizeof)
+   else static if (event.data3.sizeof == double.sizeof)
    {
       return *(cast(double*)(&event.data3));
    }
@@ -248,7 +248,7 @@ public @property void spriteAnimationEventID(
  */
 public @property int spriteAnimationEventID(const ref ALLEGRO_USER_EVENT event)
 {
-   return event.data3;
+   return cast(int)(event.data3);
 }
 
 // Tests spriteAnimationEventID()
