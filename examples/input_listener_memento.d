@@ -10,6 +10,7 @@
 
 import std.file;
 import std.stdio;
+import std.string;
 import fewdee.all;
 
 
@@ -40,8 +41,8 @@ in
 }
 body
 {
-   al_draw_text(
-      theFont, al_map_rgb(255, 255, 255), x, y, ALLEGRO_ALIGN_LEFT, text.ptr);
+   al_draw_text(theFont, al_map_rgb(255, 255, 255), x, y, ALLEGRO_ALIGN_LEFT,
+                text.toStringz);
 }
 
 

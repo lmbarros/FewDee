@@ -10,6 +10,7 @@
  */
 
 import std.exception;
+import std.string;
 import fewdee.all;
 
 // This font is the only resource used in this example. In real programs, you'll
@@ -29,8 +30,8 @@ in
 }
 body
 {
-   al_draw_text(
-      theFont, al_map_rgb(255, 255, 255), x, y, ALLEGRO_ALIGN_LEFT, text.ptr);
+   al_draw_text(theFont, al_map_rgb(255, 255, 255), x, y, ALLEGRO_ALIGN_LEFT,
+                text.toStringz);
 }
 
 
