@@ -780,3 +780,255 @@ class JoyNegAxisUpTrigger: InputTrigger
    /// The axis value the last time $(D didTrigger()) was called.
    private float _prevValue = 0.0;
 }
+
+
+//
+// Composite input triggers
+//
+
+/**
+ * An input trigger that, once starts triggering, keeps triggering regularly
+ * until a certain condition is met.
+ *
+ * An example use case: pressing a certain key will generate a "shot" command,
+ * and, until the key is released, new "shot" events will be generated every
+ * 0.15 second.
+ */
+class RepeatingTrigger: InputTrigger
+{
+   /**
+    * The default constructor; if you use it, you must set the trigger
+    * parameters manually (either via the appropriate properties, or using $(D
+    * memento)).
+    */
+   public this()
+   {
+      startTrigger = new DummyTrigger();
+      stopTrigger = startTrigger;
+   }
+
+   /**
+    * Constructs the trigger.
+    *
+    * Parameters:
+    *    startTrigger = An input trigger used to detect if this $(D
+    *       RepeatingTrigger) shall start to trigger.
+    *    stopTrigger = An input trigger used to detect if this $(D
+    *       RepeatingTrigger) shall stop to trigger.
+    *    repeatInterval = The time, in seconds, to wait between two consecutive
+    *       triggerings.
+    *    startTriggering = Start the trigger in a "triggering state"? If $(D
+    *       true), the trigger will start to trigger periodically as soon as it
+    *       is constructed (until $(D stopTrigger) triggers). If $(D false), the
+    *       trigger will start triggering only after $(D startTrigger) triggers.
+    *
+    */
+   public this(InputTrigger startTrigger, InputTrigger stopTrigger,
+               double repeatInterval, bool startTriggering = false)
+   in
+   {
+      assert(startTrigger !is null);
+      assert(stopTrigger !is null);
+   }
+   body
+   {
+      this.startTrigger = startTrigger;
+      this.stopTrigger = stopTrigger;
+      this.repeatInterval = repeatInterval;
+      _isTriggering = startTriggering;
+   }
+
+   // Inherit docs.
+   public override bool didTrigger(in ref ALLEGRO_EVENT event,
+                                   out InputHandlerParam param)
+   {
+      if (_isTriggering)
+      {
+         if (_stopTrigger.didTrigger(event, param))
+         {
+            _isTriggering = false;
+            return false;
+         }
+         else // is still triggering
+         {
+            if (event.any.timestamp >= _timeOfNextTrigger)
+            {
+               _timeOfNextTrigger += _repeatInterval;
+               return true;
+            }
+            else
+            {
+               return false;
+            }
+         }
+      }
+      else if (!_isTriggering && _startTrigger.didTrigger(event, param))
+      {
+         _isTriggering = true;
+         _timeOfNextTrigger = event.any.timestamp + _repeatInterval;
+         return true;
+      }
+
+      return false;
+   }
+
+   // Inherit docs.
+   public override @property ConfigValue memento() inout
+   {
+      ConfigValue c;
+      c.makeAA();
+      c["class"] = className;
+      c["startTrigger"] = startTrigger.memento;
+      c["stopTrigger"] = stopTrigger.memento;
+      c["repeatInterval"] = repeatInterval;
+
+      return c;
+   }
+
+   // Inherit docs.
+   public override @property void memento(const ConfigValue state)
+   {
+      enforce(state.hasString("class"));
+      enforce(state.hasAA("startTrigger"));
+      enforce(state.hasAA("stopTrigger"));
+      enforce(state.hasNumber("repeatInterval"));
+      enforce(state["class"] == className);
+
+      startTrigger = makeInputTrigger(state["startTrigger"]);
+      stopTrigger = makeInputTrigger(state["stopTrigger"]);
+      repeatInterval = state["repeatInterval"].asNumber;
+   }
+
+   /// The trigger used to start the sequence of triggerings.
+   public final @property inout(InputTrigger) startTrigger() inout
+   {
+      return _startTrigger;
+   }
+
+   /// Ditto
+   public final @property void startTrigger(InputTrigger startTrigger)
+   {
+      _startTrigger = startTrigger;
+   }
+
+   /// Ditto
+   private InputTrigger _startTrigger = null;
+
+   /// The trigger used to stop the sequence of triggerings.
+   public final @property inout(InputTrigger) stopTrigger() inout
+   {
+      return _stopTrigger;
+   }
+
+   /// Ditto
+   public final @property void stopTrigger(InputTrigger stopTrigger)
+   {
+      _stopTrigger = stopTrigger;
+   }
+
+   /// Ditto
+   private InputTrigger _stopTrigger = null;
+
+   /// The interval, in seconds, between two consecutive, automatic triggerings.
+   public final @property double repeatInterval() inout
+   {
+      return _repeatInterval;
+   }
+
+   /// Ditto
+   public final @property void repeatInterval(double repeatInterval)
+   {
+      _repeatInterval = repeatInterval;
+   }
+
+   /// Ditto
+   private double _repeatInterval;
+
+   /// The time the next triggering will occur.
+   private double _timeOfNextTrigger;
+
+   /**
+    * Are we in a triggering state?
+    *
+    * We'll not trigger if this is not $(D true).
+    */
+   private bool _isTriggering;
+}
+
+
+//
+// Miscellaneous input triggers
+//
+
+/**
+ * An input trigger that never triggers (or always triggers).
+ *
+ * This is
+ */
+class DummyTrigger: InputTrigger
+{
+   /**
+    * The default constructor; if you use it, you must set the trigger
+    * parameters manually (either via the appropriate properties, or using $(D
+    * memento)).
+    */
+   public this() { }
+
+   /**
+    * Constructs the trigger.
+    *
+    * Parameters:
+    *    alwaysTriggers = Shall this trigger always trigger? (If not, it never
+    *       triggers.)
+    */
+   public this(bool alwaysTriggers = false)
+   {
+      this.alwaysTriggers = alwaysTriggers;
+   }
+
+   // Inherit docs.
+   public override bool didTrigger(in ref ALLEGRO_EVENT event,
+                                   out InputHandlerParam param)
+   {
+      return alwaysTriggers;
+   }
+
+   // Inherit docs.
+   public override @property ConfigValue memento() inout
+   {
+      ConfigValue c;
+      c.makeAA();
+      c["class"] = className;
+      c["alwaysTriggers"] = alwaysTriggers;
+
+      return c;
+   }
+
+   // Inherit docs.
+   public override @property void memento(const ConfigValue state)
+   {
+      enforce(state.hasString("class"));
+      enforce(state.hasBoolean("alwaysTriggers"));
+      enforce(state["class"] == className);
+      alwaysTriggers = state["alwaysTriggers"].asBoolean;
+   }
+
+   /**
+    * Shall this trigger always trigger?
+    *
+    * If not, it will never trigger.
+    */
+   public final @property bool alwaysTriggers() inout
+   {
+      return _alwaysTriggers;
+   }
+
+   /// Ditto
+   public final @property void alwaysTriggers(bool alwaysTriggers)
+   {
+      _alwaysTriggers = alwaysTriggers;
+   }
+
+   /// Ditto
+   private bool _alwaysTriggers = false;
+}
