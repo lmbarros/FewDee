@@ -135,6 +135,18 @@ public class Display
       al_destroy_display(_display);
    }
 
+   /// The display width, in pixels.
+   public final @property int width()
+   {
+      return al_get_display_width(_display);
+   }
+
+   /// The display height, in pixels.
+   public final @property int height()
+   {
+      return al_get_display_height(_display);
+   }
+
    /// The Allegro object representing the Display.
    private ALLEGRO_DISPLAY* _display;
 
@@ -264,6 +276,20 @@ private class DisplayManagerImpl
    body
    {
       al_set_target_backbuffer(_displays[displayName]._display);
+   }
+
+   /**
+    * Returns a given $(D Display).
+    *
+    * Parameters:
+    *    displayName = The name of the desired display.
+    *
+    * Returns:
+    *    The requested display; $(D null), if no such display exists.
+    */
+   public final inout(Display) getDisplay(string displayName) inout
+   {
+      return *(displayName in _displays);
    }
 
    /// The collection of $(D Display)s, indexed by their string keys.
