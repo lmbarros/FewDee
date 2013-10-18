@@ -39,20 +39,29 @@ public class GameState
    }
 
    /**
-    * Pops this state from the stack of Game States. If there is an state
-    * underneath this one, its $(D onDigOut()) method will be called.
+    * Pops this state (and possibly other states) from the stack of Game
+    * States.
+
+    * If there is an state underneath the popped ones ones, its $(D onDigOut())
+    * method will be called.
     *
     * This must be called by the state on the top of the stack. Failing to
     * observe this rule will trigger an $(D assert()).
+    *
+    * Parameters:
+    *    numStates = The number of states to pop. Requesting to pop more states
+    *       than the current number of states in the stack is an error, which
+    *       will trigger an $(D assert()). Also, this value must be larger
+    *       than zero.
     */
-   public final void popState()
+   public final void popState(int numStates = 1)
    in
    {
       assert(this is StateManager.top);
    }
    body
    {
-      StateManager.popState();
+      StateManager.popState(numStates);
    }
 
    /**

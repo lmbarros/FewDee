@@ -147,7 +147,7 @@ private class StateManagerImpl: LowLevelEventHandler
       }
 
       // Allow just one push or pop per tick. See "Policies" in class' docs.
-      if (_poppedState !is null || _pushedState !is null)
+      if (_poppedStates.length != 0 || _pushedState !is null)
          return;
 
       // Set state so that 'endTick()' can complete the operation later.
@@ -155,22 +155,31 @@ private class StateManagerImpl: LowLevelEventHandler
    }
 
    /**
-    * Pops the state on the top of the stack of Game States. The destructor of
-    * the popped state is called.
+    * Pops one or more states from the top of the stack of Game States.
+    *
+    * Popping doesn't occur immediately, but at the end of the current tick. The
+    * destructor of the popped states is called as the states are popped.
+    *
+    * Parameters:
+    *    numStates = The number of states to pop. Requesting to pop more states
+    *       than the current number of states in the stack is an error, which
+    *       will trigger an $(D assert()). Also, this value must be larger
+    *       than zero.
     */
-   public final void popState()
+   public final void popState(int numStates = 1)
    in
    {
-      assert(_states.length > 0);
+      assert(numStates > 0);
+      assert(_states.length >= numStates);
    }
    body
    {
       // Allow just one push or pop per tick. See "Policies" in class' docs.
-      if (_poppedState !is null || _pushedState !is null)
+      if (_poppedStates.length != 0 || _pushedState !is null)
          return;
 
       // Set state so that 'endTick()' can complete the operation later.
-      _poppedState = _states[$-1];
+      _poppedStates = _states[$-numStates .. $];
    }
 
    /**
@@ -186,12 +195,12 @@ private class StateManagerImpl: LowLevelEventHandler
    body
    {
       // Allow just one push or pop per tick. See "Policies" in class' docs.
-      if (_poppedState !is null || _pushedState !is null)
+      if (_poppedStates.length != 0 || _pushedState !is null)
          return;
 
       // Set state so that 'endTick()' can complete the operation later.
       _pushedState = state;
-      _poppedState = _states[$-1];
+      _poppedStates = [ _states[$-1] ];
    }
 
    /**
@@ -204,6 +213,8 @@ private class StateManagerImpl: LowLevelEventHandler
     */
    public final override void handleEvent(in ref ALLEGRO_EVENT event)
    {
+      import std.algorithm;
+
       foreach (key, handlers; _eventHandlers)
       {
          const keyType = key[1];
@@ -212,6 +223,7 @@ private class StateManagerImpl: LowLevelEventHandler
             continue;
 
          const keyState = key[0];
+         const keyStateIsPopped = _poppedStates.canFind(keyState);
 
          foreach (handler; _eventHandlers[key])
          {
@@ -224,7 +236,7 @@ private class StateManagerImpl: LowLevelEventHandler
             // As per the policies in the class' docs, don't handle events for
             // newly pushed or popped states. States being "dug out" will handle
             // events if wanting to ('_pushedState' will be null in this case)
-            if (wants && keyState !is _pushedState && keyState !is _poppedState)
+            if (wants && keyState !is _pushedState && !keyStateIsPopped)
                handler(event);
          }
       }
@@ -236,23 +248,24 @@ private class StateManagerImpl: LowLevelEventHandler
     */
    public override void endTick()
    {
-      if (_poppedState !is null && _pushedState !is null) // replace
+      if (_poppedStates.length != 0 && _pushedState !is null) // replace
       {
-         assert(_states.length > 0);
-         assert(_poppedState is _states[$-1]);
+         assert(_states.length >= _poppedStates.length);
 
          removeAllStateHandlers(_states[$-1]);
          destroy(_states[$-1]);
          _states[$-1] = _pushedState;
       }
-      else if (_poppedState !is null) // pop
+      else if (_poppedStates.length != 0) // pop
       {
-         assert(_states.length > 0);
-         assert(_poppedState is _states[$-1]);
+         assert(_states.length >= _poppedStates.length);
 
-         removeAllStateHandlers(_states[$-1]);
-         destroy(_states[$-1]);
-         _states = _states[0 .. $-1];
+         foreach (poppedState; _poppedStates)
+         {
+            removeAllStateHandlers(poppedState);
+            destroy(poppedState);
+         }
+         _states = _states[0 .. $ - _poppedStates.length];
 
          if (_states.length > 0)
             _states[$-1].onDigOut();
@@ -266,17 +279,17 @@ private class StateManagerImpl: LowLevelEventHandler
       }
 
       // Tick is over. Clean up internal state for the next tick.
-      _poppedState = null;
+      _poppedStates = [ ];
       _pushedState = null;
    }
 
    /**
-    * The state that was popped (or replaced) during the current tick. Used in
+    * The states that were popped (or replaced) during the current tick. Used in
     * the communication between $(D pushState()), $(D popState()), $(D
-    * replaceState()) and $(D endTick()). $(D null) if no state was popped
+    * replaceState()) and $(D endTick()). An empty array if no state was popped
     * during the current tick.
     */
-   private GameState _poppedState = null;
+   private GameState[] _poppedStates;
 
    /**
     * The state that was pushed (or replaced another one) during the current
