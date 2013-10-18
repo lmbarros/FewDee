@@ -770,21 +770,6 @@ private class InputManagerImpl: LowLevelEventHandler
       return _commandHandlers.remove(handlerID);
    }
 
-   /**
-    * Removes a set of triggers from the internal collections of triggers.
-    *
-    * This is equivalent to calling $(D removeTrigger()) for each ID
-    * sequentially.
-    *
-    * Parameters:
-    *    triggerIDs = The IDs of the triggers to remove.
-    */
-   public final void removeTriggers(TriggerID[] triggerIDs)
-   {
-      foreach (id; triggerIDs)
-         _triggers.remove(id);
-   }
-
    /// The collection of command handlers.
    private
       BucketedCollection!(CommandHandler, int, CommandHandlerID,
