@@ -103,7 +103,7 @@ The Future
 
 As I write this (October 22nd, 2013), I wrote a single game protoype
 to showcase FewDee: [Anytris](https://bitbucket.org/lmb/anytris) (and
-it doesn't really use much of FewDee offers.)
+it doesn't really use much of what FewDee offers.)
 
 Before that,I have used an early version of FewDee to develop a single
 game prototype. After that, I redesigned and rewrote lots of things
