@@ -101,10 +101,13 @@ documentation and a set of examples.
 The Future
 ----------
 
-As I write this (September 4th, 2013), I have used an early version of
-FewDee to develop a single game prototype. After that, I redesigned
-and rewrote lots of things that didn't worked well in this first
-experiment.
+As I write this (October 22nd, 2013), I wrote a single game protoype
+to showcase FewDee: [Anytris](https://bitbucket.org/lmb/anytris) (and
+it doesn't really use much of FewDee offers.)
+
+Before that,I have used an early version of FewDee to develop a single
+game prototype. After that, I redesigned and rewrote lots of things
+that didn't worked well in this first experiment.
 
 My plan now is to focus on using FewDee on some game prototypes,
 instead of working on the library itself. So, the next FewDee updates
