@@ -21,6 +21,50 @@ import fewdee.internal.singleton;
 
 
 /**
+ * Returns the memory address of the given $(D GameState).
+ *
+ * We use the address of the $(D GameState)s as part of a key in an associative
+ * array, that's why this function is needed.
+ */
+private @property void* address(const GameState state)
+{
+   return cast(void*)state;
+}
+
+
+/**
+ * Returns the $(D GameState) located at a given memory address.
+ *
+ * We use the address of the $(D GameState)s as part of a key in an associative
+ * array, that's why this function is needed.
+ */
+private @property const(GameState) gameState(void* stateAddr)
+{
+   return cast(const(GameState))stateAddr;
+}
+
+
+/**
+ * Tells the GC to no longer move a given $(D GameState) around the memory.
+ *
+ * This is pretty low-level stuff. Since we use the address of the $(D
+ * GameState)s as part of a key in an associative array, we don't want to have a
+ * garbage collector moving this memory around. This function sets the necessary
+ * flags to pin $(D state) into its current memory location.
+ *
+ * This isn't the ideal solution (too low-level, to begin with), but right now
+ * D's garbage collector doesn't move objects around the memory anyway (so,
+ * while the GC doesn't change, this function is effectively a no-op).
+ */
+private void disableGCMoving(GameState state)
+{
+   import core.memory;
+   GC.setAttr(state.address, GC.BlkAttr.NO_MOVE);
+}
+
+
+
+/**
  * The real implementation of the State Manager. Users shall use this through
  * the $(D StateManager) class.
  *
@@ -127,6 +171,9 @@ private class StateManagerImpl: LowLevelEventHandler
    /// Pushes a state into the stack of Game States.
    public final void pushState(GameState state)
    {
+      // Don't move 'state' around the memory; see disableGCMoving() docs.
+      state.disableGCMoving();
+
       // The first push must do the real pushing at the moment this is called
       // (and not latter, when 'endTick()' is called). The reason is related to
       // the form of a typical main loop:
@@ -194,6 +241,9 @@ private class StateManagerImpl: LowLevelEventHandler
    }
    body
    {
+      // Don't move 'state' around the memory; see disableGCMoving() docs.
+      state.disableGCMoving();
+
       // Allow just one push or pop per tick. See "Policies" in class' docs.
       if (_poppedStates.length != 0 || _pushedState !is null)
          return;
@@ -222,7 +272,7 @@ private class StateManagerImpl: LowLevelEventHandler
          if (keyType != event.type)
             continue;
 
-         const keyState = key[0];
+         const keyState = key[0].gameState;
          const keyStateIsPopped = _poppedStates.canFind(keyState);
 
          foreach (handler; _eventHandlers[key])
@@ -317,7 +367,7 @@ private class StateManagerImpl: LowLevelEventHandler
    package final EventHandlerID addHandler(
       in GameState state, ALLEGRO_EVENT_TYPE eventType, EventHandler handler)
    {
-      auto key = tuple(state, eventType);
+      auto key = tuple(state.address, eventType);
 
       if (key !in _eventHandlers)
          _eventHandlers[key] = typeof(_eventHandlers[key]).init;
@@ -365,7 +415,7 @@ private class StateManagerImpl: LowLevelEventHandler
 
       foreach (key, handlers; _eventHandlers)
       {
-         const keyState = key[0];
+         const keyState = key[0].gameState;
          if (state is keyState)
             toRemove ~= key;
       }
@@ -374,8 +424,15 @@ private class StateManagerImpl: LowLevelEventHandler
          _eventHandlers.remove(key);
    }
 
-   /// A pair of a $(D GameState) and an event type.
-   private alias Tuple!(const(GameState), ALLEGRO_EVENT_TYPE) stateTypePair;
+   /**
+    * A pair of a pointer to a $(D GameState) and an event type.
+    *
+    * Using pointers to objects (specially as a $(D void*)) doesn't really look
+    * good. However, it was the easiest solution to fix a runtime error I
+    * started getting after upgrading to DMD 2.064. (Prior to using a pointer, I
+    * used the object itself here.)
+    */
+   private alias Tuple!(void*, ALLEGRO_EVENT_TYPE) stateTypePair;
 
    /**
     * The collection of all registered event handlers.
