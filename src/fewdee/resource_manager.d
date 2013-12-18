@@ -183,6 +183,40 @@ public class ResourceManager
 }
 
 
+/**
+ * Shortcut functions to get resources from the Resource Manager.
+ *
+ * Yeah, we all love Unix but, no, that $(D rm) in the function names doesn't
+ * mean "remove"; it stands for "Resource Manager". Sure, it is somewhat
+ * redundant, since this is all in a $(D resource_manager) module already. But I
+ * wanted to avoid having to use fully-qualified names (these are shortcuts,
+ * after all), and using names like "font" and "bitmap" would be asking for
+ * naming conflicts.
+ */
+Bitmap rmBitmap(string key)
+{
+   return ResourceManager.bitmaps[key];
+}
+
+/// Ditto
+Font rmFont(string key)
+{
+   return ResourceManager.fonts[key];
+}
+
+/// Ditto
+AudioSample rmSample(string key)
+{
+   return ResourceManager.samples[key];
+}
+
+/// Ditto
+AudioStream rmStream(string key)
+{
+   return ResourceManager.streams[key];
+}
+
+
 
 //
 // Unit tests
