@@ -836,15 +836,15 @@ body
  * The format of configuration strings is a subset of the Lua programming
  * language. Why Lua? Because it works great as a data description language and
  * because I use Lua anyway whenever I have to embed a scripting language into
- * some other program something (so to makes sense to use the same format). Why
- * a $(I subset) of Lua? Because I didn't want to re-implement Lua in D; I just
- * wanted to implement something quickly that provided enough data description
+ * some other program (so it makes sense to use the same format). Why a $(I
+ * subset) of Lua? Because I didn't want to re-implement Lua in D; I just wanted
+ * to implement something quickly that provided enough data description
  * capabilities for my needs, and which worked at compile-time.
  *
  * So, what's supported? Well, a configuration string is a sequence of
  * assignments in the format "key = value". The key must be a valid identifier
  * (you know, alphanumeric characters and underscores, but not starting with a
- * digit nor being a reserved word like "nil). The values must be one of the
+ * digit nor being a reserved word like "nil"). The values must be one of the
  * following:
  *
  * $(UL
