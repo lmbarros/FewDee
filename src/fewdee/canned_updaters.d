@@ -268,7 +268,7 @@ addScaleUpdater(Scalable)(Updater updater, Scalable target,
  * Parameters:
  *    updater = The $(D Updater) to which the updater function will be added.
  *    target = The object whose rotation will be updated.
- *    destAlpha = The desired target rotation, in radians.
+ *    destRotation = The desired target rotation, in radians.
  *    duration = The time, in seconds, it will take to go from the current to
  *       the target rotation.
  *    maker = A function that will be used to create the necessary
