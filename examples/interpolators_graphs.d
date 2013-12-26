@@ -400,7 +400,7 @@ void main()
          delegate(in ref ALLEGRO_EVENT event)
          {
             al_clear_to_color(al_map_rgb(255, 255, 255));
-            al_draw_bitmap(bmpBG, 0.0, 0.0, 0);
+            bmpBG.draw(0.0, 0.0);
             drawGraph();
          });
 

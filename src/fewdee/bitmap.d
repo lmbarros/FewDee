@@ -72,6 +72,182 @@ public class Bitmap: LowLevelResource
    }
 
    /**
+    * Draw the bitmap to the current render target (normally, the default
+    * screen).
+    *
+    * Different overloads are provided, each one accepting arguments in
+    * different orders, or in a slightly different fashion.
+    *
+    * Parameters:
+    *   x = The horizontal coordinate of the point where the bitmap will be
+    *      drawn. This is in pixels, in the target coordinate system.
+    *   y = The vertical coordinate of the point where the bitmap will be
+    *      drawn. This is in pixels, in the target coordinate system.
+    *   tint = The colors of the bitmap are multiplied by this one.
+    *   rotation = The angle of rotation, in radians. Rotation is measured in
+    *      the clockwise direction.
+    *   scaleX = The scale factor to apply in the horizontal axis.
+    *   scaleY = The scale factor to apply in the vertical axis.
+    *   centerX = The horizontal coordinate of the bitmap center, around which
+    *      scale and rotation will be performed (and also the point that will be
+    *      drawn at the ($(D x), $(D y)) coordinates passed as parameter).
+    *   centerY = The vertical coordinate of the bitmap center, around which
+    *      scale and rotation will be performed (and also the point that will be
+    *      drawn at the ($(D x), $(D y)) coordinates passed as parameter).
+    *   height = The width of the region to draw, in pixels.
+    *   flags = The drawing flags, passed directly to Allegro. As of this
+    *      writing, $(D flags) must be a combination of $(D
+    *      ALLEGRO_FLIP_HORIZONTAL) and $(D ALLEGRO_FLIP_VERTICAL).
+    */
+   public final void draw(float x, float y, int flags = 0)
+   {
+      // Could have used al_draw_bitmap() here for somewhat simpler code. As of
+      // now (December, 2014), however, the simpler Allegro functions simply
+      // call the more complex ones, so calling this one can actually be
+      // marginally faster, since some function calls are spared. (Or is the
+      // average linker/optimizer nowadays smarter than I think?)
+      al_draw_tinted_scaled_rotated_bitmap(
+         _bitmap,
+         al_map_rgba_f(1.0, 1.0, 1.0, 1.0),
+         0.0, 0.0,
+         x, y,
+         1.0, 1.0,
+         0.0,
+         flags);
+   }
+
+   /// Ditto
+   public final void draw(float x, float y,
+                          float[4] tint,
+                          float rotation = 0.0,
+                          float scaleX = 1.0, float scaleY = 1.0,
+                          float centerX = 0.0, float centerY = 0.0,
+                          int flags = 0)
+   {
+      al_draw_tinted_scaled_rotated_bitmap(
+         _bitmap,
+         al_map_rgba_f(tint[0], tint[1], tint[2], tint[3]),
+         centerX, centerY,
+         x, y,
+         scaleX, scaleY,
+         rotation,
+         flags);
+   }
+
+   // Ditto
+   public final void draw(float x, float y,
+                          float rotation,
+                          float scaleX = 1.0, float scaleY = 1.0,
+                          float[4] tint = [ 1.0, 1.0, 1.0, 1.0 ],
+                          float centerX = 0.0, float centerY = 0.0,
+                          int flags = 0)
+   {
+      al_draw_tinted_scaled_rotated_bitmap(
+         _bitmap,
+         al_map_rgba_f(tint[0], tint[1], tint[2], tint[3]),
+         centerX, centerY,
+         x, y,
+         scaleX, scaleY,
+         rotation,
+         flags);
+   }
+
+   /**
+    * Draw a region of the bitmap to the current render target (normally, the
+    * default screen).
+    *
+    * Different overloads are provided, each one accepting arguments in
+    * different orders, or in a slightly different fashion.
+    *
+    * Parameters:
+    *   x = The horizontal coordinate of the point where the bitmap will be
+    *      drawn. This is in pixels, in the target coordinate system.
+    *   y = The vertical coordinate of the point where the bitmap will be
+    *      drawn. This is in pixels, in the target coordinate system.
+    *   tint = The colors of the bitmap are multiplied by this one.
+    *   rotation = The angle of rotation, in radians. Rotation is measured in
+    *      the clockwise direction.
+    *   scaleX = The scale factor to apply in the horizontal axis.
+    *   scaleY = The scale factor to apply in the vertical axis.
+    *   centerX = The horizontal coordinate of the bitmap center, around which
+    *      scale and rotation will be performed (and also the point that will be
+    *      drawn at the ($(D x), $(D y)) coordinates passed as parameter).
+    *   centerY = The vertical coordinate of the bitmap center, around which
+    *      scale and rotation will be performed (and also the point that will be
+    *      drawn at the ($(D x), $(D y)) coordinates passed as parameter).
+    *   srcX = The horizontal coordinate of the top-left corner of the region to
+    *      draw, in pixels.
+    *   srcY = The vertical coordinate of the top-left corner of the region to
+    *      draw, in pixels.
+    *   width = The width of the region to draw, in pixels.
+    *   height = The width of the region to draw, in pixels.
+    *   flags = The drawing flags, passed directly to Allegro. As of this
+    *      writing, $(D flags) must be a combination of $(D
+    *      ALLEGRO_FLIP_HORIZONTAL) and $(D ALLEGRO_FLIP_VERTICAL).
+    */
+   public final void drawRegion(float x, float y, float srcX, float srcY,
+                                float width, float height, int flags = 0)
+   {
+      // Could have used al_draw_bitmap_region() here for somewhat simpler
+      // code. As of now (December, 2014), however, the simpler Allegro
+      // functions simply call the more complex ones, so calling this one can
+      // actually be marginally faster, since some function calls are
+      // spared. (Or is the average linker/optimizer nowadays smarter than I
+      // think?)
+      al_draw_tinted_scaled_rotated_bitmap_region(
+         _bitmap,
+         srcX, srcY, width, height,
+         al_map_rgba_f(1.0, 1.0, 1.0, 1.0),
+         0.0, 0.0,
+         x, y,
+         1.0, 1.0,
+         0.0,
+         flags);
+   }
+
+   /// Ditto
+   public final void drawRegion(float x, float y,
+                                float srcX, float srcY,
+                                float width, float height,
+                                float[4] tint,
+                                float rotation = 0.0,
+                                float scaleX = 1.0, float scaleY = 1.0,
+                                float centerX = 0.0, float centerY = 0.0,
+                                int flags = 0)
+   {
+      al_draw_tinted_scaled_rotated_bitmap_region(
+         _bitmap,
+         srcX, srcY, width, height,
+         al_map_rgba_f(tint[0], tint[1], tint[2], tint[3]),
+         centerX, centerY,
+         x, y,
+         scaleX, scaleY,
+         rotation,
+         flags);
+   }
+
+   // Ditto
+   public final void drawRegion(float x, float y,
+                                float srcX, float srcY,
+                                float width, float height,
+                                float rotation,
+                                float scaleX = 1.0, float scaleY = 1.0,
+                                float[4] tint = [ 1.0, 1.0, 1.0, 1.0 ],
+                                float centerX = 0.0, float centerY = 0.0,
+                                int flags = 0)
+   {
+      al_draw_tinted_scaled_rotated_bitmap_region(
+         _bitmap,
+         srcX, srcY, width, height,
+         al_map_rgba_f(tint[0], tint[1], tint[2], tint[3]),
+         centerX, centerY,
+         x, y,
+         scaleX, scaleY,
+         rotation,
+         flags);
+   }
+
+   /**
     * The wrapped $(D ALLEGRO_BITMAP*). This is public just to make the $(D
     * alias this) work.
     */

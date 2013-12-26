@@ -101,7 +101,7 @@ void main()
             // We start by clearing the background to white, then using the
             // Allegro API do draw a background image.
             al_clear_to_color(al_map_rgb(255, 255, 255));
-            al_draw_bitmap(bmpBG, 0.0, 0.0, 0);
+            bmpBG.draw(0.0, 0.0);
 
             // Here's our OpenGL code.
             drawWithOpenGL();

@@ -400,18 +400,19 @@ public class Sprite
 
       auto image = _type._images[_currentImage];
 
-      al_draw_tinted_scaled_rotated_bitmap_region(
-         image.bitmap,
-         image.x, image.y,
-         _type.width, _type.height,
-         color,
-         _type.centerX, _type.centerY,
+      float[4] rgba;
+      al_unmap_rgba_f(color, &rgba[0], &rgba[1], &rgba[2], &rgba[3]);
+
+      image.bitmap.drawRegion(
          x, y,
-         scaleX, scaleY,
+         cast(float)image.x, cast(float)image.y,
+         cast(float)_type.width, cast(float)_type.height,
+         rgba,
          rotation,
+         scaleX, scaleY,
+         _type.centerX, _type.centerY,
          flags);
    }
-
 
    /**
     * Draws the $(D Sprite), with parameters that allow to override some (or
@@ -424,7 +425,7 @@ public class Sprite
     *
     * Calling this function using its default parameters is functionally the
     * same thing as calling $(D draw()) (possibly a bit slower, however). When
-    * you passing at least one of its arguments with a value different than the
+    * passing at least one of its arguments with a value different than the
     * default, the value passed is used in the drawing operation, instead of the
     * corresponding $(D Sprite) property. For example, if you pass $(D 1.23) in
     * the $(D rotation) parameter, this value is used for the sprite rotation,
@@ -458,15 +459,22 @@ public class Sprite
 
       auto image = _type._images[_currentImage];
 
-      al_draw_tinted_scaled_rotated_bitmap_region(
-         image.bitmap, image.x, image.y, _type.width, _type.height,
-         color.isValid ? color : this.color,
-         _type.centerX, _type.centerY,
+      float[4] rgba;
+      if (color.isValid)
+         al_unmap_rgba_f(color, &rgba[0], &rgba[1], &rgba[2], &rgba[3]);
+      else
+         al_unmap_rgba_f(this.color, &rgba[0], &rgba[1], &rgba[2], &rgba[3]);
+
+      image.bitmap.drawRegion(
          isNaN(x) ? this.x : x,
          isNaN(y) ? this.y : y,
+         cast(float)image.x, cast(float)image.y,
+         cast(float)_type.width, cast(float)_type.height,
+         rgba,
+         isNaN(rotation) ? this.rotation : rotation,
          isNaN(scaleX) ? this.scaleX : scaleX,
          isNaN(scaleY) ? this.scaleY : scaleY,
-         isNaN(rotation) ? this.rotation : rotation,
+         _type.centerX, _type.centerY,
          flags);
    }
 
