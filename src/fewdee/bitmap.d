@@ -12,6 +12,7 @@ import std.exception;
 import std.string;
 import allegro5.allegro;
 import fewdee.allegro_manager;
+import fewdee.color;
 import fewdee.engine;
 import fewdee.low_level_resource;
 
@@ -118,7 +119,7 @@ public class Bitmap: LowLevelResource
 
    /// Ditto
    public final void draw(float x, float y,
-                          float[4] tint,
+                          in ref Color tint,
                           float rotation = 0.0,
                           float scaleX = 1.0, float scaleY = 1.0,
                           float centerX = 0.0, float centerY = 0.0,
@@ -126,7 +127,7 @@ public class Bitmap: LowLevelResource
    {
       al_draw_tinted_scaled_rotated_bitmap(
          _bitmap,
-         al_map_rgba_f(tint[0], tint[1], tint[2], tint[3]),
+         tint,
          centerX, centerY,
          x, y,
          scaleX, scaleY,
@@ -138,13 +139,13 @@ public class Bitmap: LowLevelResource
    public final void draw(float x, float y,
                           float rotation,
                           float scaleX = 1.0, float scaleY = 1.0,
-                          float[4] tint = [ 1.0, 1.0, 1.0, 1.0 ],
+                          in ref Color tint = WhiteColor,
                           float centerX = 0.0, float centerY = 0.0,
                           int flags = 0)
    {
       al_draw_tinted_scaled_rotated_bitmap(
          _bitmap,
-         al_map_rgba_f(tint[0], tint[1], tint[2], tint[3]),
+         tint,
          centerX, centerY,
          x, y,
          scaleX, scaleY,
@@ -209,7 +210,7 @@ public class Bitmap: LowLevelResource
    public final void drawRegion(float x, float y,
                                 float srcX, float srcY,
                                 float width, float height,
-                                float[4] tint,
+                                in ref Color tint,
                                 float rotation = 0.0,
                                 float scaleX = 1.0, float scaleY = 1.0,
                                 float centerX = 0.0, float centerY = 0.0,
@@ -218,7 +219,7 @@ public class Bitmap: LowLevelResource
       al_draw_tinted_scaled_rotated_bitmap_region(
          _bitmap,
          srcX, srcY, width, height,
-         al_map_rgba_f(tint[0], tint[1], tint[2], tint[3]),
+         tint,
          centerX, centerY,
          x, y,
          scaleX, scaleY,
@@ -232,14 +233,14 @@ public class Bitmap: LowLevelResource
                                 float width, float height,
                                 float rotation,
                                 float scaleX = 1.0, float scaleY = 1.0,
-                                float[4] tint = [ 1.0, 1.0, 1.0, 1.0 ],
+                                in ref Color tint = WhiteColor,
                                 float centerX = 0.0, float centerY = 0.0,
                                 int flags = 0)
    {
       al_draw_tinted_scaled_rotated_bitmap_region(
          _bitmap,
          srcX, srcY, width, height,
-         al_map_rgba_f(tint[0], tint[1], tint[2], tint[3]),
+         tint,
          centerX, centerY,
          x, y,
          scaleX, scaleY,

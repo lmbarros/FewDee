@@ -400,14 +400,11 @@ public class Sprite
 
       auto image = _type._images[_currentImage];
 
-      float[4] rgba;
-      al_unmap_rgba_f(color, &rgba[0], &rgba[1], &rgba[2], &rgba[3]);
-
       image.bitmap.drawRegion(
          x, y,
          cast(float)image.x, cast(float)image.y,
          cast(float)_type.width, cast(float)_type.height,
-         rgba,
+         color,
          rotation,
          scaleX, scaleY,
          _type.centerX, _type.centerY,
@@ -453,24 +450,18 @@ public class Sprite
    public final void drawOverriding(
       float x = float.nan, float y = float.nan,
       float scaleX = float.nan, float scaleY = float.nan,
-      float rotation = float.nan, Color color = InvalidColor,)
+      float rotation = float.nan, Color color = InvalidColor)
    {
       enum flags = 0;
 
       auto image = _type._images[_currentImage];
-
-      float[4] rgba;
-      if (color.isValid)
-         al_unmap_rgba_f(color, &rgba[0], &rgba[1], &rgba[2], &rgba[3]);
-      else
-         al_unmap_rgba_f(this.color, &rgba[0], &rgba[1], &rgba[2], &rgba[3]);
 
       image.bitmap.drawRegion(
          isNaN(x) ? this.x : x,
          isNaN(y) ? this.y : y,
          cast(float)image.x, cast(float)image.y,
          cast(float)_type.width, cast(float)_type.height,
-         rgba,
+         color.isValid ? color : this.color,
          isNaN(rotation) ? this.rotation : rotation,
          isNaN(scaleX) ? this.scaleX : scaleX,
          isNaN(scaleY) ? this.scaleY : scaleY,
