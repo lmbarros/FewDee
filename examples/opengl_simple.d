@@ -109,8 +109,8 @@ void main()
             // And then we draw some text over everything, just to give that
             // feeling that one can really mix OpenGL with FewDee/Allegro
             // freely.
-            al_draw_text(theFont, al_map_rgb(10, 20, 30), 25, 200,
-                         ALLEGRO_ALIGN_LEFT, "Look, ma! An OpenGL triangle!");
+            theFont.drawText("Look, ma! An OpenGL triangle!",
+                             25, 200);
          });
 
       // Create a display

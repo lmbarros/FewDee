@@ -37,14 +37,6 @@ void main()
       // free it manually latter.
       Font font = new Font("data/lato.otf", 22);
 
-      // Lil' function to draw text on the display
-      void drawText(string text, float x, float y)
-      {
-         al_draw_text(
-            font, al_map_rgb(255, 255, 255), x, y, ALLEGRO_ALIGN_LEFT,
-            text.toStringz);
-      }
-
       // Register event handlers
 
       // Start an updater when the mouse is clicked. Notice that many instances
@@ -92,10 +84,10 @@ void main()
          delegate(in ref ALLEGRO_EVENT event)
          {
             al_clear_to_color(al_map_rgb(50, 50, 50));
-            drawText("Updater simple example", 30, 30);
-            drawText("Click to start updater (and watch your console!)",
-                     50, 60);
-            drawText("Press ESC to quit", 50, 90);
+            font.drawText("Updater simple example", 30, 30);
+            font.drawText("Click to start updater (and watch your console!)",
+                          50, 60);
+            font.drawText("Press ESC to quit", 50, 90);
          });
 
       // Create a display

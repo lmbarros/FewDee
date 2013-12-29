@@ -13,6 +13,7 @@ import allegro5.allegro;
 import allegro5.allegro_font;
 import fewdee.aabb;
 import fewdee.color;
+import fewdee.font;
 import fewdee.sg.drawable;
 import fewdee.internal.default_implementations;
 
@@ -43,7 +44,7 @@ public class Text: Drawable
     *    font = The font to use to when drawing the text.
     *    text = Text to use when drawing the text.
     */
-   this(ALLEGRO_FONT* font, string text)
+   this(Font font, string text)
    in
    {
       assert(font !is null);
@@ -57,7 +58,7 @@ public class Text: Drawable
    /// Draws the text to the current target bitmap.
    public override void draw()
    {
-      al_draw_text(_font, color, x, y, _alignment, _text.ptr);
+      _font.drawText(_text, x, y, color, _alignment,);
    }
 
    /// The text alignment.
@@ -94,7 +95,7 @@ public class Text: Drawable
    }
 
    /// The font used to draw the text.
-   private ALLEGRO_FONT* _font;
+   private Font _font;
 
    /// The text itself.
    private string _text;

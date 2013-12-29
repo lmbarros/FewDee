@@ -29,13 +29,6 @@ void main()
       enum fontSpacing = fontSize * 1.3;
       Font font = new Font("data/lato.otf", fontSize);
 
-      // Helper function, to draw text on the screen
-      void drawText(string text, float x, float y)
-      {
-         al_draw_text(font, al_map_rgb(255, 255, 255), x, y, ALLEGRO_ALIGN_LEFT,
-                      text.toStringz);
-      }
-
       // Quit if ESC is pressed
       EventManager.addHandler(
          ALLEGRO_EVENT_KEY_DOWN,
@@ -66,23 +59,23 @@ void main()
          {
             al_clear_to_color(al_map_rgb(50, 50, 50));
 
-            drawText("InputManager joysticks example (ESC to quit)",
-                     15, fontSize);
+            font.drawText("InputManager joysticks example (ESC to quit)",
+                          15, fontSize);
 
             auto y = 15 + fontSpacing;
 
             foreach (joy; InputManager.joysticks)
             {
                // Joystick name
-               drawText("Joystick: '" ~ joy.name ~ "'", 15, y);
+               font.drawText("Joystick: '" ~ joy.name ~ "'", 15, y);
                y += fontSpacing;
 
                // Joystick buttons
-               drawText("Buttons: " ~ join(joy.buttons.dup, ", "), 30, y);
+               font.drawText("Buttons: " ~ join(joy.buttons.dup, ", "), 30, y);
                y += fontSpacing;
 
                // Joystick axes
-               drawText("Axes: " ~ join(joy.axes.dup, ", "), 30, y);
+               font.drawText("Axes: " ~ join(joy.axes.dup, ", "), 30, y);
                y += fontSpacing;
             }
          });

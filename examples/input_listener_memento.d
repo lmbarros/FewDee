@@ -30,22 +30,6 @@ enum configFile = "input_listener_memento.cfg";
 // management manually.
 private Font theFont;
 
-// We'll want to draw some text, so here is something that will help us. Again,
-// we are avoiding to use higher level abstractions provided by FewDee, in order
-// to focus on what this example is supposed to be about. Anyway, notice how the
-// FewDee wrappers (like Font) work seamlessly with the Allegro API.
-private void drawText(string text, float x, float y)
-in
-{
-   assert(theFont !is null);
-}
-body
-{
-   al_draw_text(theFont, al_map_rgb(255, 255, 255), x, y, ALLEGRO_ALIGN_LEFT,
-                text.toStringz);
-}
-
-
 void main()
 {
    al_run_allegro(
@@ -158,9 +142,13 @@ private class MainGameState: GameState
          delegate(in ref ALLEGRO_EVENT event)
          {
             al_clear_to_color(al_map_rgb(10, 10, 50));
-            drawText("Initial State", 30, 30);
-            drawText("Generate some events and watch the console", 50, 60);
-            drawText("Press F10 to configure input; ESC to quit", 50, 90);
+            theFont.drawText("Initial State", 30, 30);
+            theFont.drawText(
+               "Generate some events and watch the console",
+               50, 60);
+            theFont.drawText(
+               "Press F10 to configure input; ESC to quit",
+               50, 90);
          });
 
    }
@@ -254,9 +242,9 @@ private class ConfigInputState: GameState
                : "Enter key for firing.";
 
             al_clear_to_color(al_map_rgb(50, 10, 10));
-            drawText("Configuring Input", 30, 30);
-            drawText(msg, 50, 60);
-            drawText("Press ESC to cancel input configuration", 50, 90);
+            theFont.drawText("Configuring Input", 30, 30);
+            theFont.drawText(msg, 50, 60);
+            theFont.drawText("Press ESC to cancel input configuration", 50, 90);
          });
 
       // The "tick" event handler is where most of the magic happens. It is here

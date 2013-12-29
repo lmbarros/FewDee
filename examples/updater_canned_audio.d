@@ -29,13 +29,6 @@ void main()
 
       auto font = new Font("data/lato.otf", 22);
 
-      // Lil' function to draw text on the display
-      void drawText(string text, float x, float y)
-      {
-         al_draw_text(font, al_map_rgb(255, 255, 255), x, y, ALLEGRO_ALIGN_LEFT,
-                      text.toStringz);
-      }
-
       auto stream = new AudioStream("data/Bassa_Island_Game_Loop.ogg");
       stream.playMode = ALLEGRO_PLAYMODE.ALLEGRO_PLAYMODE_LOOP;
       stream.play();
@@ -144,8 +137,9 @@ void main()
          delegate(in ref ALLEGRO_EVENT event)
          {
             al_clear_to_color(al_map_rgb_f(0.1, 0.1, 0.1));
-            drawText("Pressing some keys will make the audio playing change.",
-                     20.0, 240.0);
+            font.drawText(
+               "Pressing some keys will make the audio playing change.",
+               20.0, 240.0);
          });
 
       // Create a display

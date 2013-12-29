@@ -192,6 +192,14 @@ public immutable Color InvalidColor = {
 };
 
 
+/// White, as a $(D Color).
+public immutable Color WhiteColor = {
+   ALLEGRO_COLOR(1.0, 1.0, 1.0, 1.0),
+   [1, 1, 1],
+   1
+};
+
+
 // Theoretically, ALLEGRO_COLOR is an opaque type that should be accessed only
 // through functions like al_map_rgba_f(). However, being able to initialize it
 // directly simplifies the code a lot. So, here we just make sure that the

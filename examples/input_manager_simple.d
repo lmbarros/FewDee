@@ -55,13 +55,6 @@ void main()
       // free it manually latter.
       Font font = new Font("data/lato.otf", 22);
 
-      // Helper function, to draw text on the screen
-      void drawText(string text, float x, float y)
-      {
-         al_draw_text(font, al_map_rgb(255, 255, 255), x, y, ALLEGRO_ALIGN_LEFT,
-                      text.toStringz);
-      }
-
       // Prior to using the InputManager, we have to tell it which constants
       // we'll be using for commands and states. We do this by calling
       // initInputConstants(). (If you are using only commands, or only states,
@@ -182,11 +175,11 @@ void main()
          delegate(in ref ALLEGRO_EVENT event)
          {
             al_clear_to_color(al_map_rgb(50, 50, 50));
-            drawText("InputManager simple example", 30, 30);
-            drawText("Generate some events and watch the console", 50, 60);
-            drawText("Press ESC to quit", 50, 90);
+            font.drawText("InputManager simple example", 30, 30);
+            font.drawText("Generate some events and watch the console", 50, 60);
+            font.drawText("Press ESC to quit", 50, 90);
 
-            drawText("Direction: " ~ to!string(TheDirection), 50, 150);
+            font.drawText("Direction: " ~ to!string(TheDirection), 50, 150);
          });
 
       // Create a display

@@ -19,22 +19,6 @@ import fewdee.all;
 private Font theFont;
 
 
-// We'll want to draw some text, so here is something that will help us. Again,
-// we are avoiding to use higher level abstractions provided by FewDee, in order
-// to focus on what this example is supposed to be about. Anyway, notice how the
-// FewDee wrappers (like Font) work seamlessly with the Allegro API.
-private void drawText(string text, float x, float y)
-in
-{
-   assert(theFont !is null);
-}
-body
-{
-   al_draw_text(theFont, al_map_rgb(255, 255, 255), x, y, ALLEGRO_ALIGN_LEFT,
-                text.toStringz);
-}
-
-
 // This is the state in which the example starts.
 private class InitialState: GameState
 {
@@ -62,9 +46,9 @@ private class InitialState: GameState
                  delegate(in ref ALLEGRO_EVENT event)
                  {
                     al_clear_to_color(al_map_rgb(10, 10, 50));
-                    drawText("Initial State", 30, 30);
-                    drawText("Press space to push a State A", 50, 60);
-                    drawText("Press ESC to quit", 50, 90);
+                    theFont.drawText("Initial State", 30, 30);
+                    theFont.drawText("Press space to push a State A", 50, 60);
+                    theFont.drawText("Press ESC to quit", 50, 90);
                  });
    }
 };
@@ -94,11 +78,13 @@ private class StateA: GameState
                  delegate(in ref ALLEGRO_EVENT event)
                  {
                     al_clear_to_color(al_map_rgb(50, 10, 10));
-                    drawText("State A", 30, 30);
-                    drawText("Press ESC to go back to the initial state",
-                             50, 60);
-                    drawText("Press \"B\" to replace this state with State B",
-                             50, 90);
+                    theFont.drawText("State A", 30, 30);
+                    theFont.drawText(
+                       "Press ESC to go back to the initial state",
+                       50, 60);
+                    theFont.drawText(
+                       "Press \"B\" to replace this state with State B",
+                       50, 90);
                  });
    }
 }
@@ -124,11 +110,13 @@ private class StateB: GameState
                  delegate(in ref ALLEGRO_EVENT event)
                  {
                     al_clear_to_color(al_map_rgb(10, 50, 10));
-                    drawText("State B", 30, 30);
-                    drawText("Press ESC to go back to the initial state",
-                             50, 60);
-                    drawText("Press \"A\" to replace this state with State A",
-                             50, 90);
+                    theFont.drawText("State B", 30, 30);
+                    theFont.drawText(
+                       "Press ESC to go back to the initial state",
+                       50, 60);
+                    theFont.drawText(
+                       "Press \"A\" to replace this state with State A",
+                       50, 90);
                  });
    }
 }

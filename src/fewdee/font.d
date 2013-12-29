@@ -10,8 +10,10 @@ module fewdee.font;
 
 import std.exception;
 import std.string;
+import allegro5.allegro;
 import allegro5.allegro_font;
 import fewdee.allegro_manager;
+import fewdee.color;
 import fewdee.engine;
 import fewdee.low_level_resource;
 
@@ -54,6 +56,29 @@ public class Font: LowLevelResource
    {
       al_destroy_font(_font);
       _font = null;
+   }
+
+   /**
+    * Draws some text to the current render target using this font.
+    *
+    * Parameters:
+    *   text = The text to draw.
+    *   x = The horizontal coordinate of the point where the text will be drawn,
+    *      in pixels, measured from the left.
+    *   y = The vertical coordinate of the point where the text will be drawn,
+    *      in pixels, measured from the top.
+    *   color = The color to use when drawing the text.
+    *   flags = Flags passed directly to Allegro's $(D al_draw_text()).
+    *
+    * TODO:
+    *    Add some Allegro-free mean to request the text alignment.
+    */
+   public final void drawText(in string text, float x, float y,
+                              Color color = WhiteColor,
+                              int flags = ALLEGRO_ALIGN_LEFT)
+   {
+      import std.string;
+      al_draw_text(_font, color, x, y, flags, text.toStringz);
    }
 
    /**
