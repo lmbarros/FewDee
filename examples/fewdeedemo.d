@@ -42,7 +42,7 @@ void main()
       sprite.color = al_map_rgba_f(0.2, 0.2, 0.2, 0.2);
 
       // Create a text
-      auto text = new Text(ResourceManager.fonts["font"], "Hi! Âçënts, tóô!");
+      auto text = new Text(rmFont("font"), "Hi! Âçënts, tóô!");
       text.alignment = Text.Alignment.RIGHT;
       text.x = 400;
       text.y = 25;
@@ -154,6 +154,18 @@ void main()
             al_clear_to_color(al_map_rgb(200, 200, 0));
             text.draw();
             sprite.draw();
+
+            rmFont("font").drawBorderedText(
+               "This text has a thin border!", 10, 350,
+               Color(0.9, 0.9, 0.9, 1.0),
+               Color(0.1, 0.1, 0.1, 1.0),
+               0.75);
+
+            rmFont("font").drawBorderedText(
+               "This text has a thick border!", 10, 400,
+               Color(0.9, 0.9, 0.9, 1.0),
+               Color(0.1, 0.1, 0.1, 1.0),
+               1.8);
          });
 
       // Create a display

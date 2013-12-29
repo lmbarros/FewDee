@@ -50,6 +50,20 @@ import allegro5.allegro;
  */
 public struct Color
 {
+   /// Constructs a $(D Color) from its (pre-multiplied) components.
+   public this(float r, float g, float b, float a)
+   {
+      rgba = al_map_rgba_f(r, g, b, a);
+   }
+
+   private this(float pmR, float pmG, float pmB, float pmA,
+                ubyte tR, ubyte tG, ubyte tB, ubyte tA)
+   {
+      _rgba = ALLEGRO_COLOR(pmR, pmG, pmB, pmA);
+      _baseColor = [ tR, tG, tB ];
+      _opacity = tA;
+   }
+
    /**
     * The RGBA color, normally interpreted as if premultiplied alpha blending is
     * being used.
@@ -185,19 +199,16 @@ public struct Color
  *
  * See_also: Color.isValid
  */
-public immutable Color InvalidColor = {
-   ALLEGRO_COLOR(float.nan, float.nan, float.nan, float.nan),
-   [0, 0, 0],
-   0
-};
-
+public immutable InvalidColor = Color(
+   float.nan, float.nan, float.nan, float.nan,
+   0, 0, 0, 0
+);
 
 /// White, as a $(D Color).
-public immutable Color WhiteColor = {
-   ALLEGRO_COLOR(1.0, 1.0, 1.0, 1.0),
-   [1, 1, 1],
-   1
-};
+public immutable WhiteColor = Color(
+   1.0, 1.0, 1.0, 1.0,
+   1, 1, 1, 1
+);
 
 
 // Theoretically, ALLEGRO_COLOR is an opaque type that should be accessed only

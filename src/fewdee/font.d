@@ -82,6 +82,50 @@ public class Font: LowLevelResource
    }
 
    /**
+    * Draws some text with a border to the current render target using this
+    * font.
+    *
+    * This is actually a bit of hack. The border is merely the result of drawing
+    * the text multiple times with small offsets from the position where the
+    * text itself will be drawn. Results may be better or worse depending on the
+    * font used, its size, and offset used.
+    *
+    * Parameters:
+    *   text = The text to draw.
+    *   x = The horizontal coordinate of the point where the text will be drawn,
+    *      in pixels, measured from the left.
+    *   y = The vertical coordinate of the point where the text will be drawn,
+    *      in pixels, measured from the top.
+    *   textColor = The color to use when drawing the text.
+    *   borderColor = The color of the border to use when drawing the text.
+    *   borderOffset = The offset to use when drawing the border. This is
+    *      roughly equals to the border width, in pixels. Experiment with this
+    *      value until you find one that works nicely with the font you are
+    *      using.
+    *   flags = Flags passed directly to Allegro's $(D al_draw_text()).
+    *
+    * TODO:
+    *    Add some Allegro-free mean to request the text alignment.
+    */
+   public final void drawBorderedText(in string text, float x, float y,
+                                      Color textColor,
+                                      Color borderColor,
+                                      float borderOffset,
+                                      int flags = ALLEGRO_ALIGN_LEFT)
+   {
+      import std.string;
+      auto s = text.toStringz;
+      alias borderOffset o;
+
+      al_draw_text(_font, borderColor, x+o, y+o, flags, s);
+      al_draw_text(_font, borderColor, x+o, y-o, flags, s);
+      al_draw_text(_font, borderColor, x-o, y+o, flags, s);
+      al_draw_text(_font, borderColor, x-o, y-o, flags, s);
+
+      al_draw_text(_font, textColor, x, y, flags, s);
+   }
+
+   /**
     * The wrapped $(D ALLEGRO_FONT*). This is public just to make the $(D alias
     * this) work.
     */
