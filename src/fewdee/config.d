@@ -109,14 +109,16 @@ public struct ConfigValue
    }
 
    /// Constructs a $(D ConfigValue) with a "number" type.
-   public this(double data)
+   public this(T)(T data)
+      if (isNumeric!T)
    {
       _type = ConfigValueType.NUMBER;
       _number = data;
    }
 
    /// Constructs a $(D ConfigValue) with a "Boolean" type.
-   public this(bool data)
+   public this(T)(T data)
+      if (is(T == bool))
    {
       _type = ConfigValueType.BOOLEAN;
       _boolean = data;
