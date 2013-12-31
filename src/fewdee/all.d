@@ -30,6 +30,7 @@ public import fewdee.config;
 public import fewdee.display_manager;
 public import fewdee.engine;
 public import fewdee.event;
+public import fewdee.event_handler_set;
 public import fewdee.event_manager;
 public import fewdee.font;
 public import fewdee.game_loop;
