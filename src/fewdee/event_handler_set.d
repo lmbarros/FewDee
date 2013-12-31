@@ -6,7 +6,7 @@
  * Authors: Leandro Motta Barros
  */
 
-module fewdee.internal.event_handler_set;
+module fewdee.event_handler_set;
 
 
 /**
