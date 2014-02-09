@@ -240,8 +240,11 @@ private class EventManagerImpl
 
       // Call handlers for all pending events (and this includes the tick event
       // we just emitted)
-      foreach (llHandler, dummy; _lowLevelEventHandlers)
-         llHandler.beginTick();
+      foreach (handler, dummy; _lowLevelEventHandlers)
+      {
+         if (handler.isActive)
+            handler.beginTick();
+      }
 
       ALLEGRO_EVENT event;
       while (al_get_next_event(_eventQueue, &event))
@@ -253,13 +256,19 @@ private class EventManagerImpl
          }
 
          foreach (handler, dummy; _lowLevelEventHandlers)
-            handler.handleEvent(event);
+         {
+            if (handler.isActive)
+               handler.handleEvent(event);
+         }
 
          doPostHandlingEventCleanup(event);
       }
 
-      foreach (llHandler, dummy; _lowLevelEventHandlers)
-         llHandler.endTick();
+      foreach (handler, dummy; _lowLevelEventHandlers)
+      {
+         if (handler.isActive)
+            handler.endTick();
+      }
    }
 
    /**

@@ -47,6 +47,14 @@ package interface LowLevelEventHandlerInterface
     *    2.063) doesn't seem to like $(D package) virtual functions.
     */
    public abstract void endTick();
+
+   /**
+    * Is this handler active?
+    *
+    * Inactive handlers don't have their $(D handleEvent()), $(D beginTick())
+    * and $(D endTick()) methods called.
+    */
+   public abstract @property bool isActive() const;
 }
 
 
@@ -77,8 +85,10 @@ package mixin template LowLevelEventHandlerAutoRegister()
  * An interface to be implemented by whoever wants to handle events in a
  * lower-than usual level.
  *
- * As long as a $(D LowLevelEventHandler) lives, it will have its $(D
- * handleEvent()) method called for every event triggered.
+ * As long as a $(D LowLevelEventHandler) lives and $(D isActive), it will have
+ * its $(D handleEvent()) method called for every event triggered.
+ *
+ * In newly constructed $(D LowLevelEventHandler), $(D isActive) is $(D true).
  */
 public abstract class LowLevelEventHandler: LowLevelEventHandlerInterface
 {
@@ -108,4 +118,24 @@ public abstract class LowLevelEventHandler: LowLevelEventHandlerInterface
     *    2.063) doesn't seem to like $(D package) virtual functions.
     */
    public override void endTick() { }
+
+   /**
+    * Is this $(D LowLevelEventHandler) active?
+    *
+    * An inactive $(D LowLevelEventHandler) doesn't have its $(D handleEvent)
+    * method called.
+    */
+   public final @property void isActive(bool active)
+   {
+      _isActive = active;
+   }
+
+   /// Ditto
+   public override @property bool isActive() const
+   {
+      return _isActive;
+   }
+
+   /// Ditto
+   private bool _isActive = true;
 }

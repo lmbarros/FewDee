@@ -163,6 +163,9 @@ public class TickBasedUpdater: Updater, LowLevelEventHandlerInterface
     *    2.063) doesn't seem to like $(D package) virtual functions.
     */
    public override void endTick() { }
+
+   /// Is this $(D Updater) active?
+   public override @property bool isActive() const { return true; }
 }
 
 
@@ -208,4 +211,7 @@ public class DrawBasedUpdater: Updater, LowLevelEventHandlerInterface
     *    2.063) doesn't seem to like $(D package) virtual functions.
     */
    public override void endTick() { }
+
+   /// Is this $(D Updater) active?
+   public override @property bool isActive() const { return true; }
 }
